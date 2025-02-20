@@ -13,38 +13,55 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.models.HomeHorModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomeHorAdapter extends RecyclerView.Adapter<HomeHorAdapter.ViewHolder> {
     Context context;
-    List<HomeHorModel> list;
-    public HomeHorAdapter(Context context, List<HomeHorModel> list){
+    ArrayList id, name, email, phone, image;
+    public HomeHorAdapter(Context context,
+                          ArrayList id,
+                          ArrayList name,
+                          ArrayList email,
+                          ArrayList phone,
+                          ArrayList image){
         this.context = context;
-        this.list = list;
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.image = image;
     }
     @NonNull
     @Override
     public HomeHorAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.home_horizontal_item,parent,false));
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.my_row,parent,false);
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull HomeHorAdapter.ViewHolder holder, int position) {
-        holder.imageView.setImageResource(list.get(position).getImage());
-        holder.textView.setText(list.get(position).getName());
+       holder.user_id_txt.setText(String.valueOf(id.get(position)));
+        holder.user_name.setText(String.valueOf(name.get(position)));
+        holder.email.setText(String.valueOf(email.get(position)));
+        holder.phone.setText(String.valueOf(phone.get(position)));
+        holder.image.setText(String.valueOf(image.get(position)));
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return id.size();
     }
     public class ViewHolder extends RecyclerView.ViewHolder{
-        ImageView imageView;
-        TextView textView;
+        TextView user_id_txt, user_name, email,phone,image;
         public ViewHolder(@NonNull View itemView){
             super(itemView);
-            imageView = itemView.findViewById(R.id.hor_img);
-            textView = itemView.findViewById(R.id.hor_text);
+            user_id_txt = itemView.findViewById(R.id.user_id_txt);
+            user_name = itemView.findViewById(R.id.user_name);
+            email = itemView.findViewById(R.id.email);
+            phone = itemView.findViewById(R.id.phone);
+            image = itemView.findViewById(R.id.image);
         }
     }
 }
