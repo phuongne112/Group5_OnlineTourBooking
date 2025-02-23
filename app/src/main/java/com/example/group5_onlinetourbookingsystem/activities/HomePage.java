@@ -2,26 +2,16 @@ package com.example.group5_onlinetourbookingsystem.activities;
 
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.HomeFragment;
 import com.example.group5_onlinetourbookingsystem.ProfileFragment;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.SearchFragment;
-import com.example.group5_onlinetourbookingsystem.adapters.HomeHorAdapter;
-import com.example.group5_onlinetourbookingsystem.models.HomeHorModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class HomePage extends AppCompatActivity {
     private RecyclerView homeHorizontalRec;

@@ -32,4 +32,18 @@
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:textColor="@android:color/holo_blue_dark" />
+    <ImageView
+        android:id="@+id/tour_image"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/microphone" />
+    <TextView
+        android:id="@+id/textCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Category: Adventure"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"/>
+
 </LinearLayout>
