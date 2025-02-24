@@ -10,15 +10,19 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SnapHelper;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.adapters.CategoryAdapter;
+import com.example.group5_onlinetourbookingsystem.adapters.CategoryPageAdapter;
 import com.example.group5_onlinetourbookingsystem.adapters.TourAdapter;
 import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
 import com.example.group5_onlinetourbookingsystem.models.TourModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
     private RecyclerView recyclerViewTours, recyclerViewCategories;
@@ -36,11 +40,14 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        if (getContext() == null) return view;
+
         databaseHelper = new MyDatabaseHelper(getContext());
 
-        // Cấu hình RecyclerView cho danh mục
+        // 👉 Cấu hình RecyclerView danh mục (phân trang)
         recyclerViewCategories = view.findViewById(R.id.recyclerViewCategories);
-        recyclerViewCategories.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 1, RecyclerView.HORIZONTAL, false);
+        recyclerViewCategories.setLayoutManager(layoutManager);
 
         categoryList = databaseHelper.getAllCategories();
         if (categoryList.isEmpty()) {
@@ -48,17 +55,27 @@ public class HomeFragment extends Fragment {
             categoryList = databaseHelper.getAllCategories(); // Lấy lại danh sách sau khi thêm
         }
 
-        categoryAdapter = new CategoryAdapter(getContext(), categoryList);
-        recyclerViewCategories.setAdapter(categoryAdapter);
+        // 👉 Chia danh mục thành các trang nhỏ (6 mục/trang)
+        List<List<CategoryModel>> categoryPages = paginateCategories(categoryList, 6);
 
-        // Cấu hình RecyclerView cho danh sách tour
+        // 👉 Dùng CategoryPageAdapter (bọc CategoryAdapter)
+        CategoryPageAdapter pageAdapter = new CategoryPageAdapter(getContext(), categoryPages, category -> {
+            // Xử lý click danh mục
+        });
+        recyclerViewCategories.setAdapter(pageAdapter);
+
+        // 👉 Thêm hiệu ứng cuộn theo từng trang
+        SnapHelper snapHelper = new PagerSnapHelper();
+        snapHelper.attachToRecyclerView(recyclerViewCategories);
+
+        // 👉 Cấu hình RecyclerView tour
         recyclerViewTours = view.findViewById(R.id.recycler_view);
         recyclerViewTours.setLayoutManager(new LinearLayoutManager(getContext()));
 
         tourList = databaseHelper.getAllTours();
         if (tourList.isEmpty()) {
             addSampleTours();
-            tourList = databaseHelper.getAllTours(); // Lấy lại danh sách sau khi thêm
+            tourList = databaseHelper.getAllTours();
         }
 
         tourAdapter = new TourAdapter(getContext(), tourList);
@@ -71,16 +88,41 @@ public class HomeFragment extends Fragment {
         databaseHelper.addCategory("Du lịch núi", "travel");
         databaseHelper.addCategory("Du lịch biển", "travel");
         databaseHelper.addCategory("Du lịch thành phố", "travel");
+        databaseHelper.addCategory("Du lịch Trời", "travel");
+        databaseHelper.addCategory("Du lịch tây ", "travel");
+        databaseHelper.addCategory("Du lịch thái", "travel");
+        databaseHelper.addCategory("Du lịch B", "travel");
+        databaseHelper.addCategory("Du lịch A", "travel");
+        databaseHelper.addCategory("Du lịch C phố", "travel");
+        databaseHelper.addCategory("Du lịch D", "travel");
+        databaseHelper.addCategory("Du lịch E ", "travel");
+        databaseHelper.addCategory("Du lịch F", "travel");
     }
 
     private void addSampleTours() {
-        databaseHelper.addTour("Tour Đà Lạt", "Đà Lạt", 150.0, 3, "travel", 1);
-        databaseHelper.addTour("Tour Phú Quốc", "Phú Quốc", 200.0, 4, "welcome_png", 2);
-        databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 180.0, 2, "travel", 3);
-        databaseHelper.addTour("Tour Sapa2", "Sapa", 220.0, 5, "travel", 3);
-        databaseHelper.addTour("Tour Đà Lạt", "Đà Lạt", 150.0, 3, "travel", 1);
-        databaseHelper.addTour("Tour Phú Quốc", "Phú Quốc", 200.0, 4, "travel", 2);
-        databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 180.0, 2, "travel", 3);
-        databaseHelper.addTour("Tour Sapa", "Sapa", 220.0, 5, "travel", 3);
+        databaseHelper.addTour("Tour Đà Lạt", "Đà Lạt", 1, 150.0, 3, "travel", 1);
+        databaseHelper.addTour("Tour Phú Quốc", "Phú Quốc", 2, 200.0, 4, "welcome_png", 2);
+        databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 3, 180.0, 2, "travel", 3);
+        databaseHelper.addTour("Tour Sapa", "Sapa", 4, 220.0, 5, "travel", 3);
+        databaseHelper.addTour("Tour Nha Trang", "Nha Trang", 5, 190.0, 3, "travel", 2);
+        databaseHelper.addTour("Tour Huế", "Huế", 6, 170.0, 4, "travel", 1);
+        databaseHelper.addTour("Tour Đà Nẵng", "Đà Nẵng", 7, 210.0, 3, "travel", 2);
+        databaseHelper.addTour("Tour Cần Thơ", "Cần Thơ", 8, 160.0, 2, "travel", 3);
     }
+
+
+    private void addSampleCities() {
+        databaseHelper.addCity("Hà Nội");
+        databaseHelper.addCity("Hồ Chí Minh");
+    }
+    private List<List<CategoryModel>> paginateCategories(List<CategoryModel> categories, int itemsPerPage) {
+        List<List<CategoryModel>> pages = new ArrayList<>();
+        int totalCategories = categories.size();
+        for (int i = 0; i < totalCategories; i += itemsPerPage) {
+            int end = Math.min(i + itemsPerPage, totalCategories);
+            pages.add(categories.subList(i, end));
+        }
+        return pages;
+    }
+
 }

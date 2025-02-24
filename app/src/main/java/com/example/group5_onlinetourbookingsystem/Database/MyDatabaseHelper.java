@@ -18,7 +18,12 @@ import java.util.List;
 public class MyDatabaseHelper extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "tourbooking.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 6;
+
+    // Bảng Cities
+    private static final String TABLE_CITIES = "cities";
+    private static final String COLUMN_CITY_ID = "id";
+    private static final String COLUMN_CITY_NAME = "name";
 
     // Bảng Users
     private static final String TABLE_USERS = "users";
@@ -39,12 +44,37 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_TOURS = "tours";
     private static final String COLUMN_TOUR_ID = "id";
     private static final String COLUMN_TOUR_NAME = "name";
-    private static final String COLUMN_TOUR_DESTINATION = "destination";
+    private static final String COLUMN_TOUR_DESTINATION = "destination"; // 🔹 Thêm cột destination
+    private static final String COLUMN_TOUR_CITY_ID = "city_id"; // Liên kết với Cities
     private static final String COLUMN_TOUR_PRICE = "price";
     private static final String COLUMN_TOUR_DURATION = "duration";
     private static final String COLUMN_TOUR_IMAGE = "image";
     private static final String COLUMN_TOUR_CATEGORY_ID = "category_id";
 
+    // Bảng Bookings
+    private static final String TABLE_BOOKINGS = "bookings";
+    private static final String COLUMN_BOOKING_ID = "id";
+    private static final String COLUMN_BOOKING_USER_ID = "user_id";
+    private static final String COLUMN_BOOKING_TOUR_ID = "tour_id";
+    private static final String COLUMN_BOOKING_DATE = "booking_date";
+    private static final String COLUMN_BOOKING_TOTAL_PRICE = "total_price";
+    private static final String COLUMN_BOOKING_STATUS = "status"; // Pending, Confirmed, Cancelled
+
+    // Bảng Booking Passengers (Danh sách hành khách)
+    private static final String TABLE_BOOKING_PASSENGERS = "booking_passengers";
+    private static final String COLUMN_PASSENGER_ID = "id";
+    private static final String COLUMN_PASSENGER_BOOKING_ID = "booking_id";
+    private static final String COLUMN_PASSENGER_TYPE = "type"; // adult, child, infant, baby
+    private static final String COLUMN_PASSENGER_NAME = "name";
+    private static final String COLUMN_PASSENGER_AGE = "age";
+
+    // Bảng Payments (Thanh toán)
+    private static final String TABLE_PAYMENTS = "payments";
+    private static final String COLUMN_PAYMENT_ID = "id";
+    private static final String COLUMN_PAYMENT_BOOKING_ID = "booking_id";
+    private static final String COLUMN_PAYMENT_AMOUNT = "amount";
+    private static final String COLUMN_PAYMENT_DATE = "payment_date";
+    private static final String COLUMN_PAYMENT_STATUS = "status"; // Pending, Completed, Failed
     public MyDatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
@@ -52,6 +82,10 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + TABLE_CITIES + " (" +
+                COLUMN_CITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_CITY_NAME + " TEXT UNIQUE)");
+
         db.execSQL("CREATE TABLE " + TABLE_USERS + " (" +
                 COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_USER_NAME + " TEXT, " +
@@ -65,15 +99,46 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_CATEGORY_NAME + " TEXT UNIQUE, " +
                 COLUMN_CATEGORY_IMAGE + " TEXT)");
 
-        db.execSQL("CREATE TABLE " + TABLE_TOURS + " (" +
-                COLUMN_TOUR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_TOUR_NAME + " TEXT, " +
-                COLUMN_TOUR_DESTINATION + " TEXT, " +
-                COLUMN_TOUR_PRICE + " REAL, " +
-                COLUMN_TOUR_DURATION + " INTEGER, " +
-                COLUMN_TOUR_IMAGE + " TEXT, " +
-                COLUMN_TOUR_CATEGORY_ID + " INTEGER, " +
-                "FOREIGN KEY(" + COLUMN_TOUR_CATEGORY_ID + ") REFERENCES " + TABLE_CATEGORIES + "(" + COLUMN_CATEGORY_ID + "))");
+        db.execSQL( "CREATE TABLE " + TABLE_TOURS + " ("
+                + COLUMN_TOUR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_TOUR_NAME + " TEXT, "
+                + COLUMN_TOUR_DESTINATION + " TEXT, " // 🔹 Thêm destination
+                + COLUMN_TOUR_CITY_ID + " INTEGER, "
+                + COLUMN_TOUR_PRICE + " REAL, "
+                + COLUMN_TOUR_DURATION + " INTEGER, "
+                + COLUMN_TOUR_IMAGE + " TEXT, "
+                + COLUMN_TOUR_CATEGORY_ID + " INTEGER, "
+                + "FOREIGN KEY(" + COLUMN_TOUR_CITY_ID + ") REFERENCES cities(id), "
+                + "FOREIGN KEY(" + COLUMN_TOUR_CATEGORY_ID + ") REFERENCES categories(id))");
+
+        // Tạo bảng bookings
+        db.execSQL("CREATE TABLE " + TABLE_BOOKINGS + " (" +
+                COLUMN_BOOKING_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_BOOKING_USER_ID + " INTEGER, " +
+                COLUMN_BOOKING_TOUR_ID + " INTEGER, " +
+                COLUMN_BOOKING_DATE + " TEXT, " +
+                COLUMN_BOOKING_TOTAL_PRICE + " REAL, " +
+                COLUMN_BOOKING_STATUS + " TEXT, " +
+                "FOREIGN KEY(" + COLUMN_BOOKING_USER_ID + ") REFERENCES users(id), " +
+                "FOREIGN KEY(" + COLUMN_BOOKING_TOUR_ID + ") REFERENCES tours(id))");
+
+        // Tạo bảng booking_passengers
+        db.execSQL("CREATE TABLE " + TABLE_BOOKING_PASSENGERS + " (" +
+                COLUMN_PASSENGER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_PASSENGER_BOOKING_ID + " INTEGER, " +
+                COLUMN_PASSENGER_TYPE + " TEXT, " +
+                COLUMN_PASSENGER_NAME + " TEXT, " +
+                COLUMN_PASSENGER_AGE + " INTEGER, " +
+                "FOREIGN KEY(" + COLUMN_PASSENGER_BOOKING_ID + ") REFERENCES bookings(id))");
+
+        // Tạo bảng payments
+        db.execSQL("CREATE TABLE " + TABLE_PAYMENTS + " (" +
+                COLUMN_PAYMENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_PAYMENT_BOOKING_ID + " INTEGER, " +
+                COLUMN_PAYMENT_AMOUNT + " REAL, " +
+                COLUMN_PAYMENT_DATE + " TEXT, " +
+                COLUMN_PAYMENT_STATUS + " TEXT, " +
+                "FOREIGN KEY(" + COLUMN_PAYMENT_BOOKING_ID + ") REFERENCES bookings(id))");
     }
 
     @Override
@@ -81,6 +146,10 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOURS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKING_PASSENGERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYMENTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CITIES);
         onCreate(db);
     }
 
@@ -120,29 +189,33 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
 
     // 🌟 Thêm tour mới
-    public void addTour(String name, String destination, double price, int duration, String imagePath, int categoryId) {
+    public void addTour(String name, String destination, int cityId, double price, int duration, String imagePath, int categoryId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+
         values.put(COLUMN_TOUR_NAME, name);
-        values.put(COLUMN_TOUR_DESTINATION, destination);
+        values.put(COLUMN_TOUR_DESTINATION, destination); // 🔹 Thêm destination
         values.put(COLUMN_TOUR_PRICE, price);
         values.put(COLUMN_TOUR_DURATION, duration);
         values.put(COLUMN_TOUR_IMAGE, imagePath);
         values.put(COLUMN_TOUR_CATEGORY_ID, categoryId);
+        values.put("city_id", cityId); // 🔹 Giữ city_id để đảm bảo liên kết
 
         db.insert(TABLE_TOURS, null, values);
         db.close();
     }
+
 
     // 🌟 Lấy tất cả tour
     public ArrayList<TourModel> getAllTours() {
         ArrayList<TourModel> tourList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Truy vấn để lấy thông tin tour cùng với tên category
-        String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, c.name AS categoryName " +
+        // Truy vấn lấy tour, category, và city
+        String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, c.name AS categoryName, ci.name AS cityName " +
                 "FROM tours t " +
-                "LEFT JOIN categories c ON t.category_id = c.id";
+                "LEFT JOIN categories c ON t.category_id = c.id " +
+                "LEFT JOIN cities ci ON t.city_id = ci.id";
 
         Cursor cursor = db.rawQuery(query, null);
 
@@ -154,9 +227,10 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 double price = cursor.getDouble(3);
                 int duration = cursor.getInt(4);
                 String image = cursor.getString(5);
-                String categoryName = cursor.getString(6); // Lấy tên category
+                String categoryName = cursor.getString(6);
+                String cityName = cursor.getString(7);
 
-                tourList.add(new TourModel(id, name, destination, price, duration, image, categoryName));
+                tourList.add(new TourModel(id, name, destination, price, duration, image, categoryName, cityName));
             } while (cursor.moveToNext());
         }
 
@@ -164,6 +238,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return tourList;
     }
+
+
 
 
     public long addUser(String name, String email, String phone, String password, String imagePath) {
@@ -201,4 +277,31 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             return -1; // Tài khoản không tồn tại
         }
     }
+    public long addCity(String cityName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_CITY_NAME, cityName);
+        long cityId = db.insert(TABLE_CITIES, null, values);
+        db.close();
+        return cityId;
+    }
+    public ArrayList<String> getAllCities() {
+        ArrayList<String> cityList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT name FROM cities"; // Giả sử bảng thành phố tên là "cities"
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                String cityName = cursor.getString(0);
+                cityList.add(cityName);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return cityList;
+    }
+
 }
