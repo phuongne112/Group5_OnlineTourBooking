@@ -15,18 +15,18 @@ import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
     private Context context;
-    private ArrayList<CategoryModel> categoryList;
+    private List<CategoryModel> categoryList;
     private OnCategoryClickListener listener;
 
     public interface OnCategoryClickListener {
         void onCategoryClick(CategoryModel category);
     }
 
-    public CategoryAdapter(Context context, ArrayList<CategoryModel> categoryList) {
+    public CategoryAdapter(Context context, List<CategoryModel> categoryList, OnCategoryClickListener listener) {
         this.context = context;
         this.categoryList = categoryList;
         this.listener = listener;
@@ -45,11 +45,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         holder.categoryName.setText(category.getName());
 
         if (category.getImagePath() != null && !category.getImagePath().isEmpty()) {
-            // Lấy resource ID từ drawable
             int imageResource = context.getResources().getIdentifier(category.getImagePath(), "drawable", context.getPackageName());
 
             if (imageResource != 0) {
-                // Load ảnh bằng URI thay vì đường dẫn
                 Uri imageUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + imageResource);
                 Picasso.get().load(imageUri).placeholder(R.drawable.favorites).into(holder.categoryImage);
             } else {
@@ -58,9 +56,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         } else {
             holder.categoryImage.setImageResource(R.drawable.favorites);
         }
-        // Xử lý sự kiện click
-        holder.itemView.setOnClickListener(v -> listener.onCategoryClick(category));
 
+        holder.itemView.setOnClickListener(v -> listener.onCategoryClick(category));
     }
 
     @Override
@@ -75,7 +72,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             categoryName = itemView.findViewById(R.id.category_name);
-            categoryImage = itemView.findViewById(R.id.category_image); // Thêm ImageView
+            categoryImage = itemView.findViewById(R.id.category_image);
         }
     }
 }

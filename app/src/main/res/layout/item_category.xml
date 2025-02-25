@@ -8,19 +8,17 @@
 
     <ImageView
         android:id="@+id/category_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/microphone"/>
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/category_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Category Name"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:paddingTop="4dp"/>
+        android:layout_gravity="center"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        android:text="Category Name" />
 </LinearLayout>
 
