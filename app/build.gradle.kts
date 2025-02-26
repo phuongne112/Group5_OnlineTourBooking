@@ -25,11 +25,25 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    // ✅ Thêm `packagingOptions` để loại bỏ lỗi trùng file META-INF
+    packagingOptions {
+        resources {
+            excludes += "META-INF/NOTICE.md"
+            excludes += "META-INF/LICENSE.md"
+            excludes += "META-INF/DEPENDENCIES"
+        }
+    }
 }
+
+
+
+
 
 dependencies {
 
@@ -42,4 +56,7 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation("androidx.cardview:cardview:1.0.0")
+    implementation("com.sun.mail:android-mail:1.6.7")
+    implementation("com.sun.mail:android-activation:1.6.7")
+
 }

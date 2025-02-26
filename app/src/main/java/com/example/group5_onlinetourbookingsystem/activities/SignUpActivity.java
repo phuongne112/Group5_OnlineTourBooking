@@ -1,5 +1,6 @@
 package com.example.group5_onlinetourbookingsystem.activities;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,8 +12,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
+
 public class SignUpActivity extends AppCompatActivity {
-    private EditText etName, etEmail, etPhone, etPassword;
+    private EditText etName, etEmail, etPhone, etPassword, etBirth;
     private Button btnSignUp;
     private MyDatabaseHelper dbHelper;
 
@@ -25,36 +30,105 @@ public class SignUpActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
         etPassword = findViewById(R.id.etPassword);
+        etBirth = findViewById(R.id.editBirth);
         btnSignUp = findViewById(R.id.btnSignUp);
 
         dbHelper = new MyDatabaseHelper(this);
 
-        btnSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        // 🔹 Khi nhấn vào etBirth, hiển thị DatePickerDialog
+        etBirth.setOnClickListener(v -> showDatePicker());
 
-                String name = etName.getText().toString().trim();
-                String email = etEmail.getText().toString().trim();
-                String phone = etPhone.getText().toString().trim();
-                String password = etPassword.getText().toString().trim();
-                String image = ""; // Nếu không có hình, để rỗng hoặc set hình mặc định
+        btnSignUp.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            String email = etEmail.getText().toString().trim();
+            String phone = etPhone.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+            String birthDate = etBirth.getText().toString().trim();
 
-                // Kiểm tra dữ liệu nhập vào
-                if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(SignUpActivity.this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            // ✅ Kiểm tra dữ liệu nhập vào
+            if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty() || birthDate.isEmpty()) {
+                Toast.makeText(SignUpActivity.this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                // Thêm người dùng vào cơ sở dữ liệu
-                long result = dbHelper.addUser(name, email, phone, password, image);
-                if (result != -1) {
-                    Toast.makeText(SignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                    // Sau khi đăng ký thành công, chuyển về trang đăng nhập hoặc trang chính
-                    finish();
-                } else {
-                    Toast.makeText(SignUpActivity.this, "Đăng ký thất bại. Email có thể đã tồn tại!", Toast.LENGTH_SHORT).show();
-                }
+            if (!isValidEmail(email)) {
+                Toast.makeText(SignUpActivity.this, "Email phải là Gmail hợp lệ", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!isValidPhone(phone)) {
+                Toast.makeText(SignUpActivity.this, "Số điện thoại phải có 10 chữ số và bắt đầu bằng 0", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!isValidPassword(password)) {
+                Toast.makeText(SignUpActivity.this, "Mật khẩu phải có ít nhất 6 ký tự", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // ✅ Mã hóa mật khẩu trước khi lưu vào database
+            String hashedPassword = hashPassword(password);
+
+            long result = dbHelper.addUser(name, email, phone, hashedPassword, birthDate, "");
+
+            if (result != -1) {
+                Toast.makeText(SignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(SignUpActivity.this, "Đăng ký thất bại. Email có thể đã tồn tại!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // ✅ Hàm hiển thị DatePickerDialog khi nhấn vào etBirth
+    private void showDatePicker() {
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    String selectedDate = selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear;
+                    etBirth.setText(selectedDate); // 🔹 Gán ngày đã chọn vào etBirth
+                },
+                year, month, day
+        );
+
+        datePickerDialog.show();
+    }
+
+    // ✅ Hàm kiểm tra email có đúng Gmail không
+    private boolean isValidEmail(String email) {
+        return email.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$");
+    }
+
+    // ✅ Hàm kiểm tra số điện thoại hợp lệ (bắt đầu bằng 0, có 10 số)
+    private boolean isValidPhone(String phone) {
+        return phone.matches("^0[0-9]{9}$");
+    }
+
+    // ✅ Hàm kiểm tra mật khẩu hợp lệ (tối thiểu 6 ký tự)
+    private boolean isValidPassword(String password) {
+        return password.length() >= 6;
+    }
+
+    // ✅ Hàm mã hóa mật khẩu SHA-256
+    private String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
