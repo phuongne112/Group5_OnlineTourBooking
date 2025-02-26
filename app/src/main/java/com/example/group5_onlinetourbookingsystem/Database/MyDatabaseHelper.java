@@ -38,6 +38,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_USER_EMAIL = "email";
     private static final String COLUMN_USER_PHONE = "phone";
     private static final String COLUMN_USER_PASSWORD = "password";
+    private static final String COLUMN_USER_BIRTH = "birth_date";
+
     private static final String COLUMN_USER_IMAGE = "image";
     private static final String COLUMN_USER_ROLE_ID = "role_id"; // Liên kết với Roles
 
@@ -132,11 +134,13 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_USER_NAME + " TEXT, " +
                 COLUMN_USER_EMAIL + " TEXT UNIQUE, " +
-                COLUMN_USER_PASSWORD + " TEXT, " +
                 COLUMN_USER_PHONE + " TEXT, " +
+                COLUMN_USER_PASSWORD + " TEXT, " +
                 COLUMN_USER_IMAGE + " TEXT, " +
+                COLUMN_USER_BIRTH + " TEXT, " + // Thêm cột ngày sinh
                 COLUMN_USER_ROLE_ID + " INTEGER, " +
                 "FOREIGN KEY(" + COLUMN_USER_ROLE_ID + ") REFERENCES roles(id))");
+
 
         // Tạo bảng Categories
         db.execSQL("CREATE TABLE " + TABLE_CATEGORIES + " (" +
@@ -313,29 +317,35 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
 
 
-    public long addUser(String name, String email, String phone, String password, String imagePath) {
+    public long addUser(String name, String email, String phone, String hashedPassword, String birthDate, String imagePath) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_USER_NAME, name);
         values.put(COLUMN_USER_EMAIL, email);
         values.put(COLUMN_USER_PHONE, phone);
-        values.put(COLUMN_USER_PASSWORD, password);
-        values.put(COLUMN_USER_IMAGE, imagePath); // Lưu đường dẫn ảnh
+        values.put(COLUMN_USER_PASSWORD, hashedPassword); // ✅ Lưu mật khẩu đã mã hóa
+        values.put(COLUMN_USER_BIRTH, birthDate);
+        values.put(COLUMN_USER_IMAGE, imagePath);
 
         long result = db.insert(TABLE_USERS, null, values);
         db.close();
         return result;
     }
-    public int checkUserLogin(String email, String password) {
+
+
+    public int checkUserLogin(String email, String hashedPassword) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT " + COLUMN_USER_PASSWORD + " FROM " + TABLE_USERS +
                 " WHERE " + COLUMN_USER_EMAIL + " = ?";
         Cursor cursor = db.rawQuery(query, new String[]{email});
+
         if (cursor != null && cursor.moveToFirst()) {
             String storedPassword = cursor.getString(0);
             cursor.close();
             db.close();
-            if (storedPassword.equals(password)) {
+
+            // ✅ So sánh mật khẩu đã mã hóa
+            if (storedPassword.equals(hashedPassword)) {
                 return 1; // Đăng nhập thành công
             } else {
                 return 0; // Sai mật khẩu
@@ -348,6 +358,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             return -1; // Tài khoản không tồn tại
         }
     }
+
     public long addCity(String cityName) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -450,6 +461,25 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             db.insert("booking_passengers", null, values);
         }
     }
+    public boolean isUserExists(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM users WHERE email = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
+    }
+
+    // ✅ Hàm cập nhật mật khẩu mới
+    public void updatePassword(String email, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("password", newPassword);
+        db.update("users", values, "email=?", new String[]{email});
+        db.close();
+    }
+
 
 
 
