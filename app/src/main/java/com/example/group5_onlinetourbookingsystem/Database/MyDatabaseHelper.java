@@ -19,37 +19,44 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "tourbooking.db";
     private static final int DATABASE_VERSION = 6;
+    // Bảng Roles
+    private static final String TABLE_ROLES = "roles";
+    private static final String COLUMN_ROLE_ID = "id";
+    private static final String COLUMN_ROLE_NAME = "role_name"; // Admin, User, Employee, Guide
 
     // Bảng Cities
     private static final String TABLE_CITIES = "cities";
     private static final String COLUMN_CITY_ID = "id";
     private static final String COLUMN_CITY_NAME = "name";
-
     // Bảng Users
     private static final String TABLE_USERS = "users";
     private static final String COLUMN_USER_ID = "id";
     private static final String COLUMN_USER_NAME = "name";
     private static final String COLUMN_USER_EMAIL = "email";
     private static final String COLUMN_USER_PHONE = "phone";
-    private static final String COLUMN_USER_IMAGE = "image";
     private static final String COLUMN_USER_PASSWORD = "password";
+    private static final String COLUMN_USER_IMAGE = "image";
+    private static final String COLUMN_USER_ROLE_ID = "role_id"; // Liên kết với Roles
 
     // Bảng Categories
     private static final String TABLE_CATEGORIES = "categories";
     private static final String COLUMN_CATEGORY_ID = "id";
     private static final String COLUMN_CATEGORY_NAME = "name";
     private static final String COLUMN_CATEGORY_IMAGE = "image";
+    private static final String COLUMN_CATEGORY_DESCRIPTION = "description"; // Mô tả danh mục
 
     // Bảng Tours
     private static final String TABLE_TOURS = "tours";
     private static final String COLUMN_TOUR_ID = "id";
     private static final String COLUMN_TOUR_NAME = "name";
-    private static final String COLUMN_TOUR_DESTINATION = "destination"; // 🔹 Thêm cột destination
-    private static final String COLUMN_TOUR_CITY_ID = "city_id"; // Liên kết với Cities
+    private static final String COLUMN_TOUR_DESTINATION = "destination";
+    private static final String COLUMN_TOUR_CITY_ID = "city_id";
     private static final String COLUMN_TOUR_PRICE = "price";
     private static final String COLUMN_TOUR_DURATION = "duration";
     private static final String COLUMN_TOUR_IMAGE = "image";
     private static final String COLUMN_TOUR_CATEGORY_ID = "category_id";
+    private static final String COLUMN_TOUR_GUIDE_ID = "guide_id";  // Cột mới để lưu ID người hướng dẫn
+
 
     // Bảng Bookings
     private static final String TABLE_BOOKINGS = "bookings";
@@ -59,7 +66,6 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_BOOKING_DATE = "booking_date";
     private static final String COLUMN_BOOKING_TOTAL_PRICE = "total_price";
     private static final String COLUMN_BOOKING_STATUS = "status"; // Pending, Confirmed, Cancelled
-
     // Bảng Booking Passengers (Danh sách hành khách)
     private static final String TABLE_BOOKING_PASSENGERS = "booking_passengers";
     private static final String COLUMN_PASSENGER_ID = "id";
@@ -67,6 +73,12 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PASSENGER_TYPE = "type"; // adult, child, infant, baby
     private static final String COLUMN_PASSENGER_NAME = "name";
     private static final String COLUMN_PASSENGER_AGE = "age";
+    // Bảng Contacts
+    private static final String TABLE_CONTACTS = "contacts";
+    private static final String COLUMN_CONTACT_ID = "contact_id";
+    private static final String COLUMN_FULL_NAME = "full_name";
+    private static final String COLUMN_EMAIL = "email";
+    private static final String COLUMN_MESSAGE = "message";
 
     // Bảng Payments (Thanh toán)
     private static final String TABLE_PAYMENTS = "payments";
@@ -75,6 +87,20 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PAYMENT_AMOUNT = "amount";
     private static final String COLUMN_PAYMENT_DATE = "payment_date";
     private static final String COLUMN_PAYMENT_STATUS = "status"; // Pending, Completed, Failed
+
+    // Bảng Help Center
+    private static final String TABLE_HELP_CENTER = "help_center";
+    private static final String COLUMN_HELP_ID = "id";
+    private static final String COLUMN_HELP_USER_ID = "user_id";
+    private static final String COLUMN_HELP_QUESTION = "question";
+    private static final String COLUMN_HELP_ANSWER = "answer";
+    // Bảng Favorites (Danh sách yêu thích của người dùng)
+    private static final String TABLE_FAVORITES = "favorites";
+    private static final String COLUMN_FAVORITE_ID = "id";
+    private static final String COLUMN_FAVORITE_USER_ID = "user_id"; // Liên kết với Users
+    private static final String COLUMN_FAVORITE_TOUR_ID = "tour_id"; // Liên kết với Tours
+
+
     public MyDatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
@@ -82,6 +108,19 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // Trong phương thức onCreate(), thêm đoạn sau để tạo bảng
+        String CREATE_FAVORITES_TABLE = "CREATE TABLE " + TABLE_FAVORITES + " ("
+                + COLUMN_FAVORITE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_FAVORITE_USER_ID + " INTEGER, "
+                + COLUMN_FAVORITE_TOUR_ID + " INTEGER, "
+                + "FOREIGN KEY(" + COLUMN_FAVORITE_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_USER_ID + "), "
+                + "FOREIGN KEY(" + COLUMN_FAVORITE_TOUR_ID + ") REFERENCES " + TABLE_TOURS + "(" + COLUMN_TOUR_ID + "))";
+        db.execSQL(CREATE_FAVORITES_TABLE);
+
+        db.execSQL("CREATE TABLE " + TABLE_ROLES + " (" +
+                COLUMN_ROLE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_ROLE_NAME + " TEXT UNIQUE)");
+
         db.execSQL("CREATE TABLE " + TABLE_CITIES + " (" +
                 COLUMN_CITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_CITY_NAME + " TEXT UNIQUE)");
@@ -92,24 +131,31 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_USER_EMAIL + " TEXT UNIQUE, " +
                 COLUMN_USER_PASSWORD + " TEXT, " +
                 COLUMN_USER_PHONE + " TEXT, " +
-                COLUMN_USER_IMAGE + " TEXT)");
+                COLUMN_USER_IMAGE + " TEXT, " +
+                COLUMN_USER_ROLE_ID + " INTEGER, " +
+                "FOREIGN KEY(" + COLUMN_USER_ROLE_ID + ") REFERENCES roles(id))");
 
+        // Tạo bảng Categories
         db.execSQL("CREATE TABLE " + TABLE_CATEGORIES + " (" +
                 COLUMN_CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_CATEGORY_NAME + " TEXT UNIQUE, " +
-                COLUMN_CATEGORY_IMAGE + " TEXT)");
+                COLUMN_CATEGORY_IMAGE + " TEXT, " +
+                COLUMN_CATEGORY_DESCRIPTION + " TEXT)"); // ✅ Cột mô tả danh mục
 
-        db.execSQL( "CREATE TABLE " + TABLE_TOURS + " ("
-                + COLUMN_TOUR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + COLUMN_TOUR_NAME + " TEXT, "
-                + COLUMN_TOUR_DESTINATION + " TEXT, " // 🔹 Thêm destination
-                + COLUMN_TOUR_CITY_ID + " INTEGER, "
-                + COLUMN_TOUR_PRICE + " REAL, "
-                + COLUMN_TOUR_DURATION + " INTEGER, "
-                + COLUMN_TOUR_IMAGE + " TEXT, "
-                + COLUMN_TOUR_CATEGORY_ID + " INTEGER, "
-                + "FOREIGN KEY(" + COLUMN_TOUR_CITY_ID + ") REFERENCES cities(id), "
-                + "FOREIGN KEY(" + COLUMN_TOUR_CATEGORY_ID + ") REFERENCES categories(id))");
+        db.execSQL("CREATE TABLE " + TABLE_TOURS + " (" +
+                COLUMN_TOUR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_TOUR_NAME + " TEXT, " +
+                COLUMN_TOUR_DESTINATION + " TEXT, " +
+                COLUMN_TOUR_CITY_ID + " INTEGER, " +
+                COLUMN_TOUR_PRICE + " REAL, " +
+                COLUMN_TOUR_DURATION + " INTEGER, " +
+                COLUMN_TOUR_IMAGE + " TEXT, " +
+                COLUMN_TOUR_CATEGORY_ID + " INTEGER, " +
+                COLUMN_TOUR_GUIDE_ID + " INTEGER, " + // Added guide_id
+                "FOREIGN KEY(" + COLUMN_TOUR_CITY_ID + ") REFERENCES cities(id), " +
+                "FOREIGN KEY(" + COLUMN_TOUR_CATEGORY_ID + ") REFERENCES categories(id), " +
+                "FOREIGN KEY(" + COLUMN_TOUR_GUIDE_ID + ") REFERENCES users(id))"); // Foreign key to users for the guide
+
 
         // Tạo bảng bookings
         db.execSQL("CREATE TABLE " + TABLE_BOOKINGS + " (" +
@@ -139,6 +185,23 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_PAYMENT_DATE + " TEXT, " +
                 COLUMN_PAYMENT_STATUS + " TEXT, " +
                 "FOREIGN KEY(" + COLUMN_PAYMENT_BOOKING_ID + ") REFERENCES bookings(id))");
+        // Tạo bảng contacts
+        String createContactsTable = "CREATE TABLE " + TABLE_CONTACTS + " (" +
+                COLUMN_CONTACT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_FULL_NAME + " TEXT NOT NULL, " +
+                COLUMN_EMAIL + " TEXT NOT NULL, " +
+                COLUMN_MESSAGE + " TEXT NOT NULL, " +
+                "user_id INTEGER, " +
+                "FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE" +
+                ");";
+        db.execSQL(createContactsTable);
+        db.execSQL("CREATE TABLE " + TABLE_HELP_CENTER + " (" +
+                COLUMN_HELP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_HELP_USER_ID + " INTEGER, " +
+                COLUMN_HELP_QUESTION + " TEXT, " +
+                COLUMN_HELP_ANSWER + " TEXT, " +
+                "FOREIGN KEY(" + COLUMN_HELP_USER_ID + ") REFERENCES users(id))");
+
     }
 
     @Override
@@ -150,6 +213,10 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYMENTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CITIES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_HELP_CENTER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ROLES);
         onCreate(db);
     }
 
@@ -303,5 +370,9 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return cityList;
     }
+
+
+
+
 
 }
