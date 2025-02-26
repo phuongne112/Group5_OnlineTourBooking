@@ -1,9 +1,11 @@
 package com.example.group5_onlinetourbookingsystem;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
+import com.example.group5_onlinetourbookingsystem.activities.TourDetailActivity;
 import com.example.group5_onlinetourbookingsystem.adapters.CategoryAdapter;
 import com.example.group5_onlinetourbookingsystem.adapters.CategoryPageAdapter;
 import com.example.group5_onlinetourbookingsystem.adapters.TourAdapter;
@@ -78,7 +81,14 @@ public class HomeFragment extends Fragment {
             tourList = databaseHelper.getAllTours();
         }
 
-        tourAdapter = new TourAdapter(getContext(), tourList);
+        // Truyền listener vào Adapter
+        tourAdapter = new TourAdapter(getContext(), tourList, tour -> {
+            // Chuyển sang TourDetailActivity khi click vào tour
+            Intent intent = new Intent(getContext(), TourDetailActivity.class);
+            intent.putExtra("tour_id", tour.getId());
+            startActivity(intent);
+        });
+
         recyclerViewTours.setAdapter(tourAdapter);
 
         return view;

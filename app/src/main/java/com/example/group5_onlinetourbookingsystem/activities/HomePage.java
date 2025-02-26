@@ -7,10 +7,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.group5_onlinetourbookingsystem.BookingFragment;
+import com.example.group5_onlinetourbookingsystem.FavouriteFragment;
 import com.example.group5_onlinetourbookingsystem.HomeFragment;
 import com.example.group5_onlinetourbookingsystem.ProfileFragment;
 import com.example.group5_onlinetourbookingsystem.R;
-import com.example.group5_onlinetourbookingsystem.SearchFragment;
+import com.example.group5_onlinetourbookingsystem.TourFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomePage extends AppCompatActivity {
@@ -34,10 +36,14 @@ public class HomePage extends AppCompatActivity {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home1) {
                 selectedFragment = new HomeFragment();
-            } else if (itemId == R.id.nav_search2) {
-                selectedFragment = new SearchFragment();
+            } else if (itemId == R.id.nav_tour2) {
+                selectedFragment = new TourFragment();
             } else if (itemId == R.id.nav_profile3) {
                 selectedFragment = new ProfileFragment();
+            }else if (itemId == R.id.nav_booking5) {
+                selectedFragment = new BookingFragment();
+            }else if (itemId == R.id.nav_favourite3) {
+                selectedFragment = new FavouriteFragment();
             }
 
             if (selectedFragment != null) {
