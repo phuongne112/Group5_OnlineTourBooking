@@ -1,0 +1,84 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Thông tin tour -->
+        <TextView
+            android:id="@+id/booking_tour_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/booking_tour_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@android:color/holo_red_dark" />
+
+        <!-- Thông tin người đặt -->
+        <!-- Chọn số lượng hành khách -->
+        <TextView
+            android:id="@+id/passenger_count_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Number of Passengers"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingTop="10dp" />
+
+        <EditText
+            android:id="@+id/num_adults"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Adults"
+            android:inputType="number"
+            android:padding="10dp" />
+
+        <EditText
+            android:id="@+id/num_children"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Children"
+            android:inputType="number"
+            android:padding="10dp" />
+
+        <EditText
+            android:id="@+id/num_infants"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Infants"
+            android:inputType="number"
+            android:padding="10dp" />
+
+        <!-- Danh sách hành khách sẽ được thêm vào đây -->
+        <LinearLayout
+            android:id="@+id/passenger_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <!-- Nút xác nhận -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="10dp">
+
+            <Button
+                android:id="@+id/confirm_booking_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirm Booking"
+                android:padding="12dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

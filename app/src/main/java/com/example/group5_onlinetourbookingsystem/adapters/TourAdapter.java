@@ -23,11 +23,12 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
         void onTourClick(TourModel tour);
     }
 
-    public TourAdapter(Context context, ArrayList<TourModel> tourList) {
+    public TourAdapter(Context context, ArrayList<TourModel> tourList, OnTourClickListener listener) {
         this.context = context;
         this.tourList = tourList;
-        this.listener = listener;
+        this.listener = listener; // Gán giá trị listener
     }
+
 
     @NonNull
     @Override
@@ -43,10 +44,9 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
         holder.name.setText(tour.getName());
         holder.price.setText(String.format("$%.2f", tour.getPrice()));
         holder.duration.setText(tour.getDuration() + " days");
-        holder.destination.setText(tour.getCityName());
-        holder.categoryTextView.setText("Category: " + tour.getCategoryName());
+        holder.destination.setText(tour.getDestination());
+        holder.categoryTextView.setText("Category: " + tour.getCategoryName());  // Hiển thị category name thay vì ID
 
-        // 🔹 Lấy resource ID từ drawable
         int imageResource = context.getResources().getIdentifier(tour.getImage(), "drawable", context.getPackageName());
 
         if (imageResource != 0) {
@@ -61,6 +61,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
                 listener.onTourClick(tour);
             }
         });
+
     }
 
     @Override
@@ -75,7 +76,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.tour_name);
-            destination = itemView.findViewById(R.id.tour_destination);
+             destination = itemView.findViewById(R.id.tour_destination);
             price = itemView.findViewById(R.id.tour_price);
             duration = itemView.findViewById(R.id.tour_duration);
             TourImage = itemView.findViewById(R.id.tour_image);

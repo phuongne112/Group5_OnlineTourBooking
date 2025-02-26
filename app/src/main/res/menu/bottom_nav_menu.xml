@@ -7,12 +7,22 @@
             android:title="Home" />
 
         <item
-            android:id="@+id/nav_search2"
-            android:icon="@drawable/search"
-            android:title="Search" />
+            android:id="@+id/nav_tour2"
+            android:icon="@drawable/tour"
+            android:title="Tour" />
 
         <item
-            android:id="@+id/nav_profile3"
-            android:icon="@drawable/bottom_btn3"
-            android:title="Profile" />
+        android:id="@+id/nav_favourite3"
+        android:icon="@drawable/favourite"
+        android:title="Favourite" />
+
+        <item
+        android:id="@+id/nav_booking5"
+        android:icon="@drawable/ticket"
+        android:title="Booking" />
+
+        <item
+        android:id="@+id/nav_profile3"
+        android:icon="@drawable/bottom_btn3"
+        android:title="Profile" />
     </menu>

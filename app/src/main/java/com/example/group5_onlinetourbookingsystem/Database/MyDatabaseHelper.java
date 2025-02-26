@@ -12,8 +12,11 @@ import androidx.annotation.Nullable;
 import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
 import com.example.group5_onlinetourbookingsystem.models.TourModel;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MyDatabaseHelper extends SQLiteOpenHelper {
     private Context context;
@@ -278,8 +281,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         ArrayList<TourModel> tourList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Truy vấn lấy tour, category, và city
-        String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, c.name AS categoryName, ci.name AS cityName " +
+        String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, c.id AS categoryId, c.name AS categoryName, ci.name AS cityName " +
                 "FROM tours t " +
                 "LEFT JOIN categories c ON t.category_id = c.id " +
                 "LEFT JOIN cities ci ON t.city_id = ci.id";
@@ -294,10 +296,11 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 double price = cursor.getDouble(3);
                 int duration = cursor.getInt(4);
                 String image = cursor.getString(5);
-                String categoryName = cursor.getString(6);
-                String cityName = cursor.getString(7);
+                int categoryId = cursor.getInt(6);
+                String categoryName = cursor.getString(7);  // Lấy category name
+                String cityName = cursor.getString(8);
 
-                tourList.add(new TourModel(id, name, destination, price, duration, image, categoryName, cityName));
+                tourList.add(new TourModel(id, name, destination, price, duration, image, categoryId, categoryName, cityName));
             } while (cursor.moveToNext());
         }
 
@@ -305,6 +308,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return tourList;
     }
+
 
 
 
@@ -370,6 +374,83 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return cityList;
     }
+
+    public TourModel getTourById(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        TourModel tour = null;
+
+        String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, c.id AS categoryId, c.name AS categoryName, ci.name AS cityName " +
+                "FROM tours t " +
+                "LEFT JOIN categories c ON t.category_id = c.id " +
+                "LEFT JOIN cities ci ON t.city_id = ci.id " +
+                "WHERE t.id = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
+
+        if (cursor.moveToFirst()) {
+            int tourId = cursor.getInt(0);
+            String name = cursor.getString(1);
+            String destination = cursor.getString(2);
+            double price = cursor.getDouble(3);
+            int duration = cursor.getInt(4);
+            String image = cursor.getString(5);
+            int categoryId = cursor.getInt(6);
+            String categoryName = cursor.getString(7);
+            String cityName = cursor.getString(8);
+
+            // Tạo đối tượng TourModel
+            tour = new TourModel(tourId, name, destination, price, duration, image, categoryId, categoryName, cityName);
+        }
+
+        cursor.close();
+        db.close();
+        return tour;
+    }
+
+    public boolean insertBooking(int userId, int tourId, double totalPrice, int adults, int children, int infants) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            userId = 1; // Mặc định User ID = 1
+
+            // Chèn vào bảng bookings
+            ContentValues bookingValues = new ContentValues();
+            bookingValues.put("user_id", userId);
+            bookingValues.put("tour_id", tourId);
+            bookingValues.put("booking_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+            bookingValues.put("total_price", totalPrice);
+            bookingValues.put("status", "Pending");
+
+            long bookingId = db.insert("bookings", null, bookingValues);
+            if (bookingId == -1) throw new Exception("Lỗi khi thêm booking");
+
+            // Thêm hành khách vào bảng booking_passengers
+            insertPassengers(db, bookingId, adults, "adult");
+            insertPassengers(db, bookingId, children, "child");
+            insertPassengers(db, bookingId, infants, "infant");
+
+            db.setTransactionSuccessful();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+    }
+
+    private void insertPassengers(SQLiteDatabase db, long bookingId, int count, String type) {
+        for (int i = 0; i < count; i++) {
+            ContentValues values = new ContentValues();
+            values.put("booking_id", bookingId);
+            values.put("name", "Guest " + (i + 1)); // Tên mặc định
+            values.put("age", 0);
+            values.put("type", type);
+            db.insert("booking_passengers", null, values);
+        }
+    }
+
 
 
 
