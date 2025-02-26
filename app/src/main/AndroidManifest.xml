@@ -15,6 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Group5_OnlineTourBookingSystem"
         tools:targetApi="31">
+
         <activity
             android:name=".activities.ForgotPasswordActivity"
             android:exported="false" />
@@ -27,18 +28,21 @@
         <activity
             android:name=".activities.SignUpActivity"
             android:exported="false" />
+
+        <!-- HomePage là màn hình khởi động -->
         <activity
             android:name=".activities.HomePage"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- MainActivity không còn là màn hình khởi động -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
