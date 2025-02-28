@@ -36,35 +36,7 @@ public class HomePage extends AppCompatActivity {
 
         sessionManager = new SessionManager(this);
 
-        textViewUserName = findViewById(R.id.textView);
-        Button btnLogin = findViewById(R.id.btnLogin); // Nút đăng nhập
-        Button btnLogout = findViewById(R.id.btnLogout); // Nút đăng xuất
 
-        // Kiểm tra trạng thái đăng nhập
-        if (sessionManager.isLoggedIn()) {
-            textViewUserName.setText("Hello " + sessionManager.getUserName());
-            btnLogout.setVisibility(View.VISIBLE); // Hiện nút Đăng xuất
-            btnLogin.setVisibility(View.GONE); // Ẩn nút Đăng nhập
-        } else {
-            textViewUserName.setText("Hello Guest");
-            btnLogout.setVisibility(View.GONE); // Ẩn nút Đăng xuất
-            btnLogin.setVisibility(View.VISIBLE); // Hiện nút Đăng nhập
-        }
-
-        // Xử lý đăng nhập
-        btnLogin.setOnClickListener(v -> {
-            Intent intent = new Intent(HomePage.this, MainActivity.class);
-            startActivity(intent);
-        });
-
-        // Xử lý đăng xuất
-        btnLogout.setOnClickListener(v -> {
-            sessionManager.logoutUser();
-            Intent intent = new Intent(HomePage.this, HomePage.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        });
 
         // Fragment Bottom Navigation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
