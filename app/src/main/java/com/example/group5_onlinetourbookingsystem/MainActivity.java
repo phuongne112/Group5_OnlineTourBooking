@@ -1,7 +1,6 @@
 package com.example.group5_onlinetourbookingsystem;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,14 +13,16 @@ import com.example.group5_onlinetourbookingsystem.activities.ForgotPasswordActiv
 import com.example.group5_onlinetourbookingsystem.activities.HomePage;
 import com.example.group5_onlinetourbookingsystem.activities.SignUpActivity;
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
+import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class MainActivity extends AppCompatActivity {
-    private Button button;
     private EditText etEmail, etPassword;
+    private Button button;
     private MyDatabaseHelper dbHelper;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,12 +34,19 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.button);
 
         dbHelper = new MyDatabaseHelper(this);
+        sessionManager = new SessionManager(this);
+
+        // Nếu user đã đăng nhập trước đó, chuyển ngay đến HomePage
+        if (sessionManager.isLoggedIn()) {
+            Intent intent = new Intent(MainActivity.this, HomePage.class);
+            startActivity(intent);
+            finish();
+        }
 
         button.setOnClickListener(view -> {
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
 
-            // ✅ Kiểm tra dữ liệu nhập vào
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(MainActivity.this, "Vui lòng nhập Email và Mật khẩu", Toast.LENGTH_SHORT).show();
                 return;
@@ -49,12 +57,17 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // ✅ Mã hóa mật khẩu trước khi kiểm tra trong database
             String hashedPassword = hashPassword(password);
-
             int result = dbHelper.checkUserLogin(email, hashedPassword);
+
             if (result == 1) {
                 Toast.makeText(MainActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+
+                // Lưu session đăng nhập
+                sessionManager.createLoginSession(email, "Guest"); // Mặc định vai trò là "user"
+
+
+                // Chuyển đến HomePage
                 Intent intent = new Intent(MainActivity.this, HomePage.class);
                 startActivity(intent);
                 finish();
@@ -66,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // ✅ Hàm kiểm tra email có đúng Gmail không
     private boolean isValidEmail(String email) {
         return email.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$");
     }
@@ -88,11 +100,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Chuyển đến màn hình đăng ký
     public void gotoSignUp(View view) {
         Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
         startActivity(intent);
     }
+
     public void gotoForgotPassword(View view) {
         Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
         startActivity(intent);
