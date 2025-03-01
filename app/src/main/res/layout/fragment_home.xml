@@ -73,21 +73,21 @@
             <!-- RecyclerView cho danh mục -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="270dp"
+                android:layout_height="wrap_content"
                 android:layout_margin="6dp"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="18dp">
+                app:cardCornerRadius="18dp"
+                app:cardElevation="14dp">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewCategories"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:clipToPadding="false"
                     android:clipChildren="false"
-                    android:padding="12dp"
-                    android:scrollbars="horizontal"
+                    android:clipToPadding="false"
                     android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"/>
+                    android:overScrollMode="never"
+                    android:padding="12dp"
+                    android:scrollbars="horizontal" />
             </androidx.cardview.widget.CardView>
 
             <!-- RecyclerView cho danh sách tour -->
