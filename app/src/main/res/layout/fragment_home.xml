@@ -26,7 +26,9 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="12dp">
+            android:padding="12dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
 
             <ImageView
                 android:id="@+id/iconSearch"
@@ -74,21 +76,22 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="14dp">
+                android:layout_margin="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="10dp">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewCategories"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="100dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:nestedScrollingEnabled="false"
                     android:overScrollMode="never"
-                    android:padding="12dp"
+                    android:padding="8dp"
                     android:scrollbars="horizontal" />
             </androidx.cardview.widget.CardView>
+
 
             <!-- RecyclerView cho danh sách tour -->
             <androidx.recyclerview.widget.RecyclerView
