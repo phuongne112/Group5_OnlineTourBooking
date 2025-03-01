@@ -62,8 +62,12 @@
         private static final String COLUMN_TOUR_IMAGE = "image";
         private static final String COLUMN_TOUR_CATEGORY_ID = "category_id";
         private static final String COLUMN_TOUR_GUIDE_ID = "guide_id";  // Cột mới để lưu ID người hướng dẫn
-    
-    
+        // Bảng Tour Images
+        private static final String TABLE_TOUR_IMAGES = "tour_images";
+        private static final String COLUMN_TOUR_IMAGE_ID = "id";
+        private static final String COLUMN_TOUR_IMAGE_TOUR_ID = "tour_id";
+        private static final String COLUMN_TOUR_IMAGE_URL = "image_url";
+
         // Bảng Bookings
         private static final String TABLE_BOOKINGS = "bookings";
         private static final String COLUMN_BOOKING_ID = "id";
@@ -71,14 +75,10 @@
         private static final String COLUMN_BOOKING_TOUR_ID = "tour_id";
         private static final String COLUMN_BOOKING_DATE = "booking_date";
         private static final String COLUMN_BOOKING_TOTAL_PRICE = "total_price";
-        private static final String COLUMN_BOOKING_STATUS = "status"; // Pending, Confirmed, Cancelled
-        // Bảng Booking Passengers (Danh sách hành khách)
-        private static final String TABLE_BOOKING_PASSENGERS = "booking_passengers";
-        private static final String COLUMN_PASSENGER_ID = "id";
-        private static final String COLUMN_PASSENGER_BOOKING_ID = "booking_id";
-        private static final String COLUMN_PASSENGER_TYPE = "type"; // adult, child, infant, baby
-        private static final String COLUMN_PASSENGER_NAME = "name";
-        private static final String COLUMN_PASSENGER_AGE = "age";
+        private static final String COLUMN_BOOKING_STATUS = "status";
+        private static final String COLUMN_BOOKING_ADULT_COUNT = "adult_count";
+        private static final String COLUMN_BOOKING_CHILD_COUNT = "child_count";
+        private static final String COLUMN_BOOKING_NOTE = "note";
         // Bảng Contacts
         private static final String TABLE_CONTACTS = "contacts";
         private static final String COLUMN_CONTACT_ID = "contact_id";
@@ -179,14 +179,7 @@
                     "FOREIGN KEY(" + COLUMN_BOOKING_USER_ID + ") REFERENCES users(id), " +
                     "FOREIGN KEY(" + COLUMN_BOOKING_TOUR_ID + ") REFERENCES tours(id))");
     
-            // Tạo bảng booking_passengers
-            db.execSQL("CREATE TABLE " + TABLE_BOOKING_PASSENGERS + " (" +
-                    COLUMN_PASSENGER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_PASSENGER_BOOKING_ID + " INTEGER, " +
-                    COLUMN_PASSENGER_TYPE + " TEXT, " +
-                    COLUMN_PASSENGER_NAME + " TEXT, " +
-                    COLUMN_PASSENGER_AGE + " INTEGER, " +
-                    "FOREIGN KEY(" + COLUMN_PASSENGER_BOOKING_ID + ") REFERENCES bookings(id))");
+
     
             // Tạo bảng payments
             db.execSQL("CREATE TABLE " + TABLE_PAYMENTS + " (" +
@@ -220,7 +213,7 @@
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOURS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKING_PASSENGERS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOUR_IMAGES);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYMENTS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_CITIES);
