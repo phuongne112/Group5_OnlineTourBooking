@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:gravity="center"
     android:padding="16dp"
     android:background="#F5F5F5">
 
-    <!-- Thẻ chứa toàn bộ thông tin user -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,7 +21,7 @@
             android:orientation="vertical"
             android:gravity="center">
 
-            <!-- Ảnh đại diện người dùng -->
+            <!-- Ảnh đại diện -->
             <ImageView
                 android:id="@+id/imgUserProfile"
                 android:layout_width="120dp"
@@ -35,73 +33,54 @@
                 android:contentDescription="User Profile Image"
                 android:clipToOutline="true" />
 
-
+            <Button
+                android:id="@+id/btnChangeImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đổi ảnh đại diện"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"/>
 
             <!-- Họ và tên -->
-            <TextView
-                android:id="@+id/tvUserName"
+            <EditText
+                android:id="@+id/edtUserName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Họ và tên"
+                android:hint="Họ và tên"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <!-- Email -->
-            <TextView
-                android:id="@+id/tvUserEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Email"
-                android:textSize="16sp"
-                android:gravity="center"
                 android:padding="8dp" />
 
             <!-- Số điện thoại -->
-            <TextView
-                android:id="@+id/tvUserPhone"
+            <EditText
+                android:id="@+id/edtUserPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Số điện thoại"
+                android:hint="Số điện thoại"
                 android:textSize="16sp"
-                android:gravity="center"
                 android:padding="8dp" />
 
             <!-- Ngày sinh -->
-            <TextView
-                android:id="@+id/tvUserBirth"
+            <EditText
+                android:id="@+id/edtUserBirth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ngày sinh"
+                android:hint="Ngày sinh"
                 android:textSize="16sp"
-                android:gravity="center"
                 android:padding="8dp" />
 
-
-
-            <!-- Nút chỉnh sửa hồ sơ -->
+            <!-- Nút lưu thông tin -->
             <Button
-                android:id="@+id/btnEditProfile"
+                android:id="@+id/btnSaveProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Chỉnh sửa hồ sơ"
+                android:text="Lưu thay đổi"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
                 android:backgroundTint="@color/teal_700"
-                android:textColor="@android:color/white"/>
-            <Button
-                android:id="@+id/btnLogout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Đăng xuất"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="@color/black"
-                android:textColor="@android:color/white"/>
-
+                android:textColor="@android:color/white" />
 
         </LinearLayout>
-
 
     </androidx.cardview.widget.CardView>
 

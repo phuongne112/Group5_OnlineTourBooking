@@ -63,15 +63,19 @@ public class MainActivity extends AppCompatActivity {
             if (result == 1) {
                 Toast.makeText(MainActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
 
-                // Lưu session đăng nhập
-                sessionManager.createLoginSession(email, "Guest"); // Mặc định vai trò là "user"
+                // 🔹 Lấy userId từ database
+                int userId = dbHelper.getUserIdByEmail(email);
+                String userName = dbHelper.getUserNameByEmail(email);
 
+                // 🔹 Lưu thông tin đăng nhập vào SessionManager
+                sessionManager.createLoginSession(userId, userName, "User");
 
                 // Chuyển đến HomePage
                 Intent intent = new Intent(MainActivity.this, HomePage.class);
                 startActivity(intent);
                 finish();
-            } else if (result == 0) {
+            }
+            else if (result == 0) {
                 Toast.makeText(MainActivity.this, "Sai mật khẩu", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(MainActivity.this, "Tài khoản không tồn tại", Toast.LENGTH_SHORT).show();
@@ -109,4 +113,5 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
         startActivity(intent);
     }
+
 }
