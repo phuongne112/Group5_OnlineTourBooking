@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Thông tin tour -->
+        <!-- Thông tin Tour -->
         <TextView
             android:id="@+id/booking_tour_name"
             android:layout_width="match_parent"
@@ -23,62 +23,80 @@
             android:textSize="18sp"
             android:textColor="@android:color/holo_red_dark" />
 
-        <!-- Thông tin người đặt -->
-        <!-- Chọn số lượng hành khách -->
+        <!-- Thông tin Người dùng -->
         <TextView
-            android:id="@+id/passenger_count_label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Number of Passengers"
+            android:text="Thông tin người đặt"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:paddingTop="10dp" />
+            android:paddingTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:id="@+id/booking_user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tên"
+            android:enabled="false" />
+
+        <EditText
+            android:id="@+id/booking_user_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:enabled="false" />
+
+        <EditText
+            android:id="@+id/booking_user_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Số điện thoại"
+            android:enabled="false" />
+
+        <!-- Số lượng hành khách -->
+        <TextView
+            android:text="Số lượng hành khách"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
         <EditText
             android:id="@+id/num_adults"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Adults"
-            android:inputType="number"
-            android:padding="10dp" />
+            android:hint="Người lớn"
+            android:inputType="number" />
 
         <EditText
             android:id="@+id/num_children"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Children"
-            android:inputType="number"
-            android:padding="10dp" />
+            android:hint="Trẻ em"
+            android:inputType="number" />
 
+        <!-- Ghi chú -->
         <EditText
-            android:id="@+id/num_infants"
+            android:id="@+id/booking_note"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Infants"
-            android:inputType="number"
-            android:padding="10dp" />
-
-        <!-- Danh sách hành khách sẽ được thêm vào đây -->
-        <LinearLayout
-            android:id="@+id/passenger_container"
+            android:hint="Ghi chú (tuỳ chọn)" />
+        <TextView
+            android:id="@+id/total_price"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:text="Tổng tiền: 0 VND"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingTop="10dp"/>
 
         <!-- Nút xác nhận -->
-        <LinearLayout
+        <Button
+            android:id="@+id/confirm_booking_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingTop="10dp">
-
-            <Button
-                android:id="@+id/confirm_booking_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Confirm Booking"
-                android:padding="12dp" />
-        </LinearLayout>
-
+            android:text="Xác nhận đặt tour"
+            android:padding="12dp" />
     </LinearLayout>
 </ScrollView>

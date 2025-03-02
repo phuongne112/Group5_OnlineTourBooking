@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <!-- Tiêu đề -->
+    <TextView
+        android:id="@+id/tv_payment_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thanh Toán"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="16dp"/>
+
+    <!-- Tổng tiền cần thanh toán -->
+    <TextView
+        android:id="@+id/payment_total_price"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Số tiền cần thanh toán: 0 VND"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:paddingBottom="16dp"
+        android:gravity="center"/>
+
+    <!-- Nút Xác nhận thanh toán -->
+    <Button
+        android:id="@+id/btn_approve_payment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xác nhận thanh toán"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/white"
+        android:layout_marginTop="20dp"/>
+
+    <!-- Nút Hủy thanh toán -->
+    <Button
+        android:id="@+id/btn_cancel_payment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hủy thanh toán"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/white"
+        android:layout_marginTop="10dp"/>
+</LinearLayout>
