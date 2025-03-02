@@ -2,9 +2,12 @@ package com.example.group5_onlinetourbookingsystem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -45,7 +48,21 @@ public class HomeFragment extends Fragment {
 
         sessionManager = new SessionManager(requireContext());
         databaseHelper = new MyDatabaseHelper(requireContext());
+        // Search
+        EditText editTextSearch = view.findViewById(R.id.editTextSearch);
+        editTextSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String query = s.toString().trim();
+                searchTours(query);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
         // 👉 Cấu hình RecyclerView danh mục
         recyclerViewCategories = view.findViewById(R.id.recyclerViewCategories);
         recyclerViewCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -100,4 +117,15 @@ public class HomeFragment extends Fragment {
         databaseHelper.addTour("Tour Nha Trang", "Nha Trang", 5, 190.0, 4, "nhatrang_tour", 5);
         databaseHelper.addTour("Tour Sapa", "Sapa", 6, 170.0, 3, "sapa_tour", 6);
     }
+    private void searchTours(String query) {
+        tourList.clear();
+        if (query.isEmpty()) {
+            tourList.addAll(databaseHelper.getAllTours());
+        } else {
+            tourList.addAll(databaseHelper.searchTours(query));
+        }
+        tourAdapter.notifyDataSetChanged();
+    }
+
+
 }
