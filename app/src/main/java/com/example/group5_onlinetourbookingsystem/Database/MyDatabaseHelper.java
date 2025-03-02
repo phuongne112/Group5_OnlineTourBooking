@@ -12,13 +12,15 @@
     import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
     import com.example.group5_onlinetourbookingsystem.models.TourModel;
     import com.example.group5_onlinetourbookingsystem.models.UserModel;
-    
+
+    import java.text.Normalizer;
     import java.text.SimpleDateFormat;
     import java.util.ArrayList;
     import java.util.Date;
     import java.util.List;
     import java.util.Locale;
-    
+    import java.util.regex.Pattern;
+
     public class MyDatabaseHelper extends SQLiteOpenHelper {
         private Context context;
         private static final String DATABASE_NAME = "tourbooking.db";
@@ -538,14 +540,67 @@
             db.close();
             return rowsAffected > 0;
         }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+        public ArrayList<TourModel> searchTours(String query) {
+            ArrayList<TourModel> tourList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            // Chuyển query thành không dấu
+            String queryNoAccent = removeDiacritics(query);
+
+            // Lấy toàn bộ danh sách tours từ SQLite
+            String sql = "SELECT t." + COLUMN_TOUR_ID + ", t." + COLUMN_TOUR_NAME +
+                    ", t." + COLUMN_TOUR_DESTINATION + ", t." + COLUMN_TOUR_PRICE +
+                    ", t." + COLUMN_TOUR_DURATION + ", t." + COLUMN_TOUR_IMAGE +
+                    ", c." + COLUMN_CATEGORY_ID + ", c." + COLUMN_CATEGORY_NAME +
+                    ", t." + COLUMN_CITY_NAME +
+                    " FROM " + TABLE_TOURS + " t " +
+                    "JOIN " + TABLE_CATEGORIES + " c ON t." + COLUMN_TOUR_CATEGORY_ID + " = c." + COLUMN_CATEGORY_ID;
+
+            Cursor cursor = db.rawQuery(sql, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(0);
+                    String name = cursor.getString(1);
+                    String destination = cursor.getString(2);
+                    double price = cursor.getDouble(3);
+                    int duration = cursor.getInt(4);
+                    String image = cursor.getString(5);
+                    int categoryId = cursor.getInt(6);
+                    String categoryName = cursor.getString(7);
+                    String cityName = cursor.getString(8);
+
+                    // Chuyển tên tour & category về không dấu
+                    String nameNoAccent = removeDiacritics(name);
+                    String categoryNoAccent = removeDiacritics(categoryName);
+
+                    // Kiểm tra nếu query khớp với tour name hoặc category name không dấu
+                    if (nameNoAccent.contains(queryNoAccent) || categoryNoAccent.contains(queryNoAccent)) {
+                        tourList.add(new TourModel(id, name, destination, price, duration, image, categoryId, categoryName, cityName));
+                    }
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return tourList;
+        }
+
+
+
+        // Hàm chuyển Tiếng Việt có dấu thành không dấu
+        public static String removeDiacritics(String text) {
+            if (text == null) return "";
+            String normalized = Normalizer.normalize(text, Normalizer.Form.NFD);
+            return normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "").toLowerCase();
+        }
+
+
+
+
+
+
+
+
     }

@@ -24,11 +24,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="12dp"
-            android:focusable="true"
-            android:focusableInTouchMode="true">
+            android:padding="12dp">
 
             <ImageView
                 android:id="@+id/iconSearch"
@@ -46,7 +46,11 @@
                 android:hint="Search"
                 android:paddingHorizontal="8dp"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:inputType="text"
+                android:breakStrategy="simple"/>
 
             <ImageView
                 android:id="@+id/iconMic"
