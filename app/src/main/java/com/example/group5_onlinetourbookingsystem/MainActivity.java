@@ -66,9 +66,9 @@ public class MainActivity extends AppCompatActivity {
                 // 🔹 Lấy userId từ database
                 int userId = dbHelper.getUserIdByEmail(email);
                 String userName = dbHelper.getUserNameByEmail(email);
+                String userPhone = dbHelper.getUserPhoneByEmail(email);
 
-                // 🔹 Lưu thông tin đăng nhập vào SessionManager
-                sessionManager.createLoginSession(userId, userName, "User");
+                sessionManager.createLoginSession(userId, userName, "User", email, userPhone);
 
                 // Chuyển đến HomePage
                 Intent intent = new Intent(MainActivity.this, HomePage.class);

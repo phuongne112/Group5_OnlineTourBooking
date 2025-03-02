@@ -17,6 +17,7 @@
     import java.text.SimpleDateFormat;
     import java.util.ArrayList;
     import java.util.Date;
+    import java.util.HashMap;
     import java.util.List;
     import java.util.Locale;
     import java.util.regex.Pattern;
@@ -81,6 +82,7 @@
         private static final String COLUMN_BOOKING_ADULT_COUNT = "adult_count";
         private static final String COLUMN_BOOKING_CHILD_COUNT = "child_count";
         private static final String COLUMN_BOOKING_NOTE = "note";
+        private static final String COLUMN_BOOKING_CREATED_AT = "created_at";
         // Bảng Contacts
         private static final String TABLE_CONTACTS = "contacts";
         private static final String COLUMN_CONTACT_ID = "contact_id";
@@ -178,11 +180,16 @@
                     COLUMN_BOOKING_DATE + " TEXT, " +
                     COLUMN_BOOKING_TOTAL_PRICE + " REAL, " +
                     COLUMN_BOOKING_STATUS + " TEXT, " +
+                    COLUMN_BOOKING_ADULT_COUNT + " INTEGER, " +
+                    COLUMN_BOOKING_CHILD_COUNT + " INTEGER, " +
+                    COLUMN_BOOKING_NOTE + " TEXT, " +
+                    COLUMN_BOOKING_CREATED_AT + " TEXT DEFAULT CURRENT_TIMESTAMP, " +  // ✅ Thêm cột created_at với giá trị mặc định
                     "FOREIGN KEY(" + COLUMN_BOOKING_USER_ID + ") REFERENCES users(id), " +
                     "FOREIGN KEY(" + COLUMN_BOOKING_TOUR_ID + ") REFERENCES tours(id))");
-    
 
-    
+
+
+
             // Tạo bảng payments
             db.execSQL("CREATE TABLE " + TABLE_PAYMENTS + " (" +
                     COLUMN_PAYMENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -337,12 +344,12 @@
             String query = "SELECT " + COLUMN_USER_PASSWORD + " FROM " + TABLE_USERS +
                     " WHERE " + COLUMN_USER_EMAIL + " = ?";
             Cursor cursor = db.rawQuery(query, new String[]{email});
-    
+
             if (cursor != null && cursor.moveToFirst()) {
                 String storedPassword = cursor.getString(0);
                 cursor.close();
                 db.close();
-    
+
                 // ✅ So sánh mật khẩu đã mã hóa
                 if (storedPassword.equals(hashedPassword)) {
                     return 1; // Đăng nhập thành công
@@ -384,7 +391,32 @@
             db.close();
             return cityList;
         }
-    
+        public String getUserPhoneByEmail(String email) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT phone FROM users WHERE email = ?", new String[]{email});
+            if (cursor.moveToFirst()) {
+                return cursor.getString(0);
+            }
+            cursor.close();
+            return "";
+        }
+        public String getUserPhoneById(int userId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String phone = null;
+
+            Cursor cursor = db.rawQuery("SELECT " + COLUMN_USER_PHONE + " FROM " + TABLE_USERS + " WHERE " + COLUMN_USER_ID + " = ?",
+                    new String[]{String.valueOf(userId)});
+
+            if (cursor.moveToFirst()) {
+                phone = cursor.getString(0);
+            }
+
+            cursor.close();
+            db.close();
+            return phone;
+        }
+
+
         public TourModel getTourById(int id) {
             SQLiteDatabase db = this.getReadableDatabase();
             TourModel tour = null;
@@ -416,50 +448,29 @@
             db.close();
             return tour;
         }
-    
-        public boolean insertBooking(int userId, int tourId, double totalPrice, int adults, int children, int infants) {
+
+        public long addBooking(int userId, int tourId, int adults, int children, String note, double totalPrice, String status) {
             SQLiteDatabase db = this.getWritableDatabase();
-            db.beginTransaction();
-            try {
-                userId = 1; // Mặc định User ID = 1
-    
-                // Chèn vào bảng bookings
-                ContentValues bookingValues = new ContentValues();
-                bookingValues.put("user_id", userId);
-                bookingValues.put("tour_id", tourId);
-                bookingValues.put("booking_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
-                bookingValues.put("total_price", totalPrice);
-                bookingValues.put("status", "Pending");
-    
-                long bookingId = db.insert("bookings", null, bookingValues);
-                if (bookingId == -1) throw new Exception("Lỗi khi thêm booking");
-    
-                // Thêm hành khách vào bảng booking_passengers
-                insertPassengers(db, bookingId, adults, "adult");
-                insertPassengers(db, bookingId, children, "child");
-                insertPassengers(db, bookingId, infants, "infant");
-    
-                db.setTransactionSuccessful();
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            } finally {
-                db.endTransaction();
-                db.close();
-            }
+            ContentValues values = new ContentValues();
+
+            values.put("user_id", userId);
+            values.put("tour_id", tourId);
+            values.put("adult_count", adults);
+            values.put("child_count", children);
+            values.put("note", note);
+            values.put("total_price", totalPrice);
+            values.put("status", status); // ✅ Thêm trạng thái
+            values.put("created_at", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+
+            long result = db.insert("bookings", null, values);
+            db.close();
+            return result;
         }
-    
-        private void insertPassengers(SQLiteDatabase db, long bookingId, int count, String type) {
-            for (int i = 0; i < count; i++) {
-                ContentValues values = new ContentValues();
-                values.put("booking_id", bookingId);
-                values.put("name", "Guest " + (i + 1)); // Tên mặc định
-                values.put("age", 0);
-                values.put("type", type);
-                db.insert("booking_passengers", null, values);
-            }
-        }
+
+
+
+
+
         public boolean isUserExists(String email) {
             SQLiteDatabase db = this.getReadableDatabase();
             String query = "SELECT * FROM users WHERE email = ?";
@@ -596,7 +607,33 @@
             return normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "").toLowerCase();
         }
 
+        public HashMap<String, String> getUserDetails(int userId) {
+            HashMap<String, String> user = new HashMap<>();
+            SQLiteDatabase db = this.getReadableDatabase();
 
+            Cursor cursor = db.rawQuery("SELECT name, role, email, phone FROM users WHERE id = ?", new String[]{String.valueOf(userId)});
+
+            if (cursor.moveToFirst()) {
+                user.put("name", cursor.getString(0));
+                user.put("role", cursor.getString(1));
+                user.put("email", cursor.getString(2));
+                user.put("phone", cursor.getString(3));
+            }
+
+            cursor.close();
+            db.close();
+            return user;
+        }
+
+
+        public void updateBookingStatus(long bookingId, String status) {  // Sửa int thành long
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("status", status);
+
+            db.update("bookings", values, "id = ?", new String[]{String.valueOf(bookingId)});
+            db.close();
+        }
 
 
 
