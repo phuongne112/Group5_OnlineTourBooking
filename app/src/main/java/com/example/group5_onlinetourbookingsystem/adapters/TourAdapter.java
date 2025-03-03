@@ -76,7 +76,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.tour_name);
-             destination = itemView.findViewById(R.id.tour_destination);
+            destination = itemView.findViewById(R.id.tour_destination);
             price = itemView.findViewById(R.id.tour_price);
             duration = itemView.findViewById(R.id.tour_duration);
             TourImage = itemView.findViewById(R.id.tour_image);

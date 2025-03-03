@@ -2,17 +2,18 @@ package com.example.group5_onlinetourbookingsystem.models;
 
 public class TourModel {
     private int id,categoryId;
-    private String name, destination, image, cityName,categoryName;
+    private String name, destination, image, cityName,categoryName, description ;
     private double price;
     private int duration;
 
-    public TourModel(int id, String name, String destination, double price, int duration, String image,int categoryId, String categoryName, String cityName) {
+    public TourModel(int id, String name, String destination, double price, int duration, String image,String description,int categoryId, String categoryName, String cityName) {
         this.id = id;
         this.name = name;
         this.destination = destination;
         this.price = price;
         this.duration = duration;
         this.image = image;
+        this.description = description;
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.cityName = cityName;
@@ -25,6 +26,7 @@ public class TourModel {
     public double getPrice() { return price; }
     public int getDuration() { return duration; }
     public String getImage() { return image; }
+    public String getDescription() { return description; }
     public int getCategoryId() { return categoryId; }
     public String getCategoryName() { return categoryName; }
     public String getCityName() { return cityName; }
