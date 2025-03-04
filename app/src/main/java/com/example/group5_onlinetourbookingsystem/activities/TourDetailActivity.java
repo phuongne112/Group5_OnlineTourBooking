@@ -15,7 +15,7 @@ import com.example.group5_onlinetourbookingsystem.models.TourModel;
 import com.squareup.picasso.Picasso;
 
 public class TourDetailActivity extends AppCompatActivity {
-    private TextView tourName, tourDestination, tourPrice, tourDuration, tourCategory;
+    private TextView tourName, tourDestination, tourPrice, tourDuration, tourCategory,tourDescription;
     private ImageView tourImage;
     private Button bookButton;
     private MyDatabaseHelper dbHelper;
@@ -32,6 +32,7 @@ public class TourDetailActivity extends AppCompatActivity {
         tourPrice = findViewById(R.id.detail_tour_price);
         tourDuration = findViewById(R.id.detail_tour_duration);
         tourCategory = findViewById(R.id.detail_tour_category);
+        tourDescription = findViewById(R.id.detail_tour_description); // Thêm mô tả
         tourImage = findViewById(R.id.detail_tour_image);
         bookButton = findViewById(R.id.book_button);
 
@@ -48,6 +49,12 @@ public class TourDetailActivity extends AppCompatActivity {
                 tourPrice.setText(String.format("$%.2f", price));
                 tourDuration.setText(tour.getDuration() + " days");
                 tourCategory.setText("Category: " + tour.getCategoryId());
+                // Hiển thị mô tả tour, kiểm tra null để tránh lỗi
+                if (tour.getDescription() != null && !tour.getDescription().isEmpty()) {
+                    tourDescription.setText(tour.getDescription());
+                } else {
+                    tourDescription.setText("Chưa có mô tả");
+                }
 
                 // Load ảnh từ database (nếu là URL)
                 if (tour.getImage().startsWith("http")) {

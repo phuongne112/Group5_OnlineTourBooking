@@ -53,7 +53,7 @@
         private static final String COLUMN_CATEGORY_NAME = "name";
         private static final String COLUMN_CATEGORY_IMAGE = "image";
         private static final String COLUMN_CATEGORY_DESCRIPTION = "description"; // Mô tả danh mục
-    
+
         // Bảng Tours
         private static final String TABLE_TOURS = "tours";
         private static final String COLUMN_TOUR_ID = "id";
@@ -64,6 +64,8 @@
         private static final String COLUMN_TOUR_DURATION = "duration";
         private static final String COLUMN_TOUR_IMAGE = "image";
         private static final String COLUMN_TOUR_CATEGORY_ID = "category_id";
+        private static final String COLUMN_TOUR_DESCRIPTION = "description";
+
         private static final String COLUMN_TOUR_GUIDE_ID = "guide_id";  // Cột mới để lưu ID người hướng dẫn
         // Bảng Tour Images
         private static final String TABLE_TOUR_IMAGES = "tour_images";
@@ -166,6 +168,7 @@
                     COLUMN_TOUR_DURATION + " INTEGER, " +
                     COLUMN_TOUR_IMAGE + " TEXT, " +
                     COLUMN_TOUR_CATEGORY_ID + " INTEGER, " +
+                    COLUMN_TOUR_DESCRIPTION + " TEXT, " +
                     COLUMN_TOUR_GUIDE_ID + " INTEGER, " + // Added guide_id
                     "FOREIGN KEY(" + COLUMN_TOUR_CITY_ID + ") REFERENCES cities(id), " +
                     "FOREIGN KEY(" + COLUMN_TOUR_CATEGORY_ID + ") REFERENCES categories(id), " +
@@ -290,14 +293,15 @@
         public ArrayList<TourModel> getAllTours() {
             ArrayList<TourModel> tourList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
-    
-            String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, c.id AS categoryId, c.name AS categoryName, ci.name AS cityName " +
+
+            String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, t.description, " +
+                    "c.id AS categoryId, c.name AS categoryName, ci.name AS cityName " +
                     "FROM tours t " +
                     "LEFT JOIN categories c ON t.category_id = c.id " +
                     "LEFT JOIN cities ci ON t.city_id = ci.id";
-    
+
             Cursor cursor = db.rawQuery(query, null);
-    
+
             if (cursor.moveToFirst()) {
                 do {
                     int id = cursor.getInt(0);
@@ -306,23 +310,25 @@
                     double price = cursor.getDouble(3);
                     int duration = cursor.getInt(4);
                     String image = cursor.getString(5);
-                    int categoryId = cursor.getInt(6);
-                    String categoryName = cursor.getString(7);  // Lấy category name
-                    String cityName = cursor.getString(8);
-    
-                    tourList.add(new TourModel(id, name, destination, price, duration, image, categoryId, categoryName, cityName));
+                    String description = cursor.getString(6); // Lấy description
+                    int categoryId = cursor.getInt(7);
+                    String categoryName = cursor.getString(8);
+                    String cityName = cursor.getString(9);
+
+                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityName));
                 } while (cursor.moveToNext());
             }
-    
+
             cursor.close();
             db.close();
             return tourList;
         }
-    
-    
-    
-    
-    
+
+
+
+
+
+
         public long addUser(String name, String email, String phone, String hashedPassword, String birthDate, String imagePath) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -421,7 +427,7 @@
             SQLiteDatabase db = this.getReadableDatabase();
             TourModel tour = null;
     
-            String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, c.id AS categoryId, c.name AS categoryName, ci.name AS cityName " +
+            String query = "SELECT t.id, t.name, t.destination,t.description , t.price, t.duration, t.image, c.id AS categoryId, c.name AS categoryName, ci.name AS cityName " +
                     "FROM tours t " +
                     "LEFT JOIN categories c ON t.category_id = c.id " +
                     "LEFT JOIN cities ci ON t.city_id = ci.id " +
@@ -433,15 +439,16 @@
                 int tourId = cursor.getInt(0);
                 String name = cursor.getString(1);
                 String destination = cursor.getString(2);
-                double price = cursor.getDouble(3);
-                int duration = cursor.getInt(4);
-                String image = cursor.getString(5);
-                int categoryId = cursor.getInt(6);
-                String categoryName = cursor.getString(7);
-                String cityName = cursor.getString(8);
-    
+                String description = cursor.getString(3); // ✅ Lấy đúng cột description
+                double price = cursor.getDouble(4);
+                int duration = cursor.getInt(5);
+                String image = cursor.getString(6);
+                int categoryId = cursor.getInt(7);
+                String categoryName = cursor.getString(8);
+                String cityName = cursor.getString(9);
+
                 // Tạo đối tượng TourModel
-                tour = new TourModel(tourId, name, destination, price, duration, image, categoryId, categoryName, cityName);
+                tour = new TourModel(tourId, name, destination, price, duration, image,description, categoryId, categoryName, cityName);
             }
     
             cursor.close();
@@ -556,17 +563,19 @@
             ArrayList<TourModel> tourList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
 
-            // Chuyển query thành không dấu
+            // Chuyển query thành không dấu để tìm kiếm
             String queryNoAccent = removeDiacritics(query);
 
-            // Lấy toàn bộ danh sách tours từ SQLite
+            // Truy vấn dữ liệu từ bảng tours, categories, cities
             String sql = "SELECT t." + COLUMN_TOUR_ID + ", t." + COLUMN_TOUR_NAME +
                     ", t." + COLUMN_TOUR_DESTINATION + ", t." + COLUMN_TOUR_PRICE +
                     ", t." + COLUMN_TOUR_DURATION + ", t." + COLUMN_TOUR_IMAGE +
+                    ", t." + COLUMN_TOUR_DESCRIPTION +  // Thêm description
                     ", c." + COLUMN_CATEGORY_ID + ", c." + COLUMN_CATEGORY_NAME +
-                    ", t." + COLUMN_CITY_NAME +
+                    ", ci." + COLUMN_CITY_NAME +  // Lấy cityName từ bảng cities
                     " FROM " + TABLE_TOURS + " t " +
-                    "JOIN " + TABLE_CATEGORIES + " c ON t." + COLUMN_TOUR_CATEGORY_ID + " = c." + COLUMN_CATEGORY_ID;
+                    "LEFT JOIN " + TABLE_CATEGORIES + " c ON t." + COLUMN_TOUR_CATEGORY_ID + " = c." + COLUMN_CATEGORY_ID + " " +
+                    "LEFT JOIN " + TABLE_CITIES + " ci ON t." + COLUMN_TOUR_CITY_ID + " = ci." + COLUMN_CITY_ID;
 
             Cursor cursor = db.rawQuery(sql, null);
 
@@ -578,17 +587,22 @@
                     double price = cursor.getDouble(3);
                     int duration = cursor.getInt(4);
                     String image = cursor.getString(5);
-                    int categoryId = cursor.getInt(6);
-                    String categoryName = cursor.getString(7);
-                    String cityName = cursor.getString(8);
+                    String description = cursor.getString(6); // Lấy description
+                    int categoryId = cursor.getInt(7);
+                    String categoryName = cursor.getString(8);
+                    String cityName = cursor.getString(9);
 
-                    // Chuyển tên tour & category về không dấu
+                    // Xử lý null để tránh lỗi
+                    if (name == null) name = "";
+                    if (categoryName == null) categoryName = "";
+
+                    // Chuyển thành không dấu để so sánh
                     String nameNoAccent = removeDiacritics(name);
                     String categoryNoAccent = removeDiacritics(categoryName);
 
-                    // Kiểm tra nếu query khớp với tour name hoặc category name không dấu
+                    // Kiểm tra nếu query khớp với name hoặc category
                     if (nameNoAccent.contains(queryNoAccent) || categoryNoAccent.contains(queryNoAccent)) {
-                        tourList.add(new TourModel(id, name, destination, price, duration, image, categoryId, categoryName, cityName));
+                        tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityName));
                     }
                 } while (cursor.moveToNext());
             }
@@ -597,6 +611,7 @@
             db.close();
             return tourList;
         }
+
 
 
 
