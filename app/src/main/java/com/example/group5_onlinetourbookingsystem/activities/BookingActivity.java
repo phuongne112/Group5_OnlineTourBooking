@@ -106,12 +106,12 @@ public class BookingActivity extends AppCompatActivity {
             return;
         }
 
-// Debug để kiểm tra giá trị ID trước khi truyền
-        Log.d("BookingDebug", "Booking ID before intent: " + bookingId);
+        Log.d("BookingDebug", "Booking ID: " + bookingId);
 
+        // Chuyển sang màn hình PaymentActivity
         Intent intent = new Intent(BookingActivity.this, PaymentActivity.class);
         intent.putExtra("bookingId", bookingId);
-        intent.putExtra("totalPrice", totalPrice);  // Truyền tổng tiền
+        intent.putExtra("totalPrice", totalPrice);
         startActivity(intent);
 
 

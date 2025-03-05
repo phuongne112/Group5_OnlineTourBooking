@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.models.TourModel;
+import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 import com.squareup.picasso.Picasso;
 
 public class TourDetailActivity extends AppCompatActivity {
@@ -20,11 +21,13 @@ public class TourDetailActivity extends AppCompatActivity {
     private Button bookButton;
     private MyDatabaseHelper dbHelper;
     private int tourId;
+    private SessionManager sessionManager;
     private double price; // Lưu giá tour dưới dạng số để truyền qua BookingActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
         setContentView(R.layout.activity_tour_detail);
 
         tourName = findViewById(R.id.detail_tour_name);
@@ -77,19 +80,27 @@ public class TourDetailActivity extends AppCompatActivity {
             finish();
         }
 
+
         // Sự kiện nhấn "Book Now"
         bookButton.setOnClickListener(view -> {
-            Intent intent = new Intent(TourDetailActivity.this, BookingActivity.class);
+            if (sessionManager.isLoggedIn()) {
+                // Người dùng đã đăng nhập
+                Intent intent = new Intent(TourDetailActivity.this, BookingActivity.class);
 
-            // Truyền dữ liệu sang BookingActivity
-            intent.putExtra("tour_id", tourId);
-            intent.putExtra("tour_name", tourName.getText().toString());
-            intent.putExtra("tour_destination", tourDestination.getText().toString());
-            intent.putExtra("tour_price", price); // Truyền số thực thay vì chuỗi
-            intent.putExtra("tour_duration", tourDuration.getText().toString());
-            intent.putExtra("tour_category", tourCategory.getText().toString());
+                // Truyền dữ liệu qua BookingActivity
+                intent.putExtra("tour_id", tourId);
+                intent.putExtra("tour_name", tourName.getText().toString());
+                intent.putExtra("tour_destination", tourDestination.getText().toString());
+                intent.putExtra("tour_price", price);
+                intent.putExtra("tour_duration", tourDuration.getText().toString());
+                intent.putExtra("tour_category", tourCategory.getText().toString());
 
-            startActivity(intent);
+                startActivity(intent);
+            } else {
+                // Người dùng chưa đăng nhập
+                Toast.makeText(this, "Bạn cần đăng nhập để đặt tour!", Toast.LENGTH_SHORT).show();
+            }
         });
+
     }
 }
