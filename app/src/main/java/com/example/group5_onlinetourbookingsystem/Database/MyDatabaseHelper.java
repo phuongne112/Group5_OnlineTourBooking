@@ -641,13 +641,35 @@
         }
 
 
-        public void updateBookingStatus(long bookingId, String status) {  // Sửa int thành long
+        public long addPayment(long bookingId, double amount, String paymentDate, String status) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("booking_id", bookingId);
+            values.put("amount", amount);
+            values.put("payment_date", paymentDate); // Thêm ngày thanh toán
+            values.put("status", status);
+
+            long result = db.insert("payments", null, values);
+            db.close();
+            return result;
+        }
+
+
+
+
+        public void updateBookingStatus(long bookingId, String status) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put("status", status);
-
-            db.update("bookings", values, "id = ?", new String[]{String.valueOf(bookingId)});
+            db.update("bookings", values, "id=?", new String[]{String.valueOf(bookingId)});
             db.close();
+        }
+        public Cursor getUserBookings(int userId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String query = "SELECT b.id AS _id, t.name AS tour_name, b.status, b.booking_date " +
+                    "FROM bookings b INNER JOIN tours t ON b.tour_id = t.id " +
+                    "WHERE b.user_id = ?";
+            return db.rawQuery(query, new String[]{String.valueOf(userId)});
         }
 
 

@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
+    android:gravity="center"
     android:background="@color/white">
 
     <!-- Tiêu đề -->
@@ -17,7 +18,7 @@
         android:gravity="center"
         android:paddingBottom="16dp"/>
 
-    <!-- Tổng tiền cần thanh toán -->
+    <!-- Tổng tiền -->
     <TextView
         android:id="@+id/payment_total_price"
         android:layout_width="match_parent"
@@ -26,10 +27,22 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@color/black"
-        android:paddingBottom="16dp"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:paddingBottom="16dp"/>
 
-    <!-- Nút Xác nhận thanh toán -->
+    <!-- Ảnh QR Code -->
+    <ImageView
+        android:id="@+id/imgQrCode"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+    android:layout_marginBottom="20dp"
+    android:adjustViewBounds="true"
+    android:scaleType="fitCenter"
+    android:src="@drawable/qr_code"
+    android:contentDescription="QR Code"/>
+
+    <!-- Button Xác nhận thanh toán -->
     <Button
         android:id="@+id/btn_approve_payment"
         android:layout_width="match_parent"
@@ -37,9 +50,9 @@
         android:text="Xác nhận thanh toán"
         android:backgroundTint="@color/black"
         android:textColor="@color/white"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="10dp"/>
 
-    <!-- Nút Hủy thanh toán -->
+    <!-- Button Hủy -->
     <Button
         android:id="@+id/btn_cancel_payment"
         android:layout_width="match_parent"

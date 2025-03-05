@@ -2,13 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/tvNoBooking"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Booking Fragment"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="Không có đơn đặt tour nào!"
+        android:textColor="#FF0000"
+        android:textSize="18sp"
+        android:visibility="gone"/>
+
+    <ListView
+        android:id="@+id/listViewBookings"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"/>
+
 </LinearLayout>
