@@ -16,61 +16,83 @@ import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 import com.squareup.picasso.Picasso;
 
 public class TourDetailActivity extends AppCompatActivity {
-    private TextView tourName, tourDestination, tourPrice, tourDuration, tourCategory,tourDescription;
+    private TextView tourName, tourDestination, tourPrice, tourDuration, tourCategory, tourDescription;
     private ImageView tourImage;
     private Button bookButton;
     private MyDatabaseHelper dbHelper;
     private int tourId;
     private SessionManager sessionManager;
-    private double price; // Lưu giá tour dưới dạng số để truyền qua BookingActivity
+    private double price;
+    private TourModel tour; // ✅ Thêm biến để lưu TourModel
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sessionManager = new SessionManager(this);
         setContentView(R.layout.activity_tour_detail);
 
+        // ✅ Khởi tạo MyDatabaseHelper
+        dbHelper = new MyDatabaseHelper(this);
+        sessionManager = new SessionManager(this);
+
+        // ✅ Ánh xạ UI
         tourName = findViewById(R.id.detail_tour_name);
         tourDestination = findViewById(R.id.detail_tour_destination);
         tourPrice = findViewById(R.id.detail_tour_price);
         tourDuration = findViewById(R.id.detail_tour_duration);
         tourCategory = findViewById(R.id.detail_tour_category);
-        tourDescription = findViewById(R.id.detail_tour_description); // Thêm mô tả
+        tourDescription = findViewById(R.id.detail_tour_description);
         tourImage = findViewById(R.id.detail_tour_image);
         bookButton = findViewById(R.id.book_button);
 
-        dbHelper = new MyDatabaseHelper(this);
-
-        // Lấy tour_id từ Intent
+        // ✅ Lấy tour_id từ Intent
         tourId = getIntent().getIntExtra("tour_id", -1);
+
         if (tourId != -1) {
-            TourModel tour = dbHelper.getTourById(tourId);
+            tour = dbHelper.getTourById(tourId); // ✅ Lưu lại tour
             if (tour != null) {
+                // ✅ Hiển thị thông tin Tour
                 tourName.setText(tour.getName());
                 tourDestination.setText("Destination: " + tour.getDestination());
                 price = tour.getPrice();
                 tourPrice.setText(String.format("$%.2f", price));
                 tourDuration.setText(tour.getDuration() + " days");
-                tourCategory.setText("Category: " + tour.getCategoryId());
-                // Hiển thị mô tả tour, kiểm tra null để tránh lỗi
-                if (tour.getDescription() != null && !tour.getDescription().isEmpty()) {
-                    tourDescription.setText(tour.getDescription());
-                } else {
-                    tourDescription.setText("Chưa có mô tả");
-                }
+                tourCategory.setText("Category: " + tour.getCategoryName());
 
-                // Load ảnh từ database (nếu là URL)
+                // ✅ Xử lý mô tả tour
+                tourDescription.setText((tour.getDescription() != null && !tour.getDescription().isEmpty())
+                        ? tour.getDescription()
+                        : "Chưa có mô tả");
+
+                // ✅ Xử lý hình ảnh
                 if (tour.getImage().startsWith("http")) {
                     Picasso.get().load(tour.getImage()).into(tourImage);
                 } else {
-                    // Nếu là ảnh trong drawable
                     int imageResource = getResources().getIdentifier(tour.getImage(), "drawable", getPackageName());
-                    if (imageResource != 0) {
-                        tourImage.setImageResource(imageResource);
-                    } else {
-                        tourImage.setImageResource(R.drawable.favorites);
-                    }
+                    tourImage.setImageResource(imageResource != 0 ? imageResource : R.drawable.favorites);
                 }
+
+                // ✅ Sự kiện nhấn "Book Now"
+                bookButton.setOnClickListener(view -> {
+                    if (sessionManager.isLoggedIn()) {
+                        Intent intent = new Intent(TourDetailActivity.this, BookingActivity.class);
+                        intent.putExtra("tour_id", tourId);
+                        intent.putExtra("tour_name", tour.getName());
+                        intent.putExtra("tour_destination", tour.getDestination());
+                        intent.putExtra("tour_price", price);
+                        intent.putExtra("tour_duration", tour.getDuration() + " days");
+                        intent.putExtra("tour_category", tour.getCategoryName());
+
+                        // ✅ Kiểm tra start_time trước khi thêm vào intent
+                        if (tour.getStartTime() != null) {
+                            intent.putExtra("start_time", tour.getStartTime());
+                        }
+
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(this, "Bạn cần đăng nhập để đặt tour!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             } else {
                 Toast.makeText(this, "Không tìm thấy thông tin tour!", Toast.LENGTH_SHORT).show();
                 finish();
@@ -79,28 +101,5 @@ public class TourDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Lỗi: Không nhận được tour_id!", Toast.LENGTH_SHORT).show();
             finish();
         }
-
-
-        // Sự kiện nhấn "Book Now"
-        bookButton.setOnClickListener(view -> {
-            if (sessionManager.isLoggedIn()) {
-                // Người dùng đã đăng nhập
-                Intent intent = new Intent(TourDetailActivity.this, BookingActivity.class);
-
-                // Truyền dữ liệu qua BookingActivity
-                intent.putExtra("tour_id", tourId);
-                intent.putExtra("tour_name", tourName.getText().toString());
-                intent.putExtra("tour_destination", tourDestination.getText().toString());
-                intent.putExtra("tour_price", price);
-                intent.putExtra("tour_duration", tourDuration.getText().toString());
-                intent.putExtra("tour_category", tourCategory.getText().toString());
-
-                startActivity(intent);
-            } else {
-                // Người dùng chưa đăng nhập
-                Toast.makeText(this, "Bạn cần đăng nhập để đặt tour!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
 }

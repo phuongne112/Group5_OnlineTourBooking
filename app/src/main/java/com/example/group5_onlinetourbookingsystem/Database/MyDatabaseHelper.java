@@ -65,7 +65,7 @@
         private static final String COLUMN_TOUR_IMAGE = "image";
         private static final String COLUMN_TOUR_CATEGORY_ID = "category_id";
         private static final String COLUMN_TOUR_DESCRIPTION = "description";
-
+        private static final String COLUMN_TOUR_START_TIME = "start_time";
         private static final String COLUMN_TOUR_GUIDE_ID = "guide_id";  // Cột mới để lưu ID người hướng dẫn
         // Bảng Tour Images
         private static final String TABLE_TOUR_IMAGES = "tour_images";
@@ -84,7 +84,6 @@
         private static final String COLUMN_BOOKING_ADULT_COUNT = "adult_count";
         private static final String COLUMN_BOOKING_CHILD_COUNT = "child_count";
         private static final String COLUMN_BOOKING_NOTE = "note";
-        private static final String COLUMN_BOOKING_CREATED_AT = "created_at";
         // Bảng Contacts
         private static final String TABLE_CONTACTS = "contacts";
         private static final String COLUMN_CONTACT_ID = "contact_id";
@@ -158,7 +157,7 @@
                     COLUMN_CATEGORY_NAME + " TEXT UNIQUE, " +
                     COLUMN_CATEGORY_IMAGE + " TEXT, " +
                     COLUMN_CATEGORY_DESCRIPTION + " TEXT)"); // ✅ Cột mô tả danh mục
-    
+
             db.execSQL("CREATE TABLE " + TABLE_TOURS + " (" +
                     COLUMN_TOUR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_TOUR_NAME + " TEXT, " +
@@ -169,26 +168,28 @@
                     COLUMN_TOUR_IMAGE + " TEXT, " +
                     COLUMN_TOUR_CATEGORY_ID + " INTEGER, " +
                     COLUMN_TOUR_DESCRIPTION + " TEXT, " +
-                    COLUMN_TOUR_GUIDE_ID + " INTEGER, " + // Added guide_id
+                    COLUMN_TOUR_GUIDE_ID + " INTEGER, " +
+                    COLUMN_TOUR_START_TIME + " TEXT, " + // 🔹 Thêm cột start_time
                     "FOREIGN KEY(" + COLUMN_TOUR_CITY_ID + ") REFERENCES cities(id), " +
                     "FOREIGN KEY(" + COLUMN_TOUR_CATEGORY_ID + ") REFERENCES categories(id), " +
-                    "FOREIGN KEY(" + COLUMN_TOUR_GUIDE_ID + ") REFERENCES users(id))"); // Foreign key to users for the guide
-    
-    
+                    "FOREIGN KEY(" + COLUMN_TOUR_GUIDE_ID + ") REFERENCES users(id))");
+
+
+
             // Tạo bảng bookings
             db.execSQL("CREATE TABLE " + TABLE_BOOKINGS + " (" +
                     COLUMN_BOOKING_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_BOOKING_USER_ID + " INTEGER, " +
                     COLUMN_BOOKING_TOUR_ID + " INTEGER, " +
-                    COLUMN_BOOKING_DATE + " TEXT, " +
+                    COLUMN_BOOKING_DATE + " TEXT DEFAULT CURRENT_TIMESTAMP, " + // ✅ Dùng booking_date làm created_at
                     COLUMN_BOOKING_TOTAL_PRICE + " REAL, " +
                     COLUMN_BOOKING_STATUS + " TEXT, " +
                     COLUMN_BOOKING_ADULT_COUNT + " INTEGER, " +
                     COLUMN_BOOKING_CHILD_COUNT + " INTEGER, " +
                     COLUMN_BOOKING_NOTE + " TEXT, " +
-                    COLUMN_BOOKING_CREATED_AT + " TEXT DEFAULT CURRENT_TIMESTAMP, " +  // ✅ Thêm cột created_at với giá trị mặc định
                     "FOREIGN KEY(" + COLUMN_BOOKING_USER_ID + ") REFERENCES users(id), " +
                     "FOREIGN KEY(" + COLUMN_BOOKING_TOUR_ID + ") REFERENCES tours(id))");
+
 
 
 
@@ -272,10 +273,11 @@
     
     
         // 🌟 Thêm tour mới
-        public void addTour(String name, String destination, int cityId, double price, int duration, String imagePath, int categoryId) {
+        public void addTour(String name, String destination, int cityId, double price, int duration,
+                            String imagePath, int categoryId, String start_time) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
-    
+
             values.put(COLUMN_TOUR_NAME, name);
             values.put(COLUMN_TOUR_DESTINATION, destination); // 🔹 Thêm destination
             values.put(COLUMN_TOUR_PRICE, price);
@@ -283,19 +285,21 @@
             values.put(COLUMN_TOUR_IMAGE, imagePath);
             values.put(COLUMN_TOUR_CATEGORY_ID, categoryId);
             values.put("city_id", cityId); // 🔹 Giữ city_id để đảm bảo liên kết
-    
+            values.put("start_time", start_time); // 🔹 Thêm ngày bắt đầu tour (Start Time)
+
             db.insert(TABLE_TOURS, null, values);
             db.close();
         }
-    
-    
+
+
+
         // 🌟 Lấy tất cả tour
         public ArrayList<TourModel> getAllTours() {
             ArrayList<TourModel> tourList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
 
             String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, t.description, " +
-                    "c.id AS categoryId, c.name AS categoryName, ci.name AS cityName " +
+                    "c.id AS categoryId, c.name AS categoryName, ci.name AS cityName, t.start_time " +  // ✅ Thêm start_time
                     "FROM tours t " +
                     "LEFT JOIN categories c ON t.category_id = c.id " +
                     "LEFT JOIN cities ci ON t.city_id = ci.id";
@@ -310,12 +314,13 @@
                     double price = cursor.getDouble(3);
                     int duration = cursor.getInt(4);
                     String image = cursor.getString(5);
-                    String description = cursor.getString(6); // Lấy description
+                    String description = cursor.getString(6);
                     int categoryId = cursor.getInt(7);
                     String categoryName = cursor.getString(8);
                     String cityName = cursor.getString(9);
+                    String startTime = cursor.getString(10);  // ✅ Lấy start_time từ database
 
-                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityName));
+                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityName, startTime));
                 } while (cursor.moveToNext());
             }
 
@@ -323,6 +328,7 @@
             db.close();
             return tourList;
         }
+
 
 
 
@@ -426,13 +432,15 @@
         public TourModel getTourById(int id) {
             SQLiteDatabase db = this.getReadableDatabase();
             TourModel tour = null;
-    
-            String query = "SELECT t.id, t.name, t.destination,t.description , t.price, t.duration, t.image, c.id AS categoryId, c.name AS categoryName, ci.name AS cityName " +
+
+            String query = "SELECT t.id, t.name, t.destination, t.description, t.price, t.duration, t.image, " +
+                    "c.id AS categoryId, c.name AS categoryName, ci.name AS cityName, t.start_time " +
                     "FROM tours t " +
                     "LEFT JOIN categories c ON t.category_id = c.id " +
                     "LEFT JOIN cities ci ON t.city_id = ci.id " +
                     "WHERE t.id = ?";
-    
+
+
             Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
     
             if (cursor.moveToFirst()) {
@@ -446,9 +454,9 @@
                 int categoryId = cursor.getInt(7);
                 String categoryName = cursor.getString(8);
                 String cityName = cursor.getString(9);
-
+                String startTime = cursor.getString(10);
                 // Tạo đối tượng TourModel
-                tour = new TourModel(tourId, name, destination, price, duration, image,description, categoryId, categoryName, cityName);
+                tour = new TourModel(tourId, name, destination, price, duration, image,description, categoryId, categoryName, cityName,startTime);
             }
     
             cursor.close();
@@ -467,7 +475,7 @@
             values.put("note", note);
             values.put("total_price", totalPrice);
             values.put("status", status); // ✅ Thêm trạng thái
-            values.put("created_at", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+            values.put("booking_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
 
             long result = db.insert("bookings", null, values);
             db.close();
@@ -573,9 +581,11 @@
                     ", t." + COLUMN_TOUR_DESCRIPTION +  // Thêm description
                     ", c." + COLUMN_CATEGORY_ID + ", c." + COLUMN_CATEGORY_NAME +
                     ", ci." + COLUMN_CITY_NAME +  // Lấy cityName từ bảng cities
+                    ", t." + COLUMN_TOUR_START_TIME + // Thêm startTime
                     " FROM " + TABLE_TOURS + " t " +
                     "LEFT JOIN " + TABLE_CATEGORIES + " c ON t." + COLUMN_TOUR_CATEGORY_ID + " = c." + COLUMN_CATEGORY_ID + " " +
                     "LEFT JOIN " + TABLE_CITIES + " ci ON t." + COLUMN_TOUR_CITY_ID + " = ci." + COLUMN_CITY_ID;
+
 
             Cursor cursor = db.rawQuery(sql, null);
 
@@ -591,7 +601,7 @@
                     int categoryId = cursor.getInt(7);
                     String categoryName = cursor.getString(8);
                     String cityName = cursor.getString(9);
-
+                    String startTime = cursor.getString(10);
                     // Xử lý null để tránh lỗi
                     if (name == null) name = "";
                     if (categoryName == null) categoryName = "";
@@ -602,7 +612,7 @@
 
                     // Kiểm tra nếu query khớp với name hoặc category
                     if (nameNoAccent.contains(queryNoAccent) || categoryNoAccent.contains(queryNoAccent)) {
-                        tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityName));
+                        tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityName,startTime));
                     }
                 } while (cursor.moveToNext());
             }

@@ -3,5 +3,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="teal_700">#00796B</color>
+    <color name="red">#FF0000</color>
+    <color name="purple_500">#9C27B0</color> <!-- Màu tím -->
+    <color name="light_gray">#F5F5F5</color>
 
 </resources>

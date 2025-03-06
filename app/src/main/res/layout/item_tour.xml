@@ -3,61 +3,89 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="6dp"
-    android:background="@android:color/white">
+    android:layout_margin="12dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="10dp"
+    android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="16dp"
+        android:background="@drawable/card_background">
 
+        <!-- Hình ảnh Tour -->
         <ImageView
             android:id="@+id/tour_image"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="220dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/microphone"
-            android:background="@android:color/darker_gray"
-            android:contentDescription="Tour Image"
-            android:layout_marginBottom="8dp"/>
+            android:background="@drawable/image_placeholder"
+            android:contentDescription="@string/tour_image"
+            android:layout_marginBottom="12dp"
+            android:clipToOutline="true"
+            android:elevation="4dp"
+            app:srcCompat="@drawable/favourite"/>
 
+        <!-- Tên Tour -->
         <TextView
             android:id="@+id/tour_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:paddingBottom="4dp"/>
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:paddingBottom="6dp"
+            android:fontFamily="sans-serif-medium"/>
 
+        <!-- Địa điểm -->
         <TextView
             android:id="@+id/tour_destination"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="@android:color/darker_gray"
-            android:paddingBottom="2dp"/>
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:drawableLeft="@drawable/ic_location"
+            android:drawablePadding="6dp"
+            android:paddingBottom="6dp"
+            android:fontFamily="sans-serif"/>
 
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:alpha="0.2"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Giá tiền -->
         <TextView
             android:id="@+id/tour_price"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@android:color/holo_red_dark"
-            android:paddingBottom="2dp"/>
+            android:fontFamily="sans-serif-medium"
+            android:paddingBottom="6dp"/>
 
+        <!-- Thời gian Tour -->
         <TextView
             android:id="@+id/tour_duration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="@android:color/holo_blue_dark"
-            android:paddingBottom="6dp"/>
+            android:drawableLeft="@drawable/ic_time"
+            android:drawablePadding="6dp"
+            android:fontFamily="sans-serif"/>
 
+        <!-- Danh mục Tour -->
         <TextView
             android:id="@+id/textCategory"
             android:layout_width="wrap_content"
@@ -65,7 +93,8 @@
             android:textSize="14sp"
             android:textColor="@android:color/darker_gray"
             android:textStyle="italic"
-            android:paddingTop="4dp"
-            android:text="Category: Adventure"/>
+            android:paddingTop="6dp"
+            android:text="Category: Adventure"
+            android:fontFamily="sans-serif-light"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

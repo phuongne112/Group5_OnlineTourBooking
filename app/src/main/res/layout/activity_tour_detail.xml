@@ -1,137 +1,165 @@
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="20dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="8dp">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#F5F5F5">
 
-    <LinearLayout
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            android:background="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Hình ảnh Tour -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="280dp"
+                    android:background="@drawable/rounded_corners">
+
+                    <ImageView
+                        android:id="@+id/detail_tour_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:background="@android:color/darker_gray"/>
+
+                    <ImageButton
+                        android:id="@+id/back_button"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_margin="16dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/back"/>
+
+                    <ImageButton
+                        android:id="@+id/favorite_button"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_margin="16dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/favourite"/>
+                </RelativeLayout>
+
+                <!-- Thông tin Tour -->
+                <TextView
+                    android:id="@+id/detail_tour_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="8dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:id="@+id/detail_tour_category"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:paddingEnd="24dp"/>
+
+                    <TextView
+                        android:id="@+id/detail_tour_destination"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/darker_gray"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/detail_tour_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:paddingTop="8dp"/>
+
+                <TextView
+                    android:id="@+id/detail_tour_duration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/holo_blue_dark"
+                    android:paddingTop="4dp"/>
+
+                <TextView
+                    android:id="@+id/detail_tour_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:lineSpacingExtra="4dp"/>
+
+                <TextView
+                    android:id="@+id/detail_tour_booking_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:paddingTop="8dp"
+                    android:text="Booking Time: --/--/---- --:--"
+                    android:lineSpacingExtra="4dp"/>
+
+                <!-- Nút đặt tour -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/book_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Đặt ngay"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@color/purple_500"
+                    android:layout_marginTop="16dp"
+                    android:padding="12dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </ScrollView>
+
+    <!-- Danh sách ảnh dạng ngang -->
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:text="Ảnh liên quan"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"/>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="300dp"> <!-- Tăng chiều cao ảnh -->
-
-            <ImageView
-                android:id="@+id/detail_tour_image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:background="@drawable/rounded_corners"/>
-
-            <ImageButton
-                android:id="@+id/back_button"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_alignParentStart="true"
-                android:layout_margin="20dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/back"/>
-
-            <ImageButton
-                android:id="@+id/favorite_button"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="20dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/favourite"/>
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:paddingTop="12dp">
-
-            <TextView
-                android:id="@+id/detail_tour_category"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textColor="@android:color/darker_gray"
-                android:paddingEnd="24dp"/>
-
-            <TextView
-                android:id="@+id/detail_tour_destination"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textColor="@android:color/darker_gray"/>
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/detail_tour_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:gravity="start"
-            android:paddingTop="16dp"
-            android:paddingBottom="8dp"
-            android:lineSpacingExtra="4dp"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="start"
-            android:paddingTop="8dp">
-
-            <TextView
-                android:id="@+id/detail_tour_price"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/holo_red_dark"/>
-
-            <TextView
-                android:id="@+id/detail_tour_duration"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="18sp"
-                android:textColor="@android:color/holo_blue_dark"/>
-            <TextView
-                android:id="@+id/detail_tour_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:lineSpacingExtra="4dp"/>
-
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/detail_tour_booking_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@android:color/darker_gray"
-            android:layout_marginTop="12dp"
-            android:text="Booking Time: --/--/---- --:--"
-            android:lineSpacingExtra="4dp"/>
-
-        <Button
-            android:id="@+id/book_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Book Now"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"
-            android:background="@color/black"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"
-            android:gravity="center"/>
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_tour_images"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:orientation="horizontal"
+        android:overScrollMode="never"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:paddingBottom="16dp"/>
+</LinearLayout>

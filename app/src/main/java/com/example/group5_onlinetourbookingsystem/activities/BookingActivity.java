@@ -21,7 +21,8 @@ import java.util.HashMap;
 
 public class BookingActivity extends AppCompatActivity {
     private EditText etUserName, etUserEmail, etUserPhone, etNumAdults, etNumChildren, etBookingNote;
-    private TextView tvTourName, tvTourPrice, tvTotalPrice;
+    private TextView tvTourName, tvTourPrice, tvTotalPrice, tvTourDuration, tvStartTime;
+
     private Button btnConfirmBooking;
     private MyDatabaseHelper dbHelper;
     private SessionManager sessionManager;
@@ -47,6 +48,8 @@ public class BookingActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        tvTourDuration = findViewById(R.id.booking_tour_duration);
+        tvStartTime = findViewById(R.id.booking_start_time);
         tvTourName = findViewById(R.id.booking_tour_name);
         tvTourPrice = findViewById(R.id.booking_tour_price);
         tvTotalPrice = findViewById(R.id.total_price);
@@ -65,13 +68,18 @@ public class BookingActivity extends AppCompatActivity {
         String name = intent.getStringExtra("tour_name");
         pricePerAdult = intent.getDoubleExtra("tour_price", 0);
         pricePerChild = pricePerAdult * 0.5;
+        String duration = intent.getStringExtra("tour_duration"); // Thời lượng tour
+        String startTime = intent.getStringExtra("start_time"); // Thời gian bắt đầu
 
         tvTourName.setText(name);
         tvTourPrice.setText("Giá: " + pricePerAdult + " VND/người lớn");
+        tvTourDuration.setText("Thời lượng: " + duration);
+        tvStartTime.setText("Start time: " + startTime);
 
         etNumAdults.addTextChangedListener(new PriceWatcher());
         etNumChildren.addTextChangedListener(new PriceWatcher());
     }
+
 
     private void loadUserData() {
         HashMap<String, String> user = sessionManager.getUserDetails();
@@ -113,9 +121,8 @@ public class BookingActivity extends AppCompatActivity {
         intent.putExtra("bookingId", bookingId);
         intent.putExtra("totalPrice", totalPrice);
         startActivity(intent);
-
-
     }
+
 
     private int parseIntOrZero(String value) {
         return value.isEmpty() ? 0 : Integer.parseInt(value);
