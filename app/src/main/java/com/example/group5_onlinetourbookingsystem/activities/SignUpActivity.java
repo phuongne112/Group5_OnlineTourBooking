@@ -69,7 +69,7 @@ public class SignUpActivity extends AppCompatActivity {
             // ✅ Mã hóa mật khẩu trước khi lưu vào database
             String hashedPassword = hashPassword(password);
 
-            long result = dbHelper.addUser(name, email, phone, hashedPassword, birthDate, "");
+            long result = dbHelper.addUser(name, email, phone, hashedPassword, birthDate, "",1);
 
             if (result != -1) {
                 Toast.makeText(SignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();

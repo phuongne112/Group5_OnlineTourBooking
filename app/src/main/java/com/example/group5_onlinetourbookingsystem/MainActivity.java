@@ -9,10 +9,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.group5_onlinetourbookingsystem.activities.AdminDashboardActivity;
 import com.example.group5_onlinetourbookingsystem.activities.ForgotPasswordActivity;
 import com.example.group5_onlinetourbookingsystem.activities.HomePage;
 import com.example.group5_onlinetourbookingsystem.activities.SignUpActivity;
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
+import com.example.group5_onlinetourbookingsystem.activities.TourGuideDashboardActivity;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 
 import java.security.MessageDigest;
@@ -63,17 +65,35 @@ public class MainActivity extends AppCompatActivity {
             if (result == 1) {
                 Toast.makeText(MainActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
 
-                // 🔹 Lấy userId từ database
+                // 🔹 Lấy thông tin user từ database
                 int userId = dbHelper.getUserIdByEmail(email);
                 String userName = dbHelper.getUserNameByEmail(email);
                 String userPhone = dbHelper.getUserPhoneByEmail(email);
+                int roleId = dbHelper.getUserRoleIdByEmail(email); // Trả về int, không phải String
 
-                sessionManager.createLoginSession(userId, userName, "User", email, userPhone);
+// 🔹 Lưu session (Chuyển roleId vào session thay vì role name)
+                sessionManager.createLoginSession(userId, userName, String.valueOf(roleId), email, userPhone);
 
-                // Chuyển đến HomePage
-                Intent intent = new Intent(MainActivity.this, HomePage.class);
+// 🔹 Điều hướng theo role_id
+                Intent intent;
+                switch (roleId) {
+                    case 1: // Customer
+                        intent = new Intent(MainActivity.this, HomePage.class);
+                        break;
+                    case 2: // Admin
+                        intent = new Intent(MainActivity.this, AdminDashboardActivity.class);
+                        break;
+                    case 3: // Tour Guide
+                        intent = new Intent(MainActivity.this, TourGuideDashboardActivity.class);
+                        break;
+                    default:
+                        intent = new Intent(MainActivity.this, HomePage.class); // Mặc định về HomePage
+                        break;
+                }
+
                 startActivity(intent);
                 finish();
+
             }
             else if (result == 0) {
                 Toast.makeText(MainActivity.this, "Sai mật khẩu", Toast.LENGTH_SHORT).show();
@@ -81,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Tài khoản không tồn tại", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     private boolean isValidEmail(String email) {

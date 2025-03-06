@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,8 @@ public class HomeFragment extends Fragment {
 
         sessionManager = new SessionManager(requireContext());
         databaseHelper = new MyDatabaseHelper(requireContext());
+        // Thêm roles vào database
+        addSampleRoles();
         // Search
         EditText editTextSearch = view.findViewById(R.id.editTextSearch);
         editTextSearch.addTextChangedListener(new TextWatcher() {
@@ -63,6 +66,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
         // 👉 Cấu hình RecyclerView danh mục
         recyclerViewCategories = view.findViewById(R.id.recyclerViewCategories);
         recyclerViewCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -74,10 +78,14 @@ public class HomeFragment extends Fragment {
         }
 
         categoryAdapter = new CategoryAdapter(getContext(), categoryList, category -> {
-            // Xử lý khi nhấn vào danh mục
+            Log.d("HomeFragment", "Clicked category: " + category.getName());
+            filterToursByCategory(category.getId());
         });
 
-        recyclerViewCategories.setAdapter(categoryAdapter);
+
+
+        recyclerViewCategories.setAdapter(categoryAdapter);  // ✅ Đã sửa lỗi
+        categoryAdapter.notifyDataSetChanged();
 
         // 👉 Cấu hình RecyclerView tour
         recyclerViewTours = view.findViewById(R.id.recycler_view);
@@ -96,6 +104,7 @@ public class HomeFragment extends Fragment {
         });
 
         recyclerViewTours.setAdapter(tourAdapter);
+        tourAdapter.notifyDataSetChanged();  // ✅ Đảm bảo RecyclerView cập nhật giao diện
 
         return view;
     }
@@ -110,13 +119,27 @@ public class HomeFragment extends Fragment {
     }
 
     private void addSampleTours() {
-        databaseHelper.addTour("Tour Đà Lạt", "Đà Lạt", 1, 150.0, 3, "dalat_tour", 1, "2025-03-10 08:00:00");
-        databaseHelper.addTour("Tour Phú Quốc", "Phú Quốc", 2, 200.0, 4, "phuquoc_tour", 2, "2025-03-12 09:30:00");
-        databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 3, 180.0, 3, "hanoi_tour", 3, "2025-03-15 07:45:00");
-        databaseHelper.addTour("Tour Đà Nẵng", "Đà Nẵng", 4, 220.0, 5, "danang_tour", 4, "2025-03-18 10:15:00");
-        databaseHelper.addTour("Tour Nha Trang", "Nha Trang", 5, 190.0, 4, "nhatrang_tour", 5, "2025-03-20 08:30:00");
-        databaseHelper.addTour("Tour Sapa", "Sapa", 6, 170.0, 3, "sapa_tour", 6, "2025-03-25 06:00:00");
+        databaseHelper.addTour("Tour Đà Lạt", "Đà Lạt", 1, 150.0, 3, "dalat_tour", 1, "2025-03-10 08:00:00",
+                "Thưởng thức khí hậu mát mẻ và cảnh đẹp thơ mộng của Đà Lạt.");
+        databaseHelper.addTour("Tour Phú Quốc", "Phú Quốc", 2, 200.0, 4, "phuquoc_tour", 2, "2025-03-12 09:30:00",
+                "Khám phá hòn đảo ngọc với bãi biển tuyệt đẹp và hải sản tươi ngon.");
+        databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 3, 180.0, 3, "hanoi_tour", 3, "2025-03-15 07:45:00",
+                "Trải nghiệm văn hóa, lịch sử thủ đô với 36 phố phường và Hồ Gươm.");
+        databaseHelper.addTour("Tour Đà Nẵng", "Đà Nẵng", 4, 220.0, 5, "danang_tour", 4, "2025-03-18 10:15:00",
+                "Tận hưởng biển Mỹ Khê và tham quan Bà Nà Hills nổi tiếng.");
+        databaseHelper.addTour("Tour Nha Trang", "Nha Trang", 5, 190.0, 4, "nhatrang_tour", 5, "2025-03-20 08:30:00",
+                "Tham quan vịnh biển đẹp nhất Việt Nam và thưởng thức hải sản.");
+        databaseHelper.addTour("Tour Sapa", "Sapa", 6, 170.0, 3, "sapa_tour", 6, "2025-03-25 06:00:00",
+                "Chinh phục đỉnh Fansipan và khám phá văn hóa dân tộc thiểu số.");
     }
+    private void addSampleRoles() {
+        if (databaseHelper.getAllRoles().isEmpty()) { // Kiểm tra nếu chưa có role nào
+            databaseHelper.addRole("Customer");
+            databaseHelper.addRole("Admin");
+            databaseHelper.addRole("Tour Guide");
+        }
+    }
+
 
     private void searchTours(String query) {
         tourList.clear();
@@ -128,5 +151,14 @@ public class HomeFragment extends Fragment {
         tourAdapter.notifyDataSetChanged();
     }
 
+    private void filterToursByCategory(int categoryId) {
+        tourList.clear();
+        if (categoryId == -1) { // Nếu chọn "Tất cả danh mục"
+            tourList.addAll(databaseHelper.getAllTours());
+        } else {
+            tourList.addAll(databaseHelper.getToursByCategory(categoryId));
+        }
+        tourAdapter.notifyDataSetChanged();
+    }
 
 }

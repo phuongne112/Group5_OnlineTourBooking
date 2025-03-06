@@ -274,18 +274,19 @@
     
         // 🌟 Thêm tour mới
         public void addTour(String name, String destination, int cityId, double price, int duration,
-                            String imagePath, int categoryId, String start_time) {
+                            String imagePath, int categoryId, String start_time, String description) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
 
             values.put(COLUMN_TOUR_NAME, name);
-            values.put(COLUMN_TOUR_DESTINATION, destination); // 🔹 Thêm destination
+            values.put(COLUMN_TOUR_DESTINATION, destination);
             values.put(COLUMN_TOUR_PRICE, price);
             values.put(COLUMN_TOUR_DURATION, duration);
             values.put(COLUMN_TOUR_IMAGE, imagePath);
             values.put(COLUMN_TOUR_CATEGORY_ID, categoryId);
-            values.put("city_id", cityId); // 🔹 Giữ city_id để đảm bảo liên kết
-            values.put("start_time", start_time); // 🔹 Thêm ngày bắt đầu tour (Start Time)
+            values.put("city_id", cityId);
+            values.put("start_time", start_time);
+            values.put("description", description); // 🔹 Thêm mô tả tour
 
             db.insert(TABLE_TOURS, null, values);
             db.close();
@@ -335,7 +336,7 @@
 
 
 
-        public long addUser(String name, String email, String phone, String hashedPassword, String birthDate, String imagePath) {
+        public long addUser(String name, String email, String phone, String hashedPassword, String birthDate, String imagePath, int roleId) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(COLUMN_USER_NAME, name);
@@ -344,13 +345,15 @@
             values.put(COLUMN_USER_PASSWORD, hashedPassword); // ✅ Lưu mật khẩu đã mã hóa
             values.put(COLUMN_USER_BIRTH, birthDate);
             values.put(COLUMN_USER_IMAGE, imagePath);
-    
+            values.put(COLUMN_USER_ROLE_ID, roleId); // ✅ Thêm role_id
+
             long result = db.insert(TABLE_USERS, null, values);
             db.close();
             return result;
         }
-    
-    
+
+
+
         public int checkUserLogin(String email, String hashedPassword) {
             SQLiteDatabase db = this.getReadableDatabase();
             String query = "SELECT " + COLUMN_USER_PASSWORD + " FROM " + TABLE_USERS +
@@ -682,6 +685,127 @@
             return db.rawQuery(query, new String[]{String.valueOf(userId)});
         }
 
+        public List<TourModel> getToursByCategory(int categoryId) {
+            List<TourModel> tourList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, " +
+                    "t.description, c.id AS categoryId, c.name AS categoryName, ci.name AS cityName, t.start_time " +
+                    "FROM tours t " +
+                    "LEFT JOIN categories c ON t.category_id = c.id " +
+                    "LEFT JOIN cities ci ON t.city_id = ci.id " +
+                    "WHERE t.category_id = ?";
+
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(categoryId)});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(0);
+                    String name = cursor.getString(1);
+                    String destination = cursor.getString(2);
+                    double price = cursor.getDouble(3);
+                    int duration = cursor.getInt(4);
+                    String image = cursor.getString(5);
+                    String description = cursor.getString(6);
+                    int categoryID = cursor.getInt(7);
+                    String categoryName = cursor.getString(8);
+                    String cityName = cursor.getString(9);
+                    String startTime = cursor.getString(10);
+
+                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryID, categoryName, cityName, startTime));
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return tourList;
+        }
+        public boolean addRole(String roleName) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("role_name", roleName);
+
+            long result = db.insert("roles", null, values);
+            db.close();
+            return result != -1;
+        }
+
+        public ArrayList<String> getAllRoles() {
+            ArrayList<String> roles = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT role_name FROM roles", null);
+            if (cursor.moveToFirst()) {
+                do {
+                    roles.add(cursor.getString(0));
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+            return roles;
+        }
+
+        public boolean registerUser(String username, String password, String role) {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            // Lấy ID của role dựa trên tên role
+            Cursor cursor = db.rawQuery("SELECT id FROM roles WHERE name = ?", new String[]{role});
+            int roleId = -1;
+            if (cursor.moveToFirst()) {
+                roleId = cursor.getInt(0);
+            }
+            cursor.close();
+
+            if (roleId == -1) return false; // Role không tồn tại
+
+            ContentValues values = new ContentValues();
+            values.put("username", username);
+            values.put("password", password);
+            values.put("role_id", roleId);
+
+            long result = db.insert("users", null, values);
+            db.close();
+            return result != -1;
+        }
+
+
+        public String getUserRole(String username) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT r.name FROM users u JOIN roles r ON u.role_id = r.id WHERE u.username = ?", new String[]{username});
+            String role = null;
+            if (cursor.moveToFirst()) {
+                role = cursor.getString(0);
+            }
+            cursor.close();
+            db.close();
+            return role;
+        }
+
+        public int getUserRoleIdByEmail(String email) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            int roleId = 3; // Mặc định là Customer nếu không tìm thấy
+
+            String query = "SELECT role_id FROM users WHERE email = ?";
+            Cursor cursor = db.rawQuery(query, new String[]{email});
+
+            if (cursor.moveToFirst()) {
+                roleId = cursor.getInt(0); // Lấy role_id từ database
+            }
+
+            cursor.close();
+            db.close();
+            return roleId;
+        }
+
+
+        // Chuyển đổi role_id thành tên vai trò
+        private String getRoleNameById(int roleId) {
+            switch (roleId) {
+                case 1: return "Customer";
+                case 2: return "Tour Guide";
+                case 3: return "User";
+                default: return "User";
+            }
+        }
 
 
 

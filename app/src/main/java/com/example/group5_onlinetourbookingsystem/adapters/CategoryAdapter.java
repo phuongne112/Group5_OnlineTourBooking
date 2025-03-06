@@ -2,6 +2,7 @@ package com.example.group5_onlinetourbookingsystem.adapters;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +12,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
+import com.example.group5_onlinetourbookingsystem.models.TourModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -21,16 +24,20 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     private Context context;
     private List<CategoryModel> categoryList;
     private OnCategoryClickListener listener;
-
+    private MyDatabaseHelper databaseHelper;
     public interface OnCategoryClickListener {
-        void onCategoryClick(CategoryModel category);
+        void onCategoryClick(CategoryModel category);  // ✅ Chỉ nhận 1 tham số
     }
+
+
 
     public CategoryAdapter(Context context, List<CategoryModel> categoryList, OnCategoryClickListener listener) {
         this.context = context;
         this.categoryList = categoryList;
         this.listener = listener;
+        this.databaseHelper = new MyDatabaseHelper(context); // ✅ Khởi tạo databaseHelper
     }
+
 
     @NonNull
     @Override
@@ -57,7 +64,15 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             holder.categoryImage.setImageResource(R.drawable.favorites);
         }
 
-        holder.itemView.setOnClickListener(v -> listener.onCategoryClick(category));
+        holder.itemView.setOnClickListener(v -> {
+            List<TourModel> tours = databaseHelper.getToursByCategory(category.getId());
+            Log.d("CategoryAdapter", "Category ID: " + category.getId() + " - Tours: " + tours.size());
+            listener.onCategoryClick(category);  // ✅ Truyền đủ 2 tham số
+        });
+
+
+
+
     }
 
     @Override
