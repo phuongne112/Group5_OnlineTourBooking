@@ -70,7 +70,7 @@ public class HomeFragment extends Fragment {
         // 👉 Cấu hình RecyclerView danh mục
         recyclerViewCategories = view.findViewById(R.id.recyclerViewCategories);
         recyclerViewCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-
+        addAdminUsers();
         categoryList = databaseHelper.getAllCategories();
         if (categoryList.isEmpty()) {
             addSampleCategories();
@@ -140,6 +140,24 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    private void addAdminUsers() {
+        Object[][] admins = {
+                {"Admin1", "admin1@gmail.com", "0123456789", "hashed_password_1", "1990-01-01", "admin1.jpg", 2},
+                {"Admin2", "admin2@example.com", "0987654321", "hashed_password_2", "1992-05-15", "admin2.jpg", 1}
+        };
+
+        for (Object[] admin : admins) {
+            databaseHelper.addUser(
+                    (String) admin[0],  // Tên
+                    (String) admin[1],  // Email
+                    (String) admin[2],  // Số điện thoại
+                    (String) admin[3],  // Mật khẩu đã mã hóa
+                    (String) admin[4],  // Ngày sinh
+                    (String) admin[5],  // Ảnh đại diện
+                    (int) admin[6]      // role_id (1 = Admin)
+            );
+        }
+    }
 
     private void searchTours(String query) {
         tourList.clear();

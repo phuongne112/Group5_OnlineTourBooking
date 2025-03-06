@@ -1,14 +1,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/nav_statistics"
-        android:title="Statistics"
-        android:icon="@drawable/tour"/>
-    <item android:id="@+id/nav_tour"
-        android:title="Tour"
-        android:icon="@drawable/tour"/>
-    <item android:id="@+id/nav_booking"
-        android:title="Booking"
-        android:icon="@drawable/tour"/>
-    <item android:id="@+id/nav_account"
-        android:title="Account"
-        android:icon="@drawable/tour"/>
+    <item
+        android:id="@+id/nav_statistics"
+        android:icon="@drawable/tour"
+        android:title="Statistics" />
+
+    <item
+        android:id="@+id/nav_tours"
+        android:icon="@drawable/tour"
+        android:title="Tours" />
+
+    <item
+        android:id="@+id/nav_bookings"
+        android:icon="@drawable/tour"
+        android:title="Bookings" />
+
+    <item
+        android:id="@+id/nav_accounts"
+        android:icon="@drawable/tour"
+        android:title="Accounts" />
 </menu>

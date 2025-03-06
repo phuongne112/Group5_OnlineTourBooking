@@ -72,31 +72,13 @@
         </GridLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Bar Chart -->
-    <!-- GraphView để vẽ biểu đồ -->
-
-
-
-    <!-- Summary Statistics -->
-    <TextView
-        android:id="@+id/totalTours"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="Total Tours: 3"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/revenue" />
-
-    <TextView
-        android:id="@+id/revenue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Revenue: 300000 VND"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/totalTours"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="8dp"/>
+    <!-- FrameLayout để chứa Fragments -->
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintTop_toTopOf="@+id/bottomNavigation" />
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -107,4 +89,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

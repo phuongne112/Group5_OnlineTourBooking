@@ -18,6 +18,7 @@
         <activity
             android:name=".activities.PaymentActivity"
             android:exported="false" />
+        <activity android:name="com.example.group5_onlinetourbookingsystem.activities.AdminDashboardActivity" />
 
         <activity
             android:name=".activities.EditProfileActivity"
