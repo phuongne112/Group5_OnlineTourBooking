@@ -2,6 +2,7 @@ package com.example.group5_onlinetourbookingsystem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,7 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
-import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.activities.TourDetailActivity;
 import com.example.group5_onlinetourbookingsystem.adapters.CategoryAdapter;
 import com.example.group5_onlinetourbookingsystem.adapters.TourAdapter;
@@ -37,6 +38,10 @@ public class HomeFragment extends Fragment {
     private MyDatabaseHelper databaseHelper;
     private SessionManager sessionManager;
     private TextView textViewUserName;
+    private ProgressBar progressBar; // ProgressBar hiển thị khi tải dữ liệu
+    private int currentPage = 0;
+    private final int PAGE_SIZE = 5; // Số tour tải mỗi lần
+    private boolean isLoading = false; // Kiểm soát trạng thái tải dữ liệu
 
     public HomeFragment() {
         // Required empty public constructor
@@ -49,114 +54,85 @@ public class HomeFragment extends Fragment {
 
         sessionManager = new SessionManager(requireContext());
         databaseHelper = new MyDatabaseHelper(requireContext());
-        // Thêm roles vào database
+
+        // Kiểm tra và thêm dữ liệu mẫu nếu cần
         addSampleRoles();
-        // Search
+        addSampleCategories();
+        addSampleTours();
+
+        // Gán UI components
         EditText editTextSearch = view.findViewById(R.id.editTextSearch);
+        recyclerViewCategories = view.findViewById(R.id.recyclerViewCategories);
+        recyclerViewTours = view.findViewById(R.id.recycler_view);
+        progressBar = view.findViewById(R.id.progressBar); // Gán ID ProgressBar
+
+        // Cấu hình tìm kiếm tour
         editTextSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String query = s.toString().trim();
-                searchTours(query);
+                searchTours(s.toString().trim());
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
 
-        // 👉 Cấu hình RecyclerView danh mục
-        recyclerViewCategories = view.findViewById(R.id.recyclerViewCategories);
+        // Cấu hình RecyclerView danh mục
         recyclerViewCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        addAdminUsers();
         categoryList = databaseHelper.getAllCategories();
-        if (categoryList.isEmpty()) {
-            addSampleCategories();
-            categoryList = databaseHelper.getAllCategories();
-        }
-
         categoryAdapter = new CategoryAdapter(getContext(), categoryList, category -> {
             Log.d("HomeFragment", "Clicked category: " + category.getName());
             filterToursByCategory(category.getId());
         });
+        recyclerViewCategories.setAdapter(categoryAdapter);
 
-
-
-        recyclerViewCategories.setAdapter(categoryAdapter);  // ✅ Đã sửa lỗi
-        categoryAdapter.notifyDataSetChanged();
-
-        // 👉 Cấu hình RecyclerView tour
-        recyclerViewTours = view.findViewById(R.id.recycler_view);
+        // Cấu hình RecyclerView danh sách tour
         recyclerViewTours.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        tourList = databaseHelper.getAllTours();
-        if (tourList.isEmpty()) {
-            addSampleTours();
-            tourList = databaseHelper.getAllTours();
-        }
-
+        tourList = new ArrayList<>();
         tourAdapter = new TourAdapter(getContext(), tourList, tour -> {
             Intent intent = new Intent(getContext(), TourDetailActivity.class);
             intent.putExtra("tour_id", tour.getId());
             startActivity(intent);
         });
-
         recyclerViewTours.setAdapter(tourAdapter);
-        tourAdapter.notifyDataSetChanged();  // ✅ Đảm bảo RecyclerView cập nhật giao diện
+
+        // Tải dữ liệu ban đầu
+        loadMoreTours();
+
+        // Xử lý sự kiện cuộn để tải thêm dữ liệu
+        recyclerViewTours.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (!isLoading && layoutManager != null && layoutManager.findLastVisibleItemPosition() >= tourList.size() - 1) {
+                    loadMoreTours();
+                }
+            }
+        });
 
         return view;
     }
 
-    private void addSampleCategories() {
-        databaseHelper.addCategory("Du lịch núi", "mountain");
-        databaseHelper.addCategory("Du lịch biển", "sea");
-        databaseHelper.addCategory("Du lịch thành phố", "city");
-        databaseHelper.addCategory("Du lịch sinh thái", "eco");
-        databaseHelper.addCategory("Du lịch văn hóa", "cultural");
-        databaseHelper.addCategory("Du lịch phiêu lưu", "adventure");
-    }
+    private void loadMoreTours() {
+        if (isLoading) return; // Tránh gọi nhiều lần
 
-    private void addSampleTours() {
-        databaseHelper.addTour("Tour Đà Lạt", "Đà Lạt", 1, 150.0, 3, "dalat_tour", 1, "2025-03-10 08:00:00",
-                "Thưởng thức khí hậu mát mẻ và cảnh đẹp thơ mộng của Đà Lạt.");
-        databaseHelper.addTour("Tour Phú Quốc", "Phú Quốc", 2, 200.0, 4, "phuquoc_tour", 2, "2025-03-12 09:30:00",
-                "Khám phá hòn đảo ngọc với bãi biển tuyệt đẹp và hải sản tươi ngon.");
-        databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 3, 180.0, 3, "hanoi_tour", 3, "2025-03-15 07:45:00",
-                "Trải nghiệm văn hóa, lịch sử thủ đô với 36 phố phường và Hồ Gươm.");
-        databaseHelper.addTour("Tour Đà Nẵng", "Đà Nẵng", 4, 220.0, 5, "danang_tour", 4, "2025-03-18 10:15:00",
-                "Tận hưởng biển Mỹ Khê và tham quan Bà Nà Hills nổi tiếng.");
-        databaseHelper.addTour("Tour Nha Trang", "Nha Trang", 5, 190.0, 4, "nhatrang_tour", 5, "2025-03-20 08:30:00",
-                "Tham quan vịnh biển đẹp nhất Việt Nam và thưởng thức hải sản.");
-        databaseHelper.addTour("Tour Sapa", "Sapa", 6, 170.0, 3, "sapa_tour", 6, "2025-03-25 06:00:00",
-                "Chinh phục đỉnh Fansipan và khám phá văn hóa dân tộc thiểu số.");
-    }
-    private void addSampleRoles() {
-        if (databaseHelper.getAllRoles().isEmpty()) { // Kiểm tra nếu chưa có role nào
-            databaseHelper.addRole("Customer");
-            databaseHelper.addRole("Admin");
-            databaseHelper.addRole("Tour Guide");
-        }
-    }
+        isLoading = true;
+        progressBar.setVisibility(View.VISIBLE);
 
-    private void addAdminUsers() {
-        Object[][] admins = {
-                {"Admin1", "admin1@gmail.com", "0123456789", "hashed_password_1", "1990-01-01", "admin1.jpg", 2},
-                {"Admin2", "admin2@example.com", "0987654321", "hashed_password_2", "1992-05-15", "admin2.jpg", 1}
-        };
-
-        for (Object[] admin : admins) {
-            databaseHelper.addUser(
-                    (String) admin[0],  // Tên
-                    (String) admin[1],  // Email
-                    (String) admin[2],  // Số điện thoại
-                    (String) admin[3],  // Mật khẩu đã mã hóa
-                    (String) admin[4],  // Ngày sinh
-                    (String) admin[5],  // Ảnh đại diện
-                    (int) admin[6]      // role_id (1 = Admin)
-            );
-        }
+        new Handler().postDelayed(() -> {
+            ArrayList<TourModel> newTours = databaseHelper.getToursByPage(currentPage * PAGE_SIZE, PAGE_SIZE);
+            if (!newTours.isEmpty()) {
+                tourList.addAll(newTours);
+                tourAdapter.notifyDataSetChanged();
+                currentPage++;
+            }
+            isLoading = false;
+            progressBar.setVisibility(View.GONE);
+        }, 1000); // Giả lập delay tải dữ liệu
     }
 
     private void searchTours(String query) {
@@ -179,4 +155,30 @@ public class HomeFragment extends Fragment {
         tourAdapter.notifyDataSetChanged();
     }
 
+    private void addSampleRoles() {
+        if (databaseHelper.getAllRoles().isEmpty()) {
+            databaseHelper.addRole("Customer");
+            databaseHelper.addRole("Admin");
+            databaseHelper.addRole("Tour Guide");
+        }
+    }
+
+    private void addSampleCategories() {
+        if (databaseHelper.getAllCategories().isEmpty()) {
+            databaseHelper.addCategory("Du lịch núi", "mountain");
+            databaseHelper.addCategory("Du lịch biển", "sea");
+            databaseHelper.addCategory("Du lịch thành phố", "city");
+            databaseHelper.addCategory("Du lịch sinh thái", "eco");
+            databaseHelper.addCategory("Du lịch văn hóa", "cultural");
+            databaseHelper.addCategory("Du lịch phiêu lưu", "adventure");
+        }
+    }
+
+    private void addSampleTours() {
+        if (databaseHelper.getAllTours().isEmpty()) {
+            databaseHelper.addTour("Tour Đà Lạt", "Đà Lạt", 1, 150.0, 3, "dalat_tour", 1, "2025-03-10 08:00:00", "Thưởng thức khí hậu mát mẻ và cảnh đẹp thơ mộng của Đà Lạt.");
+            databaseHelper.addTour("Tour Phú Quốc", "Phú Quốc", 2, 200.0, 4, "phuquoc_tour", 2, "2025-03-12 09:30:00", "Khám phá hòn đảo ngọc với bãi biển tuyệt đẹp và hải sản tươi ngon.");
+            databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 3, 180.0, 3, "hanoi_tour", 3, "2025-03-15 07:45:00", "Trải nghiệm văn hóa, lịch sử thủ đô với 36 phố phường và Hồ Gươm.");
+        }
+    }
 }

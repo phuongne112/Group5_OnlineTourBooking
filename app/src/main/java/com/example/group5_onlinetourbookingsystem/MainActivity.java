@@ -2,6 +2,7 @@ package com.example.group5_onlinetourbookingsystem;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,10 +41,22 @@ public class MainActivity extends AppCompatActivity {
 
         // Nếu user đã đăng nhập trước đó, chuyển ngay đến HomePage
         if (sessionManager.isLoggedIn()) {
-            Intent intent = new Intent(MainActivity.this, HomePage.class);
+            int roleId = sessionManager.getUserRoleId();
+
+            Log.d("SESSION", "Role ID from Session: " + roleId); // ✅ Debug log
+
+            Intent intent;
+            if (roleId == 2) {
+                intent = new Intent(MainActivity.this, AdminDashboardActivity.class); // Admin
+            } else {
+                intent = new Intent(MainActivity.this, HomePage.class); // User mặc định
+            }
             startActivity(intent);
             finish();
         }
+
+
+
 
         button.setOnClickListener(view -> {
             String email = etEmail.getText().toString().trim();
@@ -70,9 +83,9 @@ public class MainActivity extends AppCompatActivity {
                 String userName = dbHelper.getUserNameByEmail(email);
                 String userPhone = dbHelper.getUserPhoneByEmail(email);
                 int roleId = dbHelper.getUserRoleIdByEmail(email); // Trả về int, không phải String
-
+                Log.d("LOGIN", "User ID: " + userId + ", Role ID: " + roleId); // Debug log
 // 🔹 Lưu session (Chuyển roleId vào session thay vì role name)
-                sessionManager.createLoginSession(userId, userName, String.valueOf(roleId), email, userPhone);
+                sessionManager.createLoginSession(userId, userName, roleId, email, userPhone);
 
 // 🔹 Điều hướng theo role_id
                 Intent intent;
