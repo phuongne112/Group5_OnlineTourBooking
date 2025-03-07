@@ -1,10 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.EditTourActivity">
+    android:padding="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Tên tour -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Tên tour" android:textStyle="bold"/>
+        <EditText android:id="@+id/etTourName" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Nhập tên tour"/>
+
+        <!-- Điểm đến -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Điểm đến" android:textStyle="bold"/>
+        <EditText android:id="@+id/etDestination" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Nhập điểm đến"/>
+
+        <!-- Giá -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Giá (VNĐ)" android:textStyle="bold"/>
+        <EditText android:id="@+id/etPrice" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Nhập giá" android:inputType="numberDecimal"/>
+
+        <!-- Thành phố (Dropdown) -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Chọn thành phố" android:textStyle="bold"/>
+        <Spinner android:id="@+id/spinnerCity" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+        <!-- Thời gian bắt đầu -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Thời gian bắt đầu" android:textStyle="bold"/>
+        <EditText android:id="@+id/etStartTime" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Nhập thời gian bắt đầu"/>
+
+        <!-- Mô tả -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mô tả tour" android:textStyle="bold"/>
+        <EditText android:id="@+id/etDescription" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Nhập mô tả tour"/>
+
+        <!-- Nút lưu -->
+        <Button android:id="@+id/btnSave" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Lưu chỉnh sửa" android:layout_marginTop="16dp"/>
+    </LinearLayout>
+</ScrollView>

@@ -1,26 +1,139 @@
 package com.example.group5_onlinetourbookingsystem.activities;
 
+import android.content.ContentValues;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
+import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
+import com.example.group5_onlinetourbookingsystem.models.TourModel;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class EditTourActivity extends AppCompatActivity {
+
+    private EditText etTourName, etDestination, etPrice, etStartTime, etDescription;
+    private Spinner spinnerCity;
+    private Button btnSave;
+    private MyDatabaseHelper dbHelper;
+    private int tourId;
+    private HashMap<String, Integer> cityMap;
+    private ArrayList<String> cityNames;
+    private int selectedCityId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_edit_tour);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        etTourName = findViewById(R.id.etTourName);
+        etDestination = findViewById(R.id.etDestination);
+        etPrice = findViewById(R.id.etPrice);
+        etStartTime = findViewById(R.id.etStartTime);
+        etDescription = findViewById(R.id.etDescription);
+        spinnerCity = findViewById(R.id.spinnerCity);
+        btnSave = findViewById(R.id.btnSave);
+
+        dbHelper = new MyDatabaseHelper(this);
+
+        // 1️⃣ Load danh sách thành phố TRƯỚC khi load dữ liệu tour
+        loadCitySpinner();
+
+        // 2️⃣ Nhận dữ liệu từ Intent và load tour
+        Intent intent = getIntent();
+        if (intent.hasExtra("TOUR_ID")) {
+            tourId = intent.getIntExtra("TOUR_ID", -1);
+            loadTourData(tourId);
+        }
+
+        btnSave.setOnClickListener(v -> updateTour());
+    }
+
+    private void loadCitySpinner() {
+        cityMap = dbHelper.getAllCitiesWithIds(); // Lấy danh sách cityId -> cityName
+        cityNames = new ArrayList<>(cityMap.keySet());
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, cityNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCity.setAdapter(adapter);
+
+        spinnerCity.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+                String selectedCity = (String) parent.getItemAtPosition(position);
+                selectedCityId = cityMap.get(selectedCity); // Lấy cityId từ tên thành phố
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
+    }
+
+    private void loadTourData(int id) {
+        TourModel tour = dbHelper.getTourById(id);
+        if (tour != null) {
+            etTourName.setText(tour.getName());
+            etDestination.setText(tour.getDestination());
+            etPrice.setText(String.valueOf(tour.getPrice()));
+            etStartTime.setText(tour.getStartTime());
+            etDescription.setText(tour.getDescription());
+
+            // ✅ Chọn đúng thành phố trong Spinner
+            if (cityMap.containsValue(tour.getCityId())) {
+                for (String cityName : cityMap.keySet()) {
+                    if (cityMap.get(cityName) == tour.getCityId()) {
+                        int index = new ArrayList<>(cityMap.keySet()).indexOf(cityName);
+                        spinnerCity.setSelection(index);
+                        selectedCityId = tour.getCityId();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void updateTour() {
+        String name = etTourName.getText().toString().trim();
+        String destination = etDestination.getText().toString().trim();
+        String priceStr = etPrice.getText().toString().trim();
+        String startTime = etStartTime.getText().toString().trim();
+        String description = etDescription.getText().toString().trim();
+
+        if (name.isEmpty() || destination.isEmpty() || priceStr.isEmpty() || startTime.isEmpty() || description.isEmpty()) {
+            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            double price = Double.parseDouble(priceStr);
+
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("name", name);
+            values.put("destination", destination);
+            values.put("price", price);
+            values.put("city_id", selectedCityId);
+            values.put("start_time", startTime);
+            values.put("description", description);
+
+            int rowsAffected = db.update("tours", values, "id=?", new String[]{String.valueOf(tourId)});
+            db.close();
+
+            if (rowsAffected > 0) {
+                Toast.makeText(this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show();
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Vui lòng nhập số hợp lệ!", Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -276,12 +276,12 @@
             SQLiteDatabase db = this.getReadableDatabase();
 
             String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, t.description, " +
-                    "c.id AS categoryId, c.name AS categoryName, ci.name AS cityName, t.start_time " +
+                    "c.id AS categoryId, c.name AS categoryName, t.city_id, ci.name AS cityName, t.start_time " + // ✅ Lấy cả city_id
                     "FROM tours t " +
                     "LEFT JOIN categories c ON t.category_id = c.id " +
                     "LEFT JOIN cities ci ON t.city_id = ci.id " +
-                    "ORDER BY t.id " +  // ✅ Giữ thứ tự theo ID
-                    "LIMIT ? OFFSET ?"; // ✅ Thêm phân trang
+                    "ORDER BY t.id " +
+                    "LIMIT ? OFFSET ?";
 
             Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(limit), String.valueOf(offset)});
 
@@ -296,16 +296,18 @@
                     String description = cursor.getString(6);
                     int categoryId = cursor.getInt(7);
                     String categoryName = cursor.getString(8);
-                    String cityName = cursor.getString(9);
-                    String startTime = cursor.getString(10);  // ✅ Lấy start_time từ database
+                    int cityId = cursor.getInt(9); // ✅ Lấy city_id
+                    String cityName = cursor.getString(10) != null ? cursor.getString(10) : "Không xác định"; // ✅ Tránh NULL
+                    String startTime = cursor.getString(11);
 
-                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityName, startTime));
+                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityId, cityName, startTime));
                 } while (cursor.moveToNext());
             }
             cursor.close();
             db.close();
             return tourList;
         }
+
 
         // 🌟 Thêm tour mới
         public void addTour(String name, String destination, int cityId, double price, int duration,
@@ -329,13 +331,14 @@
 
 
 
+
         // 🌟 Lấy tất cả tour
         public ArrayList<TourModel> getAllTours() {
             ArrayList<TourModel> tourList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
 
             String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, t.description, " +
-                    "c.id AS categoryId, c.name AS categoryName, ci.name AS cityName, t.start_time " +  // ✅ Thêm start_time
+                    "c.id AS categoryId, c.name AS categoryName, t.city_id, ci.name AS cityName, t.start_time " +
                     "FROM tours t " +
                     "LEFT JOIN categories c ON t.category_id = c.id " +
                     "LEFT JOIN cities ci ON t.city_id = ci.id";
@@ -353,10 +356,11 @@
                     String description = cursor.getString(6);
                     int categoryId = cursor.getInt(7);
                     String categoryName = cursor.getString(8);
-                    String cityName = cursor.getString(9);
-                    String startTime = cursor.getString(10);  // ✅ Lấy start_time từ database
+                    int cityId = cursor.getInt(9);
+                    String cityName = cursor.getString(10) != null ? cursor.getString(10) : "Không xác định";
+                    String startTime = cursor.getString(11);
 
-                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityName, startTime));
+                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityId, cityName, startTime));
                 } while (cursor.moveToNext());
             }
 
@@ -472,35 +476,39 @@
             TourModel tour = null;
 
             String query = "SELECT t.id, t.name, t.destination, t.description, t.price, t.duration, t.image, " +
-                    "c.id AS categoryId, c.name AS categoryName, ci.name AS cityName, t.start_time " +
+                    "t.city_id, ci.name AS cityName, " +  // ✅ Lấy cả city_id và cityName
+                    "c.id AS categoryId, c.name AS categoryName, t.start_time " +
                     "FROM tours t " +
                     "LEFT JOIN categories c ON t.category_id = c.id " +
                     "LEFT JOIN cities ci ON t.city_id = ci.id " +
                     "WHERE t.id = ?";
 
-
             Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
-    
+
             if (cursor.moveToFirst()) {
                 int tourId = cursor.getInt(0);
                 String name = cursor.getString(1);
                 String destination = cursor.getString(2);
-                String description = cursor.getString(3); // ✅ Lấy đúng cột description
+                String description = cursor.getString(3);
                 double price = cursor.getDouble(4);
                 int duration = cursor.getInt(5);
                 String image = cursor.getString(6);
-                int categoryId = cursor.getInt(7);
-                String categoryName = cursor.getString(8);
-                String cityName = cursor.getString(9);
-                String startTime = cursor.getString(10);
-                // Tạo đối tượng TourModel
-                tour = new TourModel(tourId, name, destination, price, duration, image,description, categoryId, categoryName, cityName,startTime);
+                int cityId = cursor.getInt(7);  // ✅ Lấy city_id
+                String cityName = cursor.getString(8); // ✅ Lấy cityName
+                int categoryId = cursor.getInt(9);
+                String categoryName = cursor.getString(10);
+                String startTime = cursor.getString(11);
+
+                // ✅ Tạo đối tượng TourModel với cityId và cityName
+                tour = new TourModel(tourId, name, destination, price, duration, image, description, categoryId, categoryName, cityId, cityName, startTime);
             }
-    
+
             cursor.close();
             db.close();
             return tour;
         }
+
+
 
         public long addBooking(int userId, int tourId, int adults, int children, String note, double totalPrice, String status) {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -609,21 +617,13 @@
             ArrayList<TourModel> tourList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
 
-            // Chuyển query thành không dấu để tìm kiếm
             String queryNoAccent = removeDiacritics(query);
 
-            // Truy vấn dữ liệu từ bảng tours, categories, cities
-            String sql = "SELECT t." + COLUMN_TOUR_ID + ", t." + COLUMN_TOUR_NAME +
-                    ", t." + COLUMN_TOUR_DESTINATION + ", t." + COLUMN_TOUR_PRICE +
-                    ", t." + COLUMN_TOUR_DURATION + ", t." + COLUMN_TOUR_IMAGE +
-                    ", t." + COLUMN_TOUR_DESCRIPTION +  // Thêm description
-                    ", c." + COLUMN_CATEGORY_ID + ", c." + COLUMN_CATEGORY_NAME +
-                    ", ci." + COLUMN_CITY_NAME +  // Lấy cityName từ bảng cities
-                    ", t." + COLUMN_TOUR_START_TIME + // Thêm startTime
-                    " FROM " + TABLE_TOURS + " t " +
-                    "LEFT JOIN " + TABLE_CATEGORIES + " c ON t." + COLUMN_TOUR_CATEGORY_ID + " = c." + COLUMN_CATEGORY_ID + " " +
-                    "LEFT JOIN " + TABLE_CITIES + " ci ON t." + COLUMN_TOUR_CITY_ID + " = ci." + COLUMN_CITY_ID;
-
+            String sql = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, t.description, " +
+                    "c.id AS categoryId, c.name AS categoryName, t.city_id, ci.name AS cityName, t.start_time " +
+                    "FROM tours t " +
+                    "LEFT JOIN categories c ON t.category_id = c.id " +
+                    "LEFT JOIN cities ci ON t.city_id = ci.id";
 
             Cursor cursor = db.rawQuery(sql, null);
 
@@ -635,22 +635,20 @@
                     double price = cursor.getDouble(3);
                     int duration = cursor.getInt(4);
                     String image = cursor.getString(5);
-                    String description = cursor.getString(6); // Lấy description
+                    String description = cursor.getString(6);
                     int categoryId = cursor.getInt(7);
                     String categoryName = cursor.getString(8);
-                    String cityName = cursor.getString(9);
-                    String startTime = cursor.getString(10);
-                    // Xử lý null để tránh lỗi
-                    if (name == null) name = "";
-                    if (categoryName == null) categoryName = "";
+                    int cityId = cursor.getInt(9);
+                    String cityName = cursor.getString(10) != null ? cursor.getString(10) : "Không xác định";
+                    String startTime = cursor.getString(11);
 
-                    // Chuyển thành không dấu để so sánh
+                    // Chuyển thành không dấu để tìm kiếm
                     String nameNoAccent = removeDiacritics(name);
                     String categoryNoAccent = removeDiacritics(categoryName);
+                    String cityNoAccent = removeDiacritics(cityName);
 
-                    // Kiểm tra nếu query khớp với name hoặc category
-                    if (nameNoAccent.contains(queryNoAccent) || categoryNoAccent.contains(queryNoAccent)) {
-                        tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityName,startTime));
+                    if (nameNoAccent.contains(queryNoAccent) || categoryNoAccent.contains(queryNoAccent) || cityNoAccent.contains(queryNoAccent)) {
+                        tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityId, cityName, startTime));
                     }
                 } while (cursor.moveToNext());
             }
@@ -659,6 +657,7 @@
             db.close();
             return tourList;
         }
+
 
 
 
@@ -725,7 +724,7 @@
             SQLiteDatabase db = this.getReadableDatabase();
 
             String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, " +
-                    "t.description, c.id AS categoryId, c.name AS categoryName, ci.name AS cityName, t.start_time " +
+                    "t.description, c.id AS categoryId, c.name AS categoryName, t.city_id, ci.name AS cityName, t.start_time " +
                     "FROM tours t " +
                     "LEFT JOIN categories c ON t.category_id = c.id " +
                     "LEFT JOIN cities ci ON t.city_id = ci.id " +
@@ -744,10 +743,11 @@
                     String description = cursor.getString(6);
                     int categoryID = cursor.getInt(7);
                     String categoryName = cursor.getString(8);
-                    String cityName = cursor.getString(9);
-                    String startTime = cursor.getString(10);
+                    int cityId = cursor.getInt(9); // ✅ Lấy city_id
+                    String cityName = cursor.getString(10) != null ? cursor.getString(10) : "Không xác định"; // ✅ Tránh NULL
+                    String startTime = cursor.getString(11);
 
-                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryID, categoryName, cityName, startTime));
+                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryID, categoryName, cityId, cityName, startTime));
                 } while (cursor.moveToNext());
             }
 
@@ -755,6 +755,7 @@
             db.close();
             return tourList;
         }
+
         public boolean addRole(String roleName) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -764,6 +765,22 @@
             db.close();
             return result != -1;
         }
+        public HashMap<String, Integer> getAllCitiesWithIds() {
+            HashMap<String, Integer> cityMap = new HashMap<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT id, name FROM cities", null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    cityMap.put(cursor.getString(1), cursor.getInt(0)); // cityName -> cityId
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+            return cityMap;
+        }
+
+
 
         public ArrayList<String> getAllRoles() {
             ArrayList<String> roles = new ArrayList<>();

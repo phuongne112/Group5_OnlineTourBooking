@@ -59,7 +59,7 @@ public class HomeFragment extends Fragment {
         addSampleRoles();
         addSampleCategories();
         addSampleTours();
-
+        addSampleCities(); // 🔹 Gọi để thêm dữ liệu mẫu khi khởi chạy
         // Gán UI components
         EditText editTextSearch = view.findViewById(R.id.editTextSearch);
         recyclerViewCategories = view.findViewById(R.id.recyclerViewCategories);
@@ -160,6 +160,15 @@ public class HomeFragment extends Fragment {
             databaseHelper.addRole("Customer");
             databaseHelper.addRole("Admin");
             databaseHelper.addRole("Tour Guide");
+        }
+    }
+    private void addSampleCities() {
+        if (databaseHelper.getAllCities().isEmpty()) { // Kiểm tra nếu chưa có dữ liệu
+            databaseHelper.addCity("Hà Nội");
+            databaseHelper.addCity("Đà Nẵng");
+            databaseHelper.addCity("Hồ Chí Minh");
+            databaseHelper.addCity("Đà Lạt");
+            databaseHelper.addCity("Nha Trang");
         }
     }
 
