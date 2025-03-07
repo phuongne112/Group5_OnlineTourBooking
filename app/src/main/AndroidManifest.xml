@@ -32,8 +32,10 @@
         <activity
             android:name=".activities.LegalActivity"
             android:exported="false" />
+        <activity android:name=".activities.HelpCenterActivity" />
+        <activity android:name=".activities.HelpDetailActivity" />
         <activity
-            android:name=".activities.ContactActivity"
+            android:name=".activities.ContactUsActivity"
             android:exported="false" />
         <activity
             android:name=".activities.ChangePasswordActivity"
@@ -44,6 +46,10 @@
         <activity
             android:name=".activities.BookingActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.AddTourActivity"
+            android:exported="false" />
+
         <activity
             android:name=".activities.TourDetailActivity"
             android:exported="false" />
