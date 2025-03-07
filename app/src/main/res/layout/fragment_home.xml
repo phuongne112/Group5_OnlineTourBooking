@@ -100,6 +100,15 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:overScrollMode="never"/>
+
+            <!-- ProgressBar khi tải dữ liệu -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                style="@android:style/Widget.Material.ProgressBar.Large" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

@@ -270,8 +270,43 @@
             db.close();
             return categoryList;
         }
-    
-    
+
+        public ArrayList<TourModel> getToursByPage(int offset, int limit) {
+            ArrayList<TourModel> tourList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, t.description, " +
+                    "c.id AS categoryId, c.name AS categoryName, ci.name AS cityName, t.start_time " +
+                    "FROM tours t " +
+                    "LEFT JOIN categories c ON t.category_id = c.id " +
+                    "LEFT JOIN cities ci ON t.city_id = ci.id " +
+                    "ORDER BY t.id " +  // ✅ Giữ thứ tự theo ID
+                    "LIMIT ? OFFSET ?"; // ✅ Thêm phân trang
+
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(limit), String.valueOf(offset)});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(0);
+                    String name = cursor.getString(1);
+                    String destination = cursor.getString(2);
+                    double price = cursor.getDouble(3);
+                    int duration = cursor.getInt(4);
+                    String image = cursor.getString(5);
+                    String description = cursor.getString(6);
+                    int categoryId = cursor.getInt(7);
+                    String categoryName = cursor.getString(8);
+                    String cityName = cursor.getString(9);
+                    String startTime = cursor.getString(10);  // ✅ Lấy start_time từ database
+
+                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityName, startTime));
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+            return tourList;
+        }
+
         // 🌟 Thêm tour mới
         public void addTour(String name, String destination, int cityId, double price, int duration,
                             String imagePath, int categoryId, String start_time, String description) {
@@ -781,20 +816,18 @@
         }
 
         public int getUserRoleIdByEmail(String email) {
+            int roleId = -1;
             SQLiteDatabase db = this.getReadableDatabase();
-            int roleId = 3; // Mặc định là Customer nếu không tìm thấy
-
-            String query = "SELECT role_id FROM users WHERE email = ?";
-            Cursor cursor = db.rawQuery(query, new String[]{email});
+            Cursor cursor = db.rawQuery("SELECT " + COLUMN_USER_ROLE_ID + " FROM " + TABLE_USERS + " WHERE " + COLUMN_USER_EMAIL + " = ?", new String[]{email});
 
             if (cursor.moveToFirst()) {
-                roleId = cursor.getInt(0); // Lấy role_id từ database
+                roleId = cursor.getInt(0);
             }
-
             cursor.close();
             db.close();
             return roleId;
         }
+
 
 
         // Chuyển đổi role_id thành tên vai trò

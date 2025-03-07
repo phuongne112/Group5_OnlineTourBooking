@@ -89,4 +89,10 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
         tourList.addAll(newTourList);
         notifyDataSetChanged();
     }
+    public void addTours(ArrayList<TourModel> newTours) {
+        int startPosition = tourList.size();
+        tourList.addAll(newTours);
+        notifyItemRangeInserted(startPosition, newTours.size());
+    }
+
 }

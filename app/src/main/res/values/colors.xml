@@ -6,5 +6,6 @@
     <color name="red">#FF0000</color>
     <color name="purple_500">#9C27B0</color> <!-- Màu tím -->
     <color name="light_gray">#F5F5F5</color>
+    <color name="primaryColor">#6200EE</color> <!-- Màu tím (hoặc đổi màu theo ý bạn) -->
 
 </resources>

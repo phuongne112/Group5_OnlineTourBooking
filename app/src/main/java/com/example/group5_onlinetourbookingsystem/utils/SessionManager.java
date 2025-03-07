@@ -3,8 +3,6 @@ package com.example.group5_onlinetourbookingsystem.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
-
 import java.util.HashMap;
 
 public class SessionManager {
@@ -14,8 +12,8 @@ public class SessionManager {
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_ROLE = "userRole";
     private static final String KEY_USER_PHONE = "userPhone"; // Thêm key số điện thoại
-
     private static final String KEY_USER_EMAIL = "userEmail"; // Thêm key email
+    private static final String KEY_ROLE_ID = "role_id"; // 🛠 Định nghĩa khóa Role ID
 
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
@@ -25,27 +23,31 @@ public class SessionManager {
         editor = pref.edit();
     }
 
-    // 👉 **Lưu thông tin đăng nhập**
-    public void createLoginSession(int userId, String userName, String userRole, String email, String phone) {
+    // 👉 **Lưu thông tin đăng nhập (LƯU role_id DƯỚI DẠNG int)**
+    public void createLoginSession(int userId, String userName, int roleId, String email, String phone) {
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.putInt(KEY_USER_ID, userId);
         editor.putString(KEY_USER_NAME, userName);
-        editor.putString(KEY_USER_ROLE, userRole);
+        editor.putInt(KEY_ROLE_ID, roleId); // ✅ Lưu role_id dưới dạng int
         editor.putString(KEY_USER_EMAIL, email);
         editor.putString(KEY_USER_PHONE, phone);
         editor.apply();
     }
 
-
-    public HashMap<String, String> getUserDetails() {
-        HashMap<String, String> user = new HashMap<>();
-        user.put("name", pref.getString(KEY_USER_NAME, ""));  // ✅ Dùng đúng key
-        user.put("email", pref.getString(KEY_USER_EMAIL, "")); // ✅ Dùng đúng key
-        user.put("phone",pref.getString(KEY_USER_PHONE, "")); // 📌 Chưa có số điện thoại, cần lấy từ database nếu có
-        return user;
+    // 👉 **Lấy Role ID (Dưới dạng int, tránh ClassCastException)**
+    public int getUserRoleId() {
+        return pref.getInt(KEY_ROLE_ID, -1); // ✅ Trả về -1 nếu không tìm thấy
     }
 
-
+    // 👉 **Lấy toàn bộ thông tin User**
+    public HashMap<String, String> getUserDetails() {
+        HashMap<String, String> user = new HashMap<>();
+        user.put(KEY_USER_NAME, pref.getString(KEY_USER_NAME, ""));
+        user.put(KEY_USER_EMAIL, pref.getString(KEY_USER_EMAIL, ""));
+        user.put(KEY_USER_PHONE, pref.getString(KEY_USER_PHONE, ""));
+        user.put(KEY_ROLE_ID, String.valueOf(pref.getInt(KEY_ROLE_ID, 1))); // ✅ Trả về role_id dưới dạng String
+        return user;
+    }
 
     // 👉 **Kiểm tra trạng thái đăng nhập**
     public boolean isLoggedIn() {
@@ -71,6 +73,8 @@ public class SessionManager {
     public String getUserEmail() {
         return pref.getString(KEY_USER_EMAIL, "");
     }
+
+    // 👉 **Lấy số điện thoại User**
     public String getUserPhone() {
         return pref.getString(KEY_USER_PHONE, "");
     }
@@ -80,9 +84,10 @@ public class SessionManager {
         editor.clear();
         editor.apply();
     }
+
+    // 👉 **Cập nhật số điện thoại**
     public void updateUserPhone(String phone) {
         editor.putString(KEY_USER_PHONE, phone);
         editor.apply();
     }
-
 }
