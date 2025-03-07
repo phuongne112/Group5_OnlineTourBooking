@@ -6,6 +6,13 @@
     <color name="red">#FF0000</color>
     <color name="purple_500">#9C27B0</color> <!-- Màu tím -->
     <color name="light_gray">#F5F5F5</color>
-    <color name="primaryColor">#6200EE</color> <!-- Màu tím (hoặc đổi màu theo ý bạn) -->
+    <color name="primaryColor">#4CAF50</color> <!-- Green (Change as needed) -->
+    <color name="primaryDarkColor">#388E3C</color> <!-- Darker Green -->
+    <color name="accentColor">#FFC107</color> <!-- Accent Color -->
+
+    <color name="light_green">#A5D6A7</color> <!-- Light Green -->
+
 
 </resources>
+
+

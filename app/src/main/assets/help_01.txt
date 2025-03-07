@@ -1,0 +1,4 @@
+User Guide:
+1. Log in to the system.
+2. Search and book a tour.
+3. Check your schedule.

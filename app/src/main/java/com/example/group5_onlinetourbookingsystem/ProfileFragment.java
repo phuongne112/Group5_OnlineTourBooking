@@ -13,12 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.activities.ChangePasswordActivity;
-import com.example.group5_onlinetourbookingsystem.activities.ContactActivity;
+import com.example.group5_onlinetourbookingsystem.activities.ContactUsActivity;
+import com.example.group5_onlinetourbookingsystem.activities.HelpCenterActivity;
 import com.example.group5_onlinetourbookingsystem.activities.HomePage;
 import com.example.group5_onlinetourbookingsystem.activities.LegalActivity;
-import com.example.group5_onlinetourbookingsystem.MainActivity;
 import com.example.group5_onlinetourbookingsystem.activities.SettingsActivity;
 import com.example.group5_onlinetourbookingsystem.activities.UserProfileActivity;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
@@ -45,7 +44,7 @@ public class ProfileFragment extends Fragment {
 
         // Kiểm tra trạng thái đăng nhập
         if (sessionManager.isLoggedIn()) {
-            String email = sessionManager.getUserName(); // Lấy email từ session
+            String email = sessionManager.getUserName();
             String displayName = email.split("@")[0]; // Lấy phần trước dấu '@'
 
             textViewUserName.setText("Hello " + displayName);
@@ -73,17 +72,19 @@ public class ProfileFragment extends Fragment {
 
         // Lấy từng mục từ XML
         LinearLayout userProfile = view.findViewById(R.id.userProfile);
-        LinearLayout contact = view.findViewById(R.id.contact);
+        LinearLayout contactUs = view.findViewById(R.id.contactUs);
         LinearLayout legal = view.findViewById(R.id.legal);
         LinearLayout changePassword = view.findViewById(R.id.changePassword);
         LinearLayout appSettings = view.findViewById(R.id.appSettings);
+        LinearLayout helpCenter = view.findViewById(R.id.helpCenter); // Add Help Center option
 
         // Xử lý sự kiện nhấn từng mục
         userProfile.setOnClickListener(v -> openActivity(UserProfileActivity.class));
-        contact.setOnClickListener(v -> openActivity(ContactActivity.class));
+        contactUs.setOnClickListener(v -> openActivity(ContactUsActivity.class));
         legal.setOnClickListener(v -> openActivity(LegalActivity.class));
         changePassword.setOnClickListener(v -> openActivity(ChangePasswordActivity.class));
         appSettings.setOnClickListener(v -> openActivity(SettingsActivity.class));
+        helpCenter.setOnClickListener(v -> openActivity(HelpCenterActivity.class)); // Handle Help Center click
 
         return view;
     }

@@ -114,10 +114,15 @@
                 android:text="User Profile"
                 android:textSize="18sp"/>
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginBottom="8dp"/>
 
         <!-- Mục Contact -->
         <LinearLayout
-            android:id="@+id/contact"
+            android:id="@+id/contactUs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -129,9 +134,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Contact"
+                android:text="Contact Us"
                 android:textSize="18sp"/>
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginBottom="8dp"/>
 
         <!-- Mục Legal -->
         <LinearLayout
@@ -150,6 +160,11 @@
                 android:text="Legal"
                 android:textSize="18sp"/>
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginBottom="8dp"/>
 
         <!-- Mục Change Password -->
         <LinearLayout
@@ -167,7 +182,14 @@
                 android:layout_weight="1"
                 android:text="Change Password"
                 android:textSize="18sp"/>
+
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginBottom="8dp"/>
+
 
         <!-- Mục App Settings -->
         <LinearLayout
@@ -186,6 +208,33 @@
                 android:text="App Settings"
                 android:textSize="18sp"/>
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginBottom="8dp"/>
+
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/helpCenter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Help Center"
+            android:textSize="18sp"/>
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginBottom="8dp"/>
 
 </LinearLayout>

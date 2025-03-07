@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <application
         android:allowBackup="true"
@@ -17,15 +16,10 @@
         android:theme="@style/Theme.Group5_OnlineTourBookingSystem"
         tools:targetApi="31">
         <activity
-            android:name=".activities.AddTourActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.EditTourActivity"
-            android:exported="false" />
-        <activity
             android:name=".activities.PaymentActivity"
             android:exported="false" />
-        <activity android:name=".activities.AdminDashboardActivity" />
+        <activity android:name="com.example.group5_onlinetourbookingsystem.activities.AdminDashboardActivity" />
+
         <activity
             android:name=".activities.EditProfileActivity"
             android:exported="false" />
