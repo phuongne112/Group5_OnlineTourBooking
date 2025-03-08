@@ -135,25 +135,39 @@ public class AddTourActivity extends AppCompatActivity {
 
     // Thêm tour vào database
     private void addTourToDatabase() {
+        // Lấy dữ liệu từ EditText
         String name = etTourName.getText().toString().trim();
         String destination = etDestination.getText().toString().trim();
-        int cityId = Integer.parseInt(etCityId.getText().toString().trim());
-        double price = Double.parseDouble(etPrice.getText().toString().trim());
-        int duration = Integer.parseInt(etDuration.getText().toString().trim());
-        int categoryId = Integer.parseInt(etCategoryId.getText().toString().trim());
+        String priceStr = etPrice.getText().toString().trim();
+        String durationStr = etDuration.getText().toString().trim();
+        String categoryIdStr = etCategoryId.getText().toString().trim();
+        String cityIdStr = etCityId.getText().toString().trim();
         String startTime = etStartTime.getText().toString().trim();
         String description = etDescription.getText().toString().trim();
 
-        // Kiểm tra nếu chưa chọn ảnh
-        if (selectedImageName.isEmpty()) {
-            Toast.makeText(this, "Vui lòng chọn ảnh!", Toast.LENGTH_SHORT).show();
+        // Kiểm tra nếu có trường nào bị bỏ trống
+        if (name.isEmpty() || destination.isEmpty() || priceStr.isEmpty() || durationStr.isEmpty()
+                || categoryIdStr.isEmpty() || cityIdStr.isEmpty() || startTime.isEmpty() || description.isEmpty()) {
+            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 🟢 Chỉ lưu tên file ảnh không có phần mở rộng vào database
-        dbHelper.addTour(name, destination, cityId, price, duration, selectedImageName, categoryId, startTime, description);
+        try {
+            // Chuyển đổi giá trị
+            double price = Double.parseDouble(priceStr);
+            int duration = Integer.parseInt(durationStr);
+            int categoryId = Integer.parseInt(categoryIdStr);
+            int cityId = Integer.parseInt(cityIdStr);
 
-        Toast.makeText(this, "Thêm tour thành công!", Toast.LENGTH_SHORT).show();
-        finish();
+            // Thêm tour vào database
+            MyDatabaseHelper dbHelper = new MyDatabaseHelper(this);
+            dbHelper.addTour(name, destination, cityId, price, duration, "", categoryId, startTime, description);
+
+            Toast.makeText(this, "Thêm tour thành công!", Toast.LENGTH_SHORT).show();
+            finish(); // Đóng activity sau khi thêm thành công
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Lỗi nhập số: Vui lòng nhập giá trị hợp lệ!", Toast.LENGTH_SHORT).show();
+        }
     }
+
 }
