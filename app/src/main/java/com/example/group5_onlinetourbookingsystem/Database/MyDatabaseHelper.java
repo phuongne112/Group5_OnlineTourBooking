@@ -5,6 +5,7 @@
     import android.database.Cursor;
     import android.database.sqlite.SQLiteDatabase;
     import android.database.sqlite.SQLiteOpenHelper;
+    import android.util.Log;
     import android.widget.Toast;
     
     import androidx.annotation.Nullable;
@@ -29,7 +30,7 @@
         // Bảng Roles
         private static final String TABLE_ROLES = "roles";
         private static final String COLUMN_ROLE_ID = "id";
-        private static final String COLUMN_ROLE_NAME = "role_name"; // Admin, User, Employee, Guide
+        private static final String COLUMN_ROLE_NAME = "role_name"; // Admin, User, Guide
     
         // Bảng Cities
         private static final String TABLE_CITIES = "cities";
@@ -135,7 +136,7 @@
             db.execSQL("CREATE TABLE " + TABLE_CITIES + " (" +
                     COLUMN_CITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_CITY_NAME + " TEXT UNIQUE)");
-    
+
             db.execSQL("CREATE TABLE " + TABLE_USERS + " (" +
                     COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_USER_NAME + " TEXT, " +
@@ -143,14 +144,17 @@
                     COLUMN_USER_PHONE + " TEXT, " +
                     COLUMN_USER_PASSWORD + " TEXT, " +
                     COLUMN_USER_BIRTH + " TEXT, " +
-                    COLUMN_USER_IMAGE + " TEXT, " +  // ➕ Cột lưu ảnh đại diện
+                    COLUMN_USER_IMAGE + " TEXT, " +
                     COLUMN_USER_ROLE_ID + " INTEGER, " +
+                    "status TEXT DEFAULT 'active', " + // ✅ Đảm bảo có cột status
                     "FOREIGN KEY(" + COLUMN_USER_ROLE_ID + ") REFERENCES roles(id))"
             );
-    
-    
-    
-    
+
+
+
+
+
+
             // Tạo bảng Categories
             db.execSQL("CREATE TABLE " + TABLE_CATEGORIES + " (" +
                     COLUMN_CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -221,22 +225,27 @@
     
         }
     
+
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOURS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOUR_IMAGES);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYMENTS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_CITIES);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_HELP_CENTER);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_ROLES);
-            onCreate(db);
+            if (oldVersion < 6) { // Kiểm tra version để chỉ thêm cột nếu cần
+                db.execSQL("ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'active'");
+            } else {
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOURS);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOUR_IMAGES);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKINGS);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAYMENTS);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_CITIES);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_HELP_CENTER);
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_ROLES);
+                        onCreate(db); // Gọi lại để tạo bảng mới
+            }
         }
-    
+
+
         // 🌟 Thêm danh mục
         public void addCategory(String name, String imagePath) {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -376,20 +385,49 @@
 
 
         public long addUser(String name, String email, String phone, String hashedPassword, String birthDate, String imagePath, int roleId) {
-            SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_USER_NAME, name);
-            values.put(COLUMN_USER_EMAIL, email);
-            values.put(COLUMN_USER_PHONE, phone);
-            values.put(COLUMN_USER_PASSWORD, hashedPassword); // ✅ Lưu mật khẩu đã mã hóa
-            values.put(COLUMN_USER_BIRTH, birthDate);
-            values.put(COLUMN_USER_IMAGE, imagePath);
-            values.put(COLUMN_USER_ROLE_ID, roleId); // ✅ Thêm role_id
+            SQLiteDatabase db = null;
+            long result = -1;
 
-            long result = db.insert(TABLE_USERS, null, values);
-            db.close();
+            try {
+                db = this.getWritableDatabase();
+
+                if (isUserExists(email)) {
+                    Log.e("DB_ERROR", "Email đã tồn tại: " + email);
+                    return -1;
+                }
+
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_USER_NAME, name);
+                values.put(COLUMN_USER_EMAIL, email);
+                values.put(COLUMN_USER_PHONE, phone);
+                values.put(COLUMN_USER_PASSWORD, hashedPassword);
+                values.put(COLUMN_USER_BIRTH, birthDate);
+                values.put(COLUMN_USER_IMAGE, imagePath);
+                values.put(COLUMN_USER_ROLE_ID, roleId);
+                values.put("status", "active"); // ✅ Thêm trạng thái mặc định
+
+                result = db.insert(TABLE_USERS, null, values);
+
+                if (result == -1) {
+                    Log.e("DB_ERROR", "Thêm user thất bại!");
+                } else {
+                    Log.d("DB_SUCCESS", "Thêm user thành công với ID: " + result);
+                }
+            } catch (Exception e) {
+                Log.e("DB_EXCEPTION", "Lỗi khi thêm user: " + e.getMessage());
+            } finally {
+                if (db != null && db.isOpen()) {
+                    db.close();
+                }
+            }
+
             return result;
         }
+
+
+
+
+
 
 
 
@@ -534,14 +572,14 @@
 
         public boolean isUserExists(String email) {
             SQLiteDatabase db = this.getReadableDatabase();
-            String query = "SELECT * FROM users WHERE email = ?";
-            Cursor cursor = db.rawQuery(query, new String[]{email});
+            Cursor cursor = db.rawQuery("SELECT 1 FROM users WHERE email = ?", new String[]{email});
             boolean exists = cursor.getCount() > 0;
             cursor.close();
-            db.close();
-            return exists;
+            return exists; // Không gọi db.close() ở đây!
         }
-    
+
+
+
         // ✅ Hàm cập nhật mật khẩu mới
         public void updatePassword(String email, String newPassword) {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -553,40 +591,78 @@
         public UserModel getUserById(int userId) {
             SQLiteDatabase db = this.getReadableDatabase();
             UserModel user = null;
-    
-            String query = "SELECT id, name, email, phone, password, birth_date, image FROM users WHERE id = ?";
+
+            String query = "SELECT id, name, email, phone, birth_date, image FROM users WHERE id = ?";
             Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
-    
+
             if (cursor.moveToFirst()) {
                 int id = cursor.getInt(0);
                 String name = cursor.getString(1);
                 String email = cursor.getString(2);
                 String phone = cursor.getString(3);
-                String password = cursor.getString(4);
-                String birthDate = cursor.getString(5);
-                String image = cursor.getString(6);
-    
-                user = new UserModel(id, name, email, phone, password, birthDate, image);
+                String birthDate = cursor.getString(4);
+                String image = cursor.getString(5);
+
+                Log.d("Database", "User found: ID=" + id + ", Name=" + name + ", Email=" + email);
+
+                user = new UserModel(id, name, email, phone, birthDate , "active"); // Mặc định trạng thái active
+
+            } else {
+                Log.e("Database", "Không tìm thấy user với ID: " + userId);
             }
-    
+
             cursor.close();
             db.close();
             return user;
         }
+
+
+        public ArrayList<UserModel> getAllUsers() {
+            ArrayList<UserModel> userList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT id, name, email, phone, status FROM users"; // ✅ Lấy thêm status
+            Cursor cursor = db.rawQuery(query, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(0);
+                    String name = cursor.getString(1);
+                    String email = cursor.getString(2);
+                    String phone = cursor.getString(3);
+                    String birth_date = cursor.getString(4);
+                    String status = cursor.getString(5); // ✅ Lấy trạng thái (active/banned)
+
+                    userList.add(new UserModel(id, name, email, phone,birth_date, status)); // ✅ Thêm status vào model
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return userList;
+        }
+
+
+
+
+
         public int getUserIdByEmail(String email) {
             SQLiteDatabase db = this.getReadableDatabase();
             String query = "SELECT id FROM users WHERE email = ?";
             Cursor cursor = db.rawQuery(query, new String[]{email});
-    
-            int userId = -1; // Nếu không tìm thấy user
+
+            int userId = -1; // Nếu không tìm thấy user, giữ -1
             if (cursor.moveToFirst()) {
                 userId = cursor.getInt(0);
             }
             cursor.close();
             db.close();
+
+            Log.d("DB_USER_ID", "UserID tìm thấy: " + userId + " cho email: " + email);
             return userId;
         }
-    
+
+
         public String getUserNameByEmail(String email) {
             SQLiteDatabase db = this.getReadableDatabase();
             String query = "SELECT name FROM users WHERE email = ?";
@@ -606,12 +682,17 @@
             values.put(COLUMN_USER_NAME, name);
             values.put(COLUMN_USER_PHONE, phone);
             values.put(COLUMN_USER_BIRTH, birthDate);
-            values.put(COLUMN_USER_IMAGE, imagePath); // ✅ Cập nhật ảnh đại diện
-    
+            values.put(COLUMN_USER_IMAGE, imagePath); // Lưu URI thay vì file path
+
             int rowsAffected = db.update(TABLE_USERS, values, "id=?", new String[]{String.valueOf(userId)});
             db.close();
+
             return rowsAffected > 0;
         }
+
+
+
+
 
         public ArrayList<TourModel> searchTours(String query) {
             ArrayList<TourModel> tourList = new ArrayList<>();
@@ -659,6 +740,13 @@
         }
 
 
+        public void updateUserStatus(int userId, String status) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("status", status);
+            db.update("users", values, "id=?", new String[]{String.valueOf(userId)});
+            db.close();
+        }
 
 
 
@@ -796,28 +884,22 @@
             return roles;
         }
 
-        public boolean registerUser(String username, String password, String role) {
+        public boolean registerUser(String username, String password, String email, String phone, String birthDate) {
             SQLiteDatabase db = this.getWritableDatabase();
 
-            // Lấy ID của role dựa trên tên role
-            Cursor cursor = db.rawQuery("SELECT id FROM roles WHERE name = ?", new String[]{role});
-            int roleId = -1;
-            if (cursor.moveToFirst()) {
-                roleId = cursor.getInt(0);
-            }
-            cursor.close();
-
-            if (roleId == -1) return false; // Role không tồn tại
-
             ContentValues values = new ContentValues();
-            values.put("username", username);
+            values.put("name", username);
+            values.put("email", email);
+            values.put("phone", phone);
             values.put("password", password);
-            values.put("role_id", roleId);
+            values.put("birth_date", birthDate);
+            values.put("role_id", 1); // ✅ Luôn là User
 
             long result = db.insert("users", null, values);
             db.close();
             return result != -1;
         }
+
 
 
         public String getUserRole(String username) {

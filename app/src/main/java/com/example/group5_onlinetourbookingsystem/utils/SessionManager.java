@@ -2,6 +2,7 @@ package com.example.group5_onlinetourbookingsystem.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import java.util.HashMap;
 
@@ -21,17 +22,23 @@ public class SessionManager {
     public SessionManager(Context context) {
         pref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         editor = pref.edit();
+        // Lấy userId từ SessionManager
+
+
     }
 
     // 👉 **Lưu thông tin đăng nhập (LƯU role_id DƯỚI DẠNG int)**
+
     public void createLoginSession(int userId, String userName, int roleId, String email, String phone) {
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.putInt(KEY_USER_ID, userId);
         editor.putString(KEY_USER_NAME, userName);
-        editor.putInt(KEY_ROLE_ID, roleId); // ✅ Lưu role_id dưới dạng int
+        editor.putInt(KEY_ROLE_ID, roleId);
         editor.putString(KEY_USER_EMAIL, email);
         editor.putString(KEY_USER_PHONE, phone);
         editor.apply();
+
+        Log.d("SessionManager", "Đã lưu session: userId = " + userId);
     }
 
     // 👉 **Lấy Role ID (Dưới dạng int, tránh ClassCastException)**
@@ -56,8 +63,11 @@ public class SessionManager {
 
     // 👉 **Lấy User ID**
     public int getUserId() {
-        return pref.getInt(KEY_USER_ID, -1);
+        int userId = pref.getInt(KEY_USER_ID, -1);
+        Log.d("SessionManager", "Lấy userId từ session: " + userId);
+        return userId;
     }
+
 
     // 👉 **Lấy tên User**
     public String getUserName() {
@@ -90,4 +100,5 @@ public class SessionManager {
         editor.putString(KEY_USER_PHONE, phone);
         editor.apply();
     }
+
 }

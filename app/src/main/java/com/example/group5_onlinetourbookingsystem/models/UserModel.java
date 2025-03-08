@@ -7,77 +7,49 @@ public class UserModel {
     private String phone;
     private String password;
     private String birthDate;
-    private String image; // ➕ Ảnh đại diện
+    private String image;
+    private String roleName;
+    private String status; // ✅ Thêm trạng thái tài khoản (active/banned)
 
     // Constructor mặc định
-    public UserModel() {
-    }
+
 
     // Constructor đầy đủ
-    public UserModel(int id, String name, String email, String phone, String password, String birthDate, String image) {
+    public UserModel(int id, String name, String email, String phone, String birthDate, String status) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
-        this.password = password;
         this.birthDate = birthDate;
-        this.image = image;
+        this.status = status;
     }
+
 
     // Getter và Setter
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getBirthDate() { return birthDate; }
+    public void setBirthDate(String birthDate) { this.birthDate = birthDate; }
 
-    public String getPhone() {
-        return phone;
-    }
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    public String getRoleName() { return roleName; }
+    public void setRoleName(String roleName) { this.roleName = roleName; }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(String birthDate) {
-        this.birthDate = birthDate;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
+    public String getStatus() { return status; } // ✅ Getter cho trạng thái
+    public void setStatus(String status) { this.status = status; } // ✅ Setter cho trạng thái
 }

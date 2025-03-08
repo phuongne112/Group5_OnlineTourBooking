@@ -39,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
         dbHelper = new MyDatabaseHelper(this);
         sessionManager = new SessionManager(this);
 
+        // Thêm tài khoản Admin nếu chưa tồn tại
+        addAdminAccount();
+
         // Nếu user đã đăng nhập trước đó, chuyển ngay đến HomePage
         if (sessionManager.isLoggedIn()) {
             int roleId = sessionManager.getUserRoleId();
@@ -55,12 +58,10 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-
-
-
         button.setOnClickListener(view -> {
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
+
 
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(MainActivity.this, "Vui lòng nhập Email và Mật khẩu", Toast.LENGTH_SHORT).show();
@@ -84,10 +85,11 @@ public class MainActivity extends AppCompatActivity {
                 String userPhone = dbHelper.getUserPhoneByEmail(email);
                 int roleId = dbHelper.getUserRoleIdByEmail(email); // Trả về int, không phải String
                 Log.d("LOGIN", "User ID: " + userId + ", Role ID: " + roleId); // Debug log
-// 🔹 Lưu session (Chuyển roleId vào session thay vì role name)
+
+                // 🔹 Lưu session (Chuyển roleId vào session thay vì role name)
                 sessionManager.createLoginSession(userId, userName, roleId, email, userPhone);
 
-// 🔹 Điều hướng theo role_id
+                // 🔹 Điều hướng theo role_id
                 Intent intent;
                 switch (roleId) {
                     case 1: // Customer
@@ -106,16 +108,42 @@ public class MainActivity extends AppCompatActivity {
 
                 startActivity(intent);
                 finish();
-
-            }
-            else if (result == 0) {
+            } else if (result == 0) {
                 Toast.makeText(MainActivity.this, "Sai mật khẩu", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(MainActivity.this, "Tài khoản không tồn tại", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
+
+    // 🛠️ Hàm thêm tài khoản Admin nếu chưa tồn tại
+    private void addAdminAccount() {
+        String adminEmail = "admin@gmail.com";
+
+        if (!dbHelper.isUserExists(adminEmail)) { // Kiểm tra xem Admin đã tồn tại chưa
+            String adminName = "Admin";
+            String adminPhone = "0123456789";
+            String adminPassword = "Admin@123"; // Mật khẩu của Admin
+            String adminBirthDate = "1990-01-01"; // Ngày sinh (tùy chọn)
+            String adminImagePath = ""; // Nếu có hình ảnh đại diện
+            int adminRoleId = 2; // Role ID cho Admin
+
+            // Băm mật khẩu trước khi lưu
+            String hashedPassword = hashPassword(adminPassword);
+
+            // Thêm Admin vào database
+            long result = dbHelper.addUser(adminName, adminEmail, adminPhone, hashedPassword, adminBirthDate, adminImagePath, adminRoleId);
+
+            if (result != -1) {
+                Log.d("ADMIN", "Tạo tài khoản Admin thành công!");
+            } else {
+                Log.e("ADMIN", "Admin đã tồn tại hoặc có lỗi xảy ra!");
+            }
+        } else {
+            Log.d("ADMIN", "Tài khoản Admin đã tồn tại.");
+        }
+    }
+
 
     private boolean isValidEmail(String email) {
         return email.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$");
@@ -147,5 +175,4 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
         startActivity(intent);
     }
-
 }

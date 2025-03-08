@@ -26,6 +26,8 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
+        dbHelper = new MyDatabaseHelper(this);
+
         etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
@@ -33,7 +35,7 @@ public class SignUpActivity extends AppCompatActivity {
         etBirth = findViewById(R.id.editBirth);
         btnSignUp = findViewById(R.id.btnSignUp);
 
-        dbHelper = new MyDatabaseHelper(this);
+
 
         // 🔹 Khi nhấn vào etBirth, hiển thị DatePickerDialog
         etBirth.setOnClickListener(v -> showDatePicker());
@@ -69,7 +71,7 @@ public class SignUpActivity extends AppCompatActivity {
             // ✅ Mã hóa mật khẩu trước khi lưu vào database
             String hashedPassword = hashPassword(password);
 
-            long result = dbHelper.addUser(name, email, phone, hashedPassword, birthDate, "",2);
+            long result = dbHelper.addUser(name, email, phone, hashedPassword, birthDate, "",1);
 
             if (result != -1) {
                 Toast.makeText(SignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();

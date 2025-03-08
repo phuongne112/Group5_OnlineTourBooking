@@ -3,6 +3,7 @@ package com.example.group5_onlinetourbookingsystem.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -77,6 +78,8 @@ public class UserProfileActivity extends AppCompatActivity {
     private void loadUserProfile(int userId) {
         UserModel user = myDatabaseHelper.getUserById(userId);
         if (user != null) {
+            Log.d("UserProfile", "User found: " + user.getName() + ", Email: " + user.getEmail());
+
             tvUserName.setText(user.getName());
             tvUserEmail.setText(user.getEmail());
             tvUserPhone.setText(user.getPhone());
@@ -87,13 +90,13 @@ public class UserProfileActivity extends AppCompatActivity {
                 Glide.with(this).load(user.getImage()).into(imgUserProfile);
             } else {
                 imgUserProfile.setImageResource(R.drawable.ic_user_placeholder);
-
             }
         } else {
+            Log.e("UserProfile", "Không tìm thấy thông tin người dùng!");
             Toast.makeText(this, "Không tìm thấy thông tin người dùng", Toast.LENGTH_SHORT).show();
         }
-
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
