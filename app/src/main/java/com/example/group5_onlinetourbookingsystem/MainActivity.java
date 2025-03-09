@@ -14,8 +14,8 @@ import com.example.group5_onlinetourbookingsystem.activities.AdminDashboardActiv
 import com.example.group5_onlinetourbookingsystem.activities.ForgotPasswordActivity;
 import com.example.group5_onlinetourbookingsystem.activities.HomePage;
 import com.example.group5_onlinetourbookingsystem.activities.SignUpActivity;
-import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.activities.TourGuideDashboardActivity;
+import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 
 import java.security.MessageDigest;
@@ -39,84 +39,77 @@ public class MainActivity extends AppCompatActivity {
         dbHelper = new MyDatabaseHelper(this);
         sessionManager = new SessionManager(this);
 
-        // Thêm tài khoản Admin nếu chưa tồn tại
+        // 🔹 Thêm tài khoản Admin nếu chưa tồn tại
         addAdminAccount();
 
-        // Nếu user đã đăng nhập trước đó, chuyển ngay đến HomePage
+        // 🔹 Nếu user đã đăng nhập trước đó, chuyển ngay đến Dashboard tương ứng
         if (sessionManager.isLoggedIn()) {
-            int roleId = sessionManager.getUserRoleId();
-
-            Log.d("SESSION", "Role ID from Session: " + roleId); // ✅ Debug log
-
-            Intent intent;
-            if (roleId == 2) {
-                intent = new Intent(MainActivity.this, AdminDashboardActivity.class); // Admin
-            } else {
-                intent = new Intent(MainActivity.this, HomePage.class); // User mặc định
-            }
-            startActivity(intent);
-            finish();
+            navigateToDashboard();
         }
 
-        button.setOnClickListener(view -> {
-            String email = etEmail.getText().toString().trim();
-            String password = etPassword.getText().toString().trim();
-
-
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(MainActivity.this, "Vui lòng nhập Email và Mật khẩu", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (!isValidEmail(email)) {
-                Toast.makeText(MainActivity.this, "Email phải là Gmail hợp lệ", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            String hashedPassword = hashPassword(password);
-            int result = dbHelper.checkUserLogin(email, hashedPassword);
-
-            if (result == 1) {
-                Toast.makeText(MainActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
-
-                // 🔹 Lấy thông tin user từ database
-                int userId = dbHelper.getUserIdByEmail(email);
-                String userName = dbHelper.getUserNameByEmail(email);
-                String userPhone = dbHelper.getUserPhoneByEmail(email);
-                int roleId = dbHelper.getUserRoleIdByEmail(email); // Trả về int, không phải String
-                Log.d("LOGIN", "User ID: " + userId + ", Role ID: " + roleId); // Debug log
-
-                // 🔹 Lưu session (Chuyển roleId vào session thay vì role name)
-                sessionManager.createLoginSession(userId, userName, roleId, email, userPhone);
-
-                // 🔹 Điều hướng theo role_id
-                Intent intent;
-                switch (roleId) {
-                    case 1: // Customer
-                        intent = new Intent(MainActivity.this, HomePage.class);
-                        break;
-                    case 2: // Admin
-                        intent = new Intent(MainActivity.this, AdminDashboardActivity.class);
-                        break;
-                    case 3: // Tour Guide
-                        intent = new Intent(MainActivity.this, TourGuideDashboardActivity.class);
-                        break;
-                    default:
-                        intent = new Intent(MainActivity.this, HomePage.class); // Mặc định về HomePage
-                        break;
-                }
-
-                startActivity(intent);
-                finish();
-            } else if (result == 0) {
-                Toast.makeText(MainActivity.this, "Sai mật khẩu", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(MainActivity.this, "Tài khoản không tồn tại", Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Xử lý sự kiện đăng nhập khi bấm nút
+        button.setOnClickListener(view -> loginUser());
     }
 
-    // 🛠️ Hàm thêm tài khoản Admin nếu chưa tồn tại
+    // 👉 **Xử lý đăng nhập**
+    private void loginUser() {
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập Email và Mật khẩu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            Toast.makeText(this, "Email phải là Gmail hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String hashedPassword = hashPassword(password);
+        int result = dbHelper.checkUserLogin(email, hashedPassword);
+
+        if (result == 1) {
+            Toast.makeText(this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+
+            // 🔹 Lấy thông tin từ database
+            int userId = dbHelper.getUserIdByEmail(email);
+            String userName = dbHelper.getUserNameByEmail(email);
+            String userPhone = dbHelper.getUserPhoneByEmail(email);
+            int roleId = dbHelper.getUserRoleIdByEmail(email); // 🔥 Role ID
+
+            // 🔹 Lưu session với đúng role_id
+            sessionManager.createLoginSession(userId, userName, roleId, email, userPhone);
+
+            // Chuyển hướng đến đúng màn hình
+            navigateToDashboard();
+        } else {
+            Toast.makeText(this, "Sai thông tin đăng nhập", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // 👉 **Điều hướng đến Dashboard tương ứng**
+    private void navigateToDashboard() {
+        int roleId = sessionManager.getUserRoleId();
+        Log.d("SESSION", "User Role ID: " + roleId);
+
+        Intent intent;
+        switch (roleId) {
+            case 2: // 🔥 Admin
+                intent = new Intent(this, AdminDashboardActivity.class);
+                break;
+            case 3: // 🔥 Tour Guide
+                intent = new Intent(this, TourGuideDashboardActivity.class);
+                break;
+            default: // 🔥 Customer
+                intent = new Intent(this, HomePage.class);
+                break;
+        }
+        startActivity(intent);
+        finish(); // Không cho user quay lại màn hình đăng nhập
+    }
+
+    // 🛠️ **Hàm thêm tài khoản Admin nếu chưa tồn tại**
     private void addAdminAccount() {
         String adminEmail = "admin@gmail.com";
 
@@ -144,11 +137,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    // 👉 **Kiểm tra Email có đúng Gmail không**
     private boolean isValidEmail(String email) {
         return email.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$");
     }
 
+    // 👉 **Băm mật khẩu SHA-256**
     private String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -166,11 +160,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // 👉 **Chuyển đến màn hình đăng ký**
     public void gotoSignUp(View view) {
         Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
         startActivity(intent);
     }
 
+    // 👉 **Chuyển đến màn hình quên mật khẩu**
     public void gotoForgotPassword(View view) {
         Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
         startActivity(intent);

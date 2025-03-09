@@ -20,7 +20,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
+import com.example.group5_onlinetourbookingsystem.activities.AdminDashboardActivity;
 import com.example.group5_onlinetourbookingsystem.activities.TourDetailActivity;
+import com.example.group5_onlinetourbookingsystem.activities.TourGuideDashboardActivity;
 import com.example.group5_onlinetourbookingsystem.adapters.CategoryAdapter;
 import com.example.group5_onlinetourbookingsystem.adapters.TourAdapter;
 import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
@@ -54,7 +56,8 @@ public class HomeFragment extends Fragment {
 
         sessionManager = new SessionManager(requireContext());
         databaseHelper = new MyDatabaseHelper(requireContext());
-
+// 🔹 Kiểm tra Role ID trước khi load nội dung
+        checkUserRole();
         // Kiểm tra và thêm dữ liệu mẫu nếu cần
         addSampleRoles();
         addSampleCategories();
@@ -190,4 +193,18 @@ public class HomeFragment extends Fragment {
             databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 3, 180.0, 3, "hanoi_tour", 3, "2025-03-15 07:45:00", "Trải nghiệm văn hóa, lịch sử thủ đô với 36 phố phường và Hồ Gươm.");
         }
     }
+    private void checkUserRole() {
+        int roleId = sessionManager.getUserRoleId();
+        Log.d("SESSION_DEBUG", "Role ID tại HomeFragment: " + roleId);
+
+        // Nếu user là Admin hoặc Tour Guide, chuyển họ về đúng Dashboard
+        if (roleId == 2) {
+            startActivity(new Intent(getActivity(), AdminDashboardActivity.class));
+            getActivity().finish();
+        } else if (roleId == 3) {
+            startActivity(new Intent(getActivity(), TourGuideDashboardActivity.class));
+            getActivity().finish();
+        }
+    }
+
 }

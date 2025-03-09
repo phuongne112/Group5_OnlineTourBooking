@@ -33,7 +33,19 @@
             android:name=".activities.LegalActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.ContactActivity"
+            android:name=".activities.ContactUsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.HelpCenterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.EditTourActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AddTourActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.HelpDetailActivity"
             android:exported="false" />
         <activity
             android:name=".activities.ChangePasswordActivity"

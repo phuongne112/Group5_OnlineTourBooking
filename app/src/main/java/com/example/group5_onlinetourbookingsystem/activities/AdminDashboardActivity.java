@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+
+import com.example.group5_onlinetourbookingsystem.ProfileFragment;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.AccountFragment;
 import com.example.group5_onlinetourbookingsystem.AdminBookingFragment;
@@ -38,7 +40,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_bookings) {
                 selectedFragment = new AdminBookingFragment();
             } else if (itemId == R.id.nav_accounts) {
-                selectedFragment = new AccountFragment();
+                selectedFragment = new ProfileFragment();
             }
 
             if (selectedFragment != null) {

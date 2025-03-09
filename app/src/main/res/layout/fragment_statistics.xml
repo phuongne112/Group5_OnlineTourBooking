@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.StatisticsFragment">
+    tools:context="StatisticsFragment">
 
     <!-- Top Navigation (Tour, City, Category, Account, etc.) -->
     <androidx.cardview.widget.CardView
@@ -23,52 +23,159 @@
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:columnCount="3"
-            android:padding="8dp"
-            android:rowCount="2">
+            android:padding="10dp"
+            android:gravity="center">
 
             <!-- Tour -->
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:contentDescription="Tour"
-                android:src="@drawable/tour" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_columnWeight="1"
+                android:gravity="center"
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/tour" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tour"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+            </LinearLayout>
 
             <!-- City -->
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:contentDescription="City"
-                android:src="@drawable/tour" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_columnWeight="1"
+                android:gravity="center"
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/city" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="City"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+            </LinearLayout>
 
             <!-- Category -->
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:contentDescription="Category"
-                android:src="@drawable/tour" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_columnWeight="1"
+                android:gravity="center"
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/category" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Category"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+            </LinearLayout>
 
             <!-- Account -->
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:contentDescription="Account"
-                android:src="@drawable/tour" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_columnWeight="1"
+                android:gravity="center"
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/bottom_btn3" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Account"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+            </LinearLayout>
 
             <!-- Tour Guide -->
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:contentDescription="Tour Guide"
-                android:src="@drawable/tour" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_columnWeight="1"
+                android:gravity="center"
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/tourguide" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tour Guide"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+            </LinearLayout>
 
             <!-- Booking -->
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:contentDescription="Booking"
-                android:src="@drawable/tour" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_columnWeight="1"
+                android:gravity="center"
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ticket" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Booking"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+            </LinearLayout>
 
         </GridLayout>
     </androidx.cardview.widget.CardView>
@@ -78,6 +185,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Statistics Content Here"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
         app:layout_constraintTop_toBottomOf="@id/cardView2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

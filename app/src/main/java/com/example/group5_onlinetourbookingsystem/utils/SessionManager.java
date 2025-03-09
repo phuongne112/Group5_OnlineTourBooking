@@ -3,7 +3,6 @@ package com.example.group5_onlinetourbookingsystem.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-
 import java.util.HashMap;
 
 public class SessionManager {
@@ -11,24 +10,20 @@ public class SessionManager {
     private static final String KEY_IS_LOGGED_IN = "isLoggedIn";
     private static final String KEY_USER_ID = "userId";
     private static final String KEY_USER_NAME = "userName";
-    private static final String KEY_USER_ROLE = "userRole";
-    private static final String KEY_USER_PHONE = "userPhone"; // Thêm key số điện thoại
-    private static final String KEY_USER_EMAIL = "userEmail"; // Thêm key email
-    private static final String KEY_ROLE_ID = "role_id"; // 🛠 Định nghĩa khóa Role ID
+    private static final String KEY_USER_EMAIL = "userEmail";
+    private static final String KEY_USER_PHONE = "userPhone";
+    private static final String KEY_ROLE_ID = "role_id"; // 🔹 Role ID dưới dạng int
 
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
 
+    // 👉 **Constructor**
     public SessionManager(Context context) {
         pref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         editor = pref.edit();
-        // Lấy userId từ SessionManager
-
-
     }
 
-    // 👉 **Lưu thông tin đăng nhập (LƯU role_id DƯỚI DẠNG int)**
-
+    // 👉 **Lưu thông tin đăng nhập**
     public void createLoginSession(int userId, String userName, int roleId, String email, String phone) {
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.putInt(KEY_USER_ID, userId);
@@ -36,23 +31,23 @@ public class SessionManager {
         editor.putInt(KEY_ROLE_ID, roleId);
         editor.putString(KEY_USER_EMAIL, email);
         editor.putString(KEY_USER_PHONE, phone);
-        editor.apply();
+        editor.apply(); // 🔥 Lưu dữ liệu ngay lập tức
 
-        Log.d("SessionManager", "Đã lưu session: userId = " + userId);
+        Log.d("SessionManager", "Lưu session thành công: userId=" + userId + ", roleId=" + roleId);
     }
 
-    // 👉 **Lấy Role ID (Dưới dạng int, tránh ClassCastException)**
+    // 👉 **Lấy Role ID của user (dưới dạng int)**
     public int getUserRoleId() {
-        return pref.getInt(KEY_ROLE_ID, -1); // ✅ Trả về -1 nếu không tìm thấy
+        return pref.getInt(KEY_ROLE_ID, -1); // 🔹 Trả về -1 nếu không có dữ liệu
     }
 
-    // 👉 **Lấy toàn bộ thông tin User**
+    // 👉 **Lấy toàn bộ thông tin User dưới dạng HashMap**
     public HashMap<String, String> getUserDetails() {
         HashMap<String, String> user = new HashMap<>();
         user.put(KEY_USER_NAME, pref.getString(KEY_USER_NAME, ""));
         user.put(KEY_USER_EMAIL, pref.getString(KEY_USER_EMAIL, ""));
         user.put(KEY_USER_PHONE, pref.getString(KEY_USER_PHONE, ""));
-        user.put(KEY_ROLE_ID, String.valueOf(pref.getInt(KEY_ROLE_ID, 1))); // ✅ Trả về role_id dưới dạng String
+        user.put(KEY_ROLE_ID, String.valueOf(pref.getInt(KEY_ROLE_ID, -1))); // 🔹 Chuyển role_id thành String
         return user;
     }
 
@@ -63,20 +58,12 @@ public class SessionManager {
 
     // 👉 **Lấy User ID**
     public int getUserId() {
-        int userId = pref.getInt(KEY_USER_ID, -1);
-        Log.d("SessionManager", "Lấy userId từ session: " + userId);
-        return userId;
+        return pref.getInt(KEY_USER_ID, -1);
     }
-
 
     // 👉 **Lấy tên User**
     public String getUserName() {
         return pref.getString(KEY_USER_NAME, "Guest");
-    }
-
-    // 👉 **Lấy vai trò User**
-    public String getUserRole() {
-        return pref.getString(KEY_USER_ROLE, "user");
     }
 
     // 👉 **Lấy Email User**
@@ -89,9 +76,9 @@ public class SessionManager {
         return pref.getString(KEY_USER_PHONE, "");
     }
 
-    // 👉 **Xóa session khi đăng xuất**
-    public void logoutUser() {
-        editor.clear();
+    // 👉 **Cập nhật Email**
+    public void updateUserEmail(String email) {
+        editor.putString(KEY_USER_EMAIL, email);
         editor.apply();
     }
 
@@ -101,4 +88,15 @@ public class SessionManager {
         editor.apply();
     }
 
+    // 👉 **Cập nhật vai trò của User**
+    public void updateUserRole(int roleId) {
+        editor.putInt(KEY_ROLE_ID, roleId);
+        editor.apply();
+    }
+
+    // 👉 **Xóa session khi đăng xuất**
+    public void logoutUser() {
+        editor.clear(); // 🛑 Chỉ xóa khi user đăng xuất, không xóa khi app restart
+        editor.apply();
+    }
 }
