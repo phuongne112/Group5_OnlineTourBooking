@@ -8,13 +8,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import com.example.group5_onlinetourbookingsystem.BookingFragment;
-import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
-import com.example.group5_onlinetourbookingsystem.FavouriteFragment;
-import com.example.group5_onlinetourbookingsystem.HomeFragment;
-import com.example.group5_onlinetourbookingsystem.ProfileFragment;
+import com.example.group5_onlinetourbookingsystem.fragments.BookingFragment;
+import com.example.group5_onlinetourbookingsystem.fragments.FavouriteFragment;
+import com.example.group5_onlinetourbookingsystem.fragments.HomeFragment;
+import com.example.group5_onlinetourbookingsystem.fragments.ProfileFragment;
 import com.example.group5_onlinetourbookingsystem.R;
-import com.example.group5_onlinetourbookingsystem.TourFragment;
+import com.example.group5_onlinetourbookingsystem.fragments.TourFragment;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 

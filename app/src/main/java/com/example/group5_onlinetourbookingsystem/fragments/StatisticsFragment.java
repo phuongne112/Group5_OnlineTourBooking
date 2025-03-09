@@ -1,13 +1,17 @@
-package com.example.group5_onlinetourbookingsystem;
+package com.example.group5_onlinetourbookingsystem.fragments;
 
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.github.mikephil.charting.charts.BarChart;
@@ -33,13 +37,22 @@ public class StatisticsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_statistics, container, false);
-
+        LinearLayout navTour = view.findViewById(R.id.nav_tour);
+        LinearLayout navAccountAdmin = view.findViewById(R.id.nav_accountAdmin);
         barChart = view.findViewById(R.id.barChart);
         databaseHelper = new MyDatabaseHelper(requireContext());
 
         loadChartData(); // Gọi hàm vẽ biểu đồ
+// Xử lý khi bấm vào `nav_tour`
+        navTour.setOnClickListener(v -> navigateToFragment(new AdminTourFragment()));
+
+        // Xử lý khi bấm vào `nav_accountAdmin`
+        navAccountAdmin.setOnClickListener(v -> navigateToFragment(new AdminAccountFragment()));
+
 
         return view;
+
+
     }
 
     // 🛠️ **Hàm lấy dữ liệu & vẽ biểu đồ**
@@ -89,4 +102,11 @@ public class StatisticsFragment extends Fragment {
 
         barChart.invalidate(); // 🔄 **Vẽ lại biểu đồ**
     }
+    private void navigateToFragment(Fragment fragment) {
+        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragmentContainer, fragment);
+        transaction.addToBackStack(null); // Cho phép quay lại Fragment trước
+        transaction.commit();
+    }
+
 }

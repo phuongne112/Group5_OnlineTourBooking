@@ -52,14 +52,17 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textColor="@android:color/holo_blue_dark"
+                    android:textStyle="bold"
                     tools:text="Thời lượng: 3 ngày 2 đêm"/>
 
+                <!-- Thêm Giờ khởi hành -->
                 <TextView
                     android:id="@+id/booking_start_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textColor="@android:color/holo_green_dark"
+                    android:textStyle="bold"
                     tools:text="Start time: 08:00 AM - 10/03/2025"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>

@@ -68,10 +68,20 @@ public class BookingActivity extends AppCompatActivity {
         String name = intent.getStringExtra("tour_name");
         pricePerAdult = intent.getDoubleExtra("tour_price", 0);
         pricePerChild = pricePerAdult * 0.5;
-        String duration = intent.getStringExtra("tour_duration"); // Thời lượng tour
-        String startTime = intent.getStringExtra("start_time"); // Thời gian bắt đầu
+        String duration = intent.getStringExtra("tour_duration");
+        String startTime = intent.getStringExtra("start_time");
 
-        tvTourName.setText(name);
+        // 🔥 Thêm Log để kiểm tra dữ liệu
+        Log.d("BookingActivity", "Tour ID: " + tourId);
+        Log.d("BookingActivity", "Tour Name: " + name);
+        Log.d("BookingActivity", "Tour Price: " + pricePerAdult);
+        Log.d("BookingActivity", "Tour Duration: " + duration);
+        Log.d("BookingActivity", "Start Time: " + startTime);
+
+        // Hiển thị dữ liệu lên UI
+        if (name != null) {
+            tvTourName.setText(name);
+        }
         tvTourPrice.setText("Giá: " + pricePerAdult + " VND/người lớn");
         tvTourDuration.setText("Thời lượng: " + duration);
         tvStartTime.setText("Start time: " + startTime);
@@ -79,6 +89,7 @@ public class BookingActivity extends AppCompatActivity {
         etNumAdults.addTextChangedListener(new PriceWatcher());
         etNumChildren.addTextChangedListener(new PriceWatcher());
     }
+
 
 
     private void loadUserData() {
