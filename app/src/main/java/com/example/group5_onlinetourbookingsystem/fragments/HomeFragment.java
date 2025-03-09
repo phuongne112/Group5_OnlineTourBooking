@@ -1,4 +1,4 @@
-package com.example.group5_onlinetourbookingsystem;
+package com.example.group5_onlinetourbookingsystem.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
+import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.activities.AdminDashboardActivity;
 import com.example.group5_onlinetourbookingsystem.activities.TourDetailActivity;
 import com.example.group5_onlinetourbookingsystem.activities.TourGuideDashboardActivity;

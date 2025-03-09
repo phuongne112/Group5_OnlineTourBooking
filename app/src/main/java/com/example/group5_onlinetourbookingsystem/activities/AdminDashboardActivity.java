@@ -5,12 +5,11 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import com.example.group5_onlinetourbookingsystem.ProfileFragment;
+import com.example.group5_onlinetourbookingsystem.fragments.ProfileFragment;
 import com.example.group5_onlinetourbookingsystem.R;
-import com.example.group5_onlinetourbookingsystem.AccountFragment;
-import com.example.group5_onlinetourbookingsystem.AdminBookingFragment;
-import com.example.group5_onlinetourbookingsystem.AdminTourFragment;
-import com.example.group5_onlinetourbookingsystem.StatisticsFragment;
+import com.example.group5_onlinetourbookingsystem.fragments.AdminBookingFragment;
+import com.example.group5_onlinetourbookingsystem.fragments.AdminTourFragment;
+import com.example.group5_onlinetourbookingsystem.fragments.StatisticsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class AdminDashboardActivity extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package com.example.group5_onlinetourbookingsystem;
+package com.example.group5_onlinetourbookingsystem.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,13 +12,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.adapters.UserAdapter;
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.models.UserModel;
 
 import java.util.ArrayList;
 
-public class AccountFragment extends Fragment implements UserAdapter.OnUserActionListener {
+public class AdminAccountFragment extends Fragment implements UserAdapter.OnUserActionListener {
     private RecyclerView recyclerView;
     private UserAdapter adapter;
     private MyDatabaseHelper dbHelper;
@@ -27,7 +28,7 @@ public class AccountFragment extends Fragment implements UserAdapter.OnUserActio
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_account, container, false);
+        View view = inflater.inflate(R.layout.fragment_admin_account, container, false);
 
         recyclerView = view.findViewById(R.id.recyclerViewUsers);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

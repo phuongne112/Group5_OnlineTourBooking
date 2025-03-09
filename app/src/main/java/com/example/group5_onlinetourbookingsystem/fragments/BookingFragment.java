@@ -1,4 +1,4 @@
-package com.example.group5_onlinetourbookingsystem;
+package com.example.group5_onlinetourbookingsystem.fragments;
 
 import android.database.Cursor;
 import android.os.Bundle;

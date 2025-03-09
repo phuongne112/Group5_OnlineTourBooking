@@ -1,4 +1,4 @@
-package com.example.group5_onlinetourbookingsystem;
+package com.example.group5_onlinetourbookingsystem.fragments;
 
 import android.os.Bundle;
 
@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
+import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.adapters.TourAdapter;
 import com.example.group5_onlinetourbookingsystem.models.TourModel;
 

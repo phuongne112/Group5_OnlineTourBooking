@@ -44,10 +44,9 @@ public class SessionManager {
     // 👉 **Lấy toàn bộ thông tin User dưới dạng HashMap**
     public HashMap<String, String> getUserDetails() {
         HashMap<String, String> user = new HashMap<>();
-        user.put(KEY_USER_NAME, pref.getString(KEY_USER_NAME, ""));
-        user.put(KEY_USER_EMAIL, pref.getString(KEY_USER_EMAIL, ""));
-        user.put(KEY_USER_PHONE, pref.getString(KEY_USER_PHONE, ""));
-        user.put(KEY_ROLE_ID, String.valueOf(pref.getInt(KEY_ROLE_ID, -1))); // 🔹 Chuyển role_id thành String
+        user.put("name", pref.getString(KEY_USER_NAME, ""));  // ✅ Dùng đúng key
+        user.put("email", pref.getString(KEY_USER_EMAIL, "")); // ✅ Dùng đúng key
+        user.put("phone",pref.getString(KEY_USER_PHONE, "")); // 📌 Chưa có số điện thoại, cần lấy từ database nếu có
         return user;
     }
 

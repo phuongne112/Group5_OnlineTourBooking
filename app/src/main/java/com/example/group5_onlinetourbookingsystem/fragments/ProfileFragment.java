@@ -1,4 +1,4 @@
-package com.example.group5_onlinetourbookingsystem;
+package com.example.group5_onlinetourbookingsystem.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.group5_onlinetourbookingsystem.MainActivity;
+import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.activities.ChangePasswordActivity;
 import com.example.group5_onlinetourbookingsystem.activities.ContactUsActivity;
 import com.example.group5_onlinetourbookingsystem.activities.HelpCenterActivity;
