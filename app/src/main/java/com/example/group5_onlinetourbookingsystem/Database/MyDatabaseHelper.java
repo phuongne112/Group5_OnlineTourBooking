@@ -940,7 +940,46 @@
         }
 
 
+        public int getTotalBookings() {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String query = "SELECT COUNT(*) FROM bookings";
+            Cursor cursor = db.rawQuery(query, null);
+            int count = 0;
+            if (cursor.moveToFirst()) {
+                count = cursor.getInt(0);
+            }
+            cursor.close();
+            db.close();
+            return count;
+        }
 
+        // Truy vấn số Tour đã được đặt
+        public int getBookedToursCount() {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String query = "SELECT COUNT(DISTINCT tour_id) FROM bookings";
+            Cursor cursor = db.rawQuery(query, null);
+            int count = 0;
+            if (cursor.moveToFirst()) {
+                count = cursor.getInt(0);
+            }
+            cursor.close();
+            db.close();
+            return count;
+        }
+
+        // Truy vấn tổng số tiền đã thanh toán
+        public double getTotalRevenue() {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String query = "SELECT SUM(amount) FROM payments WHERE status = 'Completed'";
+            Cursor cursor = db.rawQuery(query, null);
+            double totalRevenue = 0;
+            if (cursor.moveToFirst()) {
+                totalRevenue = cursor.getDouble(0);
+            }
+            cursor.close();
+            db.close();
+            return totalRevenue;
+        }
 
 
     }
