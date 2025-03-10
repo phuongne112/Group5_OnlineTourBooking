@@ -3,6 +3,7 @@ package com.example.group5_onlinetourbookingsystem.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,19 +19,20 @@ import com.squareup.picasso.Picasso;
 public class TourDetailActivity extends AppCompatActivity {
     private TextView tourName, tourDestination, tourPrice, tourDuration, tourCategory, tourDescription;
     private ImageView tourImage;
+    private ImageButton favoriteButton;  // ⭐ Nút yêu thích
     private Button bookButton;
     private MyDatabaseHelper dbHelper;
-    private int tourId;
     private SessionManager sessionManager;
+    private int tourId, userId;
+    private boolean isFavorite; // Trạng thái yêu thích
+    private TourModel tour;
     private double price;
-    private TourModel tour; // ✅ Thêm biến để lưu TourModel
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tour_detail);
 
-        // ✅ Khởi tạo MyDatabaseHelper
         dbHelper = new MyDatabaseHelper(this);
         sessionManager = new SessionManager(this);
 
@@ -43,12 +45,16 @@ public class TourDetailActivity extends AppCompatActivity {
         tourDescription = findViewById(R.id.detail_tour_description);
         tourImage = findViewById(R.id.detail_tour_image);
         bookButton = findViewById(R.id.book_button);
+        favoriteButton = findViewById(R.id.favorite_button); // ⭐
+
+        // ✅ Lấy user_id từ Session
+        userId = sessionManager.getUserId();
 
         // ✅ Lấy tour_id từ Intent
         tourId = getIntent().getIntExtra("tour_id", -1);
 
         if (tourId != -1) {
-            tour = dbHelper.getTourById(tourId); // ✅ Lưu lại tour
+            tour = dbHelper.getTourById(tourId);
             if (tour != null) {
                 // ✅ Hiển thị thông tin Tour
                 tourName.setText(tour.getName());
@@ -71,7 +77,25 @@ public class TourDetailActivity extends AppCompatActivity {
                     tourImage.setImageResource(imageResource != 0 ? imageResource : R.drawable.favorites);
                 }
 
-                // ✅ Sự kiện nhấn "Book Now"
+                // ⭐ Kiểm tra xem tour có trong danh sách yêu thích không
+                isFavorite = dbHelper.isFavorite(userId, tourId);
+                updateFavoriteIcon();
+
+                // ⭐ Xử lý khi bấm vào nút yêu thích
+                favoriteButton.setOnClickListener(view -> {
+                    if (isFavorite) {
+                        dbHelper.removeFromFavorites(userId, tourId);
+                        isFavorite = false;
+                        Toast.makeText(this, "Đã xóa khỏi danh sách yêu thích", Toast.LENGTH_SHORT).show();
+                    } else {
+                        dbHelper.addToFavorites(userId, tourId);
+                        isFavorite = true;
+                        Toast.makeText(this, "Đã thêm vào danh sách yêu thích", Toast.LENGTH_SHORT).show();
+                    }
+                    updateFavoriteIcon();
+                });
+
+                // ✅ Xử lý khi bấm nút "Đặt Tour"
                 bookButton.setOnClickListener(view -> {
                     if (sessionManager.isLoggedIn()) {
                         Intent intent = new Intent(TourDetailActivity.this, BookingActivity.class);
@@ -82,7 +106,6 @@ public class TourDetailActivity extends AppCompatActivity {
                         intent.putExtra("tour_duration", tour.getDuration() + " days");
                         intent.putExtra("tour_category", tour.getCategoryName());
 
-                        // ✅ Kiểm tra start_time trước khi thêm vào intent
                         if (tour.getStartTime() != null) {
                             intent.putExtra("start_time", tour.getStartTime());
                         }
@@ -100,6 +123,15 @@ public class TourDetailActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Lỗi: Không nhận được tour_id!", Toast.LENGTH_SHORT).show();
             finish();
+        }
+    }
+
+    // ⭐ Cập nhật icon Favorite
+    private void updateFavoriteIcon() {
+        if (isFavorite) {
+            favoriteButton.setImageResource(R.drawable.ic_favorite_filled);
+        } else {
+            favoriteButton.setImageResource(R.drawable.ic_favorite_border);
         }
     }
 }

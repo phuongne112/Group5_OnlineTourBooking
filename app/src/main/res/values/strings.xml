@@ -4,5 +4,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tour_image">Hình ảnh tour</string>
-
+    <string-array name="booking_status_options">
+        <item>Pending</item>
+        <item>Confirmed</item>
+        <item>Cancelled</item>
+    </string-array>
 </resources>

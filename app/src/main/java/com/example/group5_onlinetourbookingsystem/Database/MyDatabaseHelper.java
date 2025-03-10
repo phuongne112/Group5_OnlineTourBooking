@@ -981,5 +981,74 @@
             return totalRevenue;
         }
 
+        // 🛠️ **Lấy tất cả Booking trong hệ thống (Admin)**
+        // 🛠 Lấy tất cả booking kèm thông tin tour
+        public Cursor getAllBookingsWithTourInfo() {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String query = "SELECT b.id AS _id, t.name AS tour_name, b.booking_date, b.adult_count, b.child_count, b.total_price, b.status " +
+                    "FROM bookings b " +
+                    "JOIN tours t ON b.tour_id = t.id " +
+                    "ORDER BY b.booking_date DESC";
+            return db.rawQuery(query, null);
+        }
+
+
+        // 🛠 Cập nhật trạng thái booking
+        public boolean updateBookingStatus(int bookingId, String newStatus) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("status", newStatus);
+
+            int rowsAffected = db.update("bookings", values, "id = ?", new String[]{String.valueOf(bookingId)});
+            db.close();
+            return rowsAffected > 0;
+        }
+
+        // 🛠 Lưu yêu thích vào database
+        public void addToFavorites(int userId, int tourId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            // Kiểm tra xem đã có trong danh sách yêu thích chưa
+            Cursor cursor = db.rawQuery("SELECT * FROM favorites WHERE user_id = ? AND tour_id = ?",
+                    new String[]{String.valueOf(userId), String.valueOf(tourId)});
+
+            if (cursor.getCount() == 0) { // Chưa có, thì thêm vào
+                ContentValues values = new ContentValues();
+                values.put("user_id", userId);
+                values.put("tour_id", tourId);
+
+                long result = db.insert("favorites", null, values);
+                if (result == -1) {
+                    Log.e("DB_ERROR", "Lỗi khi thêm vào danh sách yêu thích");
+                } else {
+                    Log.d("DB_SUCCESS", "Thêm vào danh sách yêu thích thành công");
+                }
+            } else {
+                Log.d("DB_INFO", "Tour đã có trong danh sách yêu thích");
+            }
+
+            cursor.close();
+            db.close();
+        }
+
+        // 🛠 Xóa khỏi danh sách yêu thích
+        public void removeFromFavorites(int userId, int tourId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete("favorites", "user_id = ? AND tour_id = ?",
+                    new String[]{String.valueOf(userId), String.valueOf(tourId)});
+            db.close();
+        }
+
+        // 🛠 Kiểm tra xem tour có trong danh sách yêu thích hay không
+        public boolean isFavorite(int userId, int tourId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT * FROM favorites WHERE user_id = ? AND tour_id = ?",
+                    new String[]{String.valueOf(userId), String.valueOf(tourId)});
+
+            boolean exists = cursor.getCount() > 0;
+            cursor.close();
+            return exists;
+        }
+
 
     }

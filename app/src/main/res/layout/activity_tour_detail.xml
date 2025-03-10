@@ -54,7 +54,8 @@
                         android:layout_alignParentEnd="true"
                         android:layout_margin="16dp"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/favourite"/>
+                        android:src="@drawable/ic_favorite_border"/>
+
                 </RelativeLayout>
 
                 <!-- Thông tin Tour -->
