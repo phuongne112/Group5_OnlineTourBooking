@@ -103,7 +103,6 @@
                     android:gravity="center"/>
             </LinearLayout>
 
-            <!-- Account -->
             <LinearLayout
                 android:id="@+id/nav_accountAdmin"
                 android:layout_width="0dp"
@@ -111,9 +110,12 @@
                 android:orientation="vertical"
                 android:layout_columnWeight="1"
                 android:gravity="center"
-                android:layout_margin="8dp">
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
+                    android:id="@+id/accountIcon"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:adjustViewBounds="true"
@@ -121,6 +123,7 @@
                     android:src="@drawable/bottom_btn3" />
 
                 <TextView
+                    android:id="@+id/accountText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Account"
@@ -128,6 +131,8 @@
                     android:textStyle="bold"
                     android:gravity="center"/>
             </LinearLayout>
+
+
 
             <!-- Tour Guide -->
             <LinearLayout
@@ -210,5 +215,10 @@
             android:layout_width="match_parent"
             android:layout_height="350dp"/>
     </androidx.cardview.widget.CardView>
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

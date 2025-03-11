@@ -97,4 +97,16 @@ public class ProfileFragment extends Fragment {
             startActivity(new Intent(getContext(), activityClass));
         }
     }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // Khi quay lại TourGuideDashboardActivity, hiển thị lại các phần đã ẩn
+        if (getActivity() != null) {
+            getActivity().findViewById(R.id.topNavigation).setVisibility(View.VISIBLE);
+            getActivity().findViewById(R.id.tabContainer).setVisibility(View.VISIBLE);
+            getActivity().findViewById(R.id.recyclerViewBookings).setVisibility(View.VISIBLE);
+        }
+    }
+
 }

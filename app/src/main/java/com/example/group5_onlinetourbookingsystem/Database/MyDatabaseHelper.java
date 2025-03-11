@@ -9,7 +9,8 @@
     import android.widget.Toast;
     
     import androidx.annotation.Nullable;
-    
+
+    import com.example.group5_onlinetourbookingsystem.models.BookingModel;
     import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
     import com.example.group5_onlinetourbookingsystem.models.TourModel;
     import com.example.group5_onlinetourbookingsystem.models.UserModel;
@@ -27,11 +28,12 @@
         private Context context;
         private static final String DATABASE_NAME = "tourbooking.db";
         private static final int DATABASE_VERSION = 6;
+
         // Bảng Roles
         private static final String TABLE_ROLES = "roles";
         private static final String COLUMN_ROLE_ID = "id";
         private static final String COLUMN_ROLE_NAME = "role_name"; // Admin, User, Guide
-    
+
         // Bảng Cities
         private static final String TABLE_CITIES = "cities";
         private static final String COLUMN_CITY_ID = "id";
@@ -44,10 +46,12 @@
         private static final String COLUMN_USER_PHONE = "phone";
         private static final String COLUMN_USER_PASSWORD = "password";
         private static final String COLUMN_USER_BIRTH = "birth_date";
-    
+        private static final String COLUMN_USER_STATUS = "status"; // ✅ Thêm cột trạng thái user
+
+
         private static final String COLUMN_USER_IMAGE = "image";
         private static final String COLUMN_USER_ROLE_ID = "role_id"; // Liên kết với Roles
-    
+
         // Bảng Categories
         private static final String TABLE_CATEGORIES = "categories";
         private static final String COLUMN_CATEGORY_ID = "id";
@@ -91,7 +95,7 @@
         private static final String COLUMN_FULL_NAME = "full_name";
         private static final String COLUMN_EMAIL = "email";
         private static final String COLUMN_MESSAGE = "message";
-    
+
         // Bảng Payments (Thanh toán)
         private static final String TABLE_PAYMENTS = "payments";
         private static final String COLUMN_PAYMENT_ID = "id";
@@ -99,7 +103,7 @@
         private static final String COLUMN_PAYMENT_AMOUNT = "amount";
         private static final String COLUMN_PAYMENT_DATE = "payment_date";
         private static final String COLUMN_PAYMENT_STATUS = "status"; // Pending, Completed, Failed
-    
+
         // Bảng Help Center
         private static final String TABLE_HELP_CENTER = "help_center";
         private static final String COLUMN_HELP_ID = "id";
@@ -111,29 +115,36 @@
         private static final String COLUMN_FAVORITE_ID = "id";
         private static final String COLUMN_FAVORITE_USER_ID = "user_id"; // Liên kết với Users
         private static final String COLUMN_FAVORITE_TOUR_ID = "tour_id"; // Liên kết với Tours
-    
-    
+
+
         public MyDatabaseHelper(@Nullable Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
             this.context = context;
         }
-    
+
         @Override
         public void onCreate(SQLiteDatabase db) {
             // Trong phương thức onCreate(), thêm đoạn sau để tạo bảng
-            String CREATE_FAVORITES_TABLE = "CREATE TABLE " + TABLE_FAVORITES + " ("
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_FAVORITES + " ("
                     + COLUMN_FAVORITE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + COLUMN_FAVORITE_USER_ID + " INTEGER, "
                     + COLUMN_FAVORITE_TOUR_ID + " INTEGER, "
                     + "FOREIGN KEY(" + COLUMN_FAVORITE_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_USER_ID + "), "
-                    + "FOREIGN KEY(" + COLUMN_FAVORITE_TOUR_ID + ") REFERENCES " + TABLE_TOURS + "(" + COLUMN_TOUR_ID + "))";
-            db.execSQL(CREATE_FAVORITES_TABLE);
-    
-            db.execSQL("CREATE TABLE " + TABLE_ROLES + " (" +
-                    COLUMN_ROLE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_ROLE_NAME + " TEXT UNIQUE)");
-    
+                    + "FOREIGN KEY(" + COLUMN_FAVORITE_TOUR_ID + ") REFERENCES " + TABLE_TOURS + "(" + COLUMN_TOUR_ID + "))");
+
+
+            if (!tableExists(db, TABLE_ROLES)) {
+                db.execSQL("CREATE TABLE " + TABLE_ROLES + " (" +
+                        COLUMN_ROLE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        COLUMN_ROLE_NAME + " TEXT UNIQUE)");
+            }
+
+
             db.execSQL("CREATE TABLE " + TABLE_CITIES + " (" +
+                    COLUMN_CITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_CITY_NAME + " TEXT UNIQUE)");
+            // Tạo bảng Cities (đã sửa lại để tránh lỗi trùng lặp)
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_CITIES + " (" +
                     COLUMN_CITY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_CITY_NAME + " TEXT UNIQUE)");
 
@@ -149,6 +160,7 @@
                     "status TEXT DEFAULT 'active', " + // ✅ Đảm bảo có cột status
                     "FOREIGN KEY(" + COLUMN_USER_ROLE_ID + ") REFERENCES roles(id))"
             );
+
 
 
 
@@ -185,7 +197,8 @@
                     COLUMN_BOOKING_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_BOOKING_USER_ID + " INTEGER, " +
                     COLUMN_BOOKING_TOUR_ID + " INTEGER, " +
-                    COLUMN_BOOKING_DATE + " TEXT DEFAULT CURRENT_TIMESTAMP, " + // ✅ Dùng booking_date làm created_at
+                    COLUMN_BOOKING_DATE + " TEXT DEFAULT CURRENT_TIMESTAMP, " +
+                    "time TEXT DEFAULT '00:00', " +  // ✅ Ensure time column exists
                     COLUMN_BOOKING_TOTAL_PRICE + " REAL, " +
                     COLUMN_BOOKING_STATUS + " TEXT, " +
                     COLUMN_BOOKING_ADULT_COUNT + " INTEGER, " +
@@ -193,6 +206,9 @@
                     COLUMN_BOOKING_NOTE + " TEXT, " +
                     "FOREIGN KEY(" + COLUMN_BOOKING_USER_ID + ") REFERENCES users(id), " +
                     "FOREIGN KEY(" + COLUMN_BOOKING_TOUR_ID + ") REFERENCES tours(id))");
+
+
+
 
 
 
@@ -222,9 +238,9 @@
                     COLUMN_HELP_QUESTION + " TEXT, " +
                     COLUMN_HELP_ANSWER + " TEXT, " +
                     "FOREIGN KEY(" + COLUMN_HELP_USER_ID + ") REFERENCES users(id))");
-    
+
         }
-    
+
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -243,7 +259,45 @@
                 db.execSQL("DROP TABLE IF EXISTS " + TABLE_ROLES);
                         onCreate(db); // Gọi lại để tạo bảng mới
             }
+             {
+                if (oldVersion < 6) {
+                    db.execSQL("ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'active'");
+                }
+                 if (oldVersion < 7) {
+                     if (!columnExists(db, TABLE_BOOKINGS, "time")) {
+                         db.execSQL("ALTER TABLE " + TABLE_BOOKINGS + " ADD COLUMN time TEXT DEFAULT '00:00'");
+                     }
+                 }
+
+                 onCreate(db);
+            }
+
         }
+        private boolean columnExists(SQLiteDatabase db, String tableName, String columnName) {
+            Cursor cursor = db.rawQuery("PRAGMA table_info(" + tableName + ")", null);
+            int columnIndex = cursor.getColumnIndex("name");
+
+            if (cursor.moveToFirst()) {
+                do {
+                    String existingColumn = cursor.getString(columnIndex);
+                    if (existingColumn.equalsIgnoreCase(columnName)) {
+                        cursor.close();
+                        return true; // ✅ Cột đã tồn tại
+                    }
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            return false; // ❌ Cột chưa tồn tại
+        }
+
+        private boolean tableExists(SQLiteDatabase db, String tableName) {
+            Cursor cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name=?", new String[]{tableName});
+            boolean exists = (cursor.getCount() > 0);
+            cursor.close();
+            return exists;
+        }
+
+
 
 
         // 🌟 Thêm danh mục
@@ -255,22 +309,22 @@
             db.insert(TABLE_CATEGORIES, null, values);
             db.close();
         }
-    
+
         // 🌟 Lấy tất cả danh mục
         public ArrayList<CategoryModel> getAllCategories() {
             ArrayList<CategoryModel> categoryList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
             Cursor cursor = db.rawQuery("SELECT * FROM Categories", null);
-    
+
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
                     do {
                         int id = cursor.getInt(0);
                         String name = cursor.getString(1);
-    
+
                         // Kiểm tra nếu bảng có hơn 2 cột
                         String image = cursor.getColumnCount() > 2 ? cursor.getString(2) : null;
-    
+
                         categoryList.add(new CategoryModel(id, name, image));
                     } while (cursor.moveToNext());
                 }
@@ -431,32 +485,40 @@
 
 
 
+
         public int checkUserLogin(String email, String hashedPassword) {
             SQLiteDatabase db = this.getReadableDatabase();
-            String query = "SELECT " + COLUMN_USER_PASSWORD + " FROM " + TABLE_USERS +
-                    " WHERE " + COLUMN_USER_EMAIL + " = ?";
+            String query = "SELECT " + COLUMN_USER_PASSWORD + ", " + COLUMN_USER_STATUS +
+                    " FROM " + TABLE_USERS + " WHERE " + COLUMN_USER_EMAIL + " = ?";
             Cursor cursor = db.rawQuery(query, new String[]{email});
 
             if (cursor != null && cursor.moveToFirst()) {
                 String storedPassword = cursor.getString(0);
+                String status = cursor.getString(1); // 🔥 Lấy trạng thái tài khoản
                 cursor.close();
                 db.close();
 
+                // ✅ Kiểm tra trạng thái tài khoản
+                if (status.equalsIgnoreCase("banned")) {
+                    return -2; // ❌ Tài khoản bị cấm
+                }
+
                 // ✅ So sánh mật khẩu đã mã hóa
                 if (storedPassword.equals(hashedPassword)) {
-                    return 1; // Đăng nhập thành công
+                    return 1; // ✅ Đăng nhập thành công
                 } else {
-                    return 0; // Sai mật khẩu
+                    return 0; // ❌ Sai mật khẩu
                 }
             } else {
                 if (cursor != null) {
                     cursor.close();
                 }
                 db.close();
-                return -1; // Tài khoản không tồn tại
+                return -1; // ❌ Tài khoản không tồn tại
             }
         }
-    
+
+
         public long addCity(String cityName) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -468,17 +530,17 @@
         public ArrayList<String> getAllCities() {
             ArrayList<String> cityList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
-    
+
             String query = "SELECT name FROM cities"; // Giả sử bảng thành phố tên là "cities"
             Cursor cursor = db.rawQuery(query, null);
-    
+
             if (cursor.moveToFirst()) {
                 do {
                     String cityName = cursor.getString(0);
                     cityList.add(cityName);
                 } while (cursor.moveToNext());
             }
-    
+
             cursor.close();
             db.close();
             return cityList;
@@ -592,7 +654,7 @@
             SQLiteDatabase db = this.getReadableDatabase();
             UserModel user = null;
 
-            String query = "SELECT id, name, email, phone, birth_date, image FROM users WHERE id = ?";
+            String query = "SELECT id, name, email, phone, birth_date, status, role_id FROM users WHERE id = ?";
             Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
 
             if (cursor.moveToFirst()) {
@@ -601,11 +663,11 @@
                 String email = cursor.getString(2);
                 String phone = cursor.getString(3);
                 String birthDate = cursor.getString(4);
-                String image = cursor.getString(5);
-
+                String status = cursor.getString(5);
+                int roleId = cursor.getInt(6);
                 Log.d("Database", "User found: ID=" + id + ", Name=" + name + ", Email=" + email);
 
-                user = new UserModel(id, name, email, phone, birthDate , "active"); // Mặc định trạng thái active
+                user = new UserModel(id, name, email, phone, birthDate , "active",roleId); // Mặc định trạng thái active
 
             } else {
                 Log.e("Database", "Không tìm thấy user với ID: " + userId);
@@ -621,26 +683,51 @@
             ArrayList<UserModel> userList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
 
-            String query = "SELECT id, name, email, phone, status FROM users"; // ✅ Lấy thêm status
+            // 🔥 Chỉ lấy user có role_id khác 2 (loại bỏ Admin)
+            String query = "SELECT id, name, email, phone, birth_date, status,role_id FROM users WHERE role_id != 2";
             Cursor cursor = db.rawQuery(query, null);
 
-            if (cursor.moveToFirst()) {
+            if (cursor != null && cursor.moveToFirst()) {
                 do {
                     int id = cursor.getInt(0);
                     String name = cursor.getString(1);
                     String email = cursor.getString(2);
                     String phone = cursor.getString(3);
-                    String birth_date = cursor.getString(4);
-                    String status = cursor.getString(5); // ✅ Lấy trạng thái (active/banned)
-
-                    userList.add(new UserModel(id, name, email, phone,birth_date, status)); // ✅ Thêm status vào model
+                    String birthDate = cursor.getString(4);
+                    String status = cursor.getString(5);
+                    int roleId = cursor.getInt(6);
+                    userList.add(new UserModel(id, name, email, phone, birthDate, status,roleId));
                 } while (cursor.moveToNext());
+
+                cursor.close();
+            } else {
+                Log.e("DB_ERROR", "Không có dữ liệu user!");
             }
 
-            cursor.close();
             db.close();
             return userList;
         }
+        public void updateUserRole(int userId, int newRoleId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            try {
+                ContentValues values = new ContentValues();
+                values.put("role_id", newRoleId);
+                db.update("users", values, "id = ?", new String[]{String.valueOf(userId)});
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (db.isOpen()) {
+                    db.close();
+                }
+            }
+        }
+
+
+
+
+
 
 
 
@@ -663,11 +750,12 @@
         }
 
 
+
         public String getUserNameByEmail(String email) {
             SQLiteDatabase db = this.getReadableDatabase();
             String query = "SELECT name FROM users WHERE email = ?";
             Cursor cursor = db.rawQuery(query, new String[]{email});
-    
+
             String userName = "Guest";
             if (cursor.moveToFirst()) {
                 userName = cursor.getString(0);
@@ -689,6 +777,19 @@
 
             return rowsAffected > 0;
         }
+        public int getUserRoleIdById(int userId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            int roleId = -1; // Giá trị mặc định nếu không tìm thấy user
+
+            Cursor cursor = db.rawQuery("SELECT " + COLUMN_USER_ROLE_ID + " FROM " + TABLE_USERS + " WHERE " + COLUMN_USER_ID + " = ?", new String[]{String.valueOf(userId)});
+            if (cursor.moveToFirst()) {
+                roleId = cursor.getInt(0);
+            }
+            cursor.close();
+            db.close();
+            return roleId;
+        }
+
 
 
 
@@ -740,13 +841,53 @@
         }
 
 
-        public void updateUserStatus(int userId, String status) {
+        public void updateUserStatus(int userId, String newStatus) {
             SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put("status", status);
-            db.update("users", values, "id=?", new String[]{String.valueOf(userId)});
-            db.close();
+
+            try {
+                // 🚨 Prevent Admin from being banned
+                String roleQuery = "SELECT role_id FROM users WHERE id = ?";
+                Cursor cursor = db.rawQuery(roleQuery, new String[]{String.valueOf(userId)});
+
+                if (cursor.moveToFirst()) {
+                    int roleId = cursor.getInt(0);
+                    if (roleId == 2) { // If Admin, prevent banning
+                        cursor.close();
+                        return; // ❌ Stop Execution
+                    }
+                }
+                cursor.close();
+
+                ContentValues values = new ContentValues();
+                values.put("status", newStatus);
+                db.update("users", values, "id = ?", new String[]{String.valueOf(userId)});
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (db.isOpen()) { // ✅ Ensure we don't close an already closed database
+                    db.close();
+                }
+            }
         }
+
+
+
+
+        public String getUserStatusByEmail(String email) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String status = "active"; // Mặc định là active
+
+            Cursor cursor = db.rawQuery("SELECT status FROM users WHERE email = ?", new String[]{email});
+            if (cursor.moveToFirst()) {
+                status = cursor.getString(0);
+            }
+            cursor.close();
+            db.close();
+            return status;
+        }
+
+
 
 
 
@@ -914,6 +1055,7 @@
             return role;
         }
 
+
         public int getUserRoleIdByEmail(String email) {
             int roleId = -1;
             SQLiteDatabase db = this.getReadableDatabase();
@@ -938,6 +1080,7 @@
                 default: return "User";
             }
         }
+
 
 
         public int getTotalBookings() {
@@ -980,6 +1123,40 @@
             db.close();
             return totalRevenue;
         }
+        public ArrayList<BookingModel> getBookings(String type) {
+            ArrayList<BookingModel> bookingList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            // Base query
+            String query = "SELECT tours.name, bookings." + COLUMN_BOOKING_DATE + " FROM bookings " +
+                    "JOIN tours ON bookings.tour_id = tours.id " +
+                    "WHERE bookings." + COLUMN_BOOKING_DATE + " >= DATE('now')";
+
+            if (type.equals("upcoming")) {
+                query += " AND bookings." + COLUMN_BOOKING_DATE + " >= DATE('now')";
+            } else {
+                query += " AND bookings." + COLUMN_BOOKING_DATE + " < DATE('now')";
+            }
+
+
+            Cursor cursor = db.rawQuery(query, null);
+            if (cursor.moveToFirst()) {
+                do {
+                    String name = cursor.getString(0);
+                    String date = cursor.getString(1);
+
+                    // ✅ Fix: Use the correct constructor
+                    bookingList.add(new BookingModel(name, date, "00:00")); // Default time added
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return bookingList;
+        }
+
+
+
 
 
     }

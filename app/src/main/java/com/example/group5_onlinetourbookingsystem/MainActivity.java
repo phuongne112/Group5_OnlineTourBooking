@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 👉 **Xử lý đăng nhập**
+    // 👉 **Xử lý đăng nhập**
     private void loginUser() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
@@ -83,10 +84,15 @@ public class MainActivity extends AppCompatActivity {
 
             // Chuyển hướng đến đúng màn hình
             navigateToDashboard();
+        } else if (result == -2) { // 🔥 Kiểm tra tài khoản bị cấm
+            Toast.makeText(this, "Tài khoản của bạn đã bị khóa! Liên hệ Admin để được hỗ trợ.", Toast.LENGTH_LONG).show();
+        } else if (result == 0) {
+            Toast.makeText(this, "Sai mật khẩu!", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Sai thông tin đăng nhập", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Tài khoản không tồn tại!", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     // 👉 **Điều hướng đến Dashboard tương ứng**
     private void navigateToDashboard() {
@@ -171,4 +177,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
         startActivity(intent);
     }
+
+
 }

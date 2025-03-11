@@ -1,11 +1,13 @@
 package com.example.group5_onlinetourbookingsystem.fragments;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,7 +15,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
+import com.example.group5_onlinetourbookingsystem.MainActivity;
 import com.example.group5_onlinetourbookingsystem.R;
+import com.example.group5_onlinetourbookingsystem.activities.ForgotPasswordActivity;
+import com.example.group5_onlinetourbookingsystem.activities.ManageAccountActivity;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -38,7 +43,7 @@ public class StatisticsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_statistics, container, false);
         LinearLayout navTour = view.findViewById(R.id.nav_tour);
-        LinearLayout navAccountAdmin = view.findViewById(R.id.nav_accountAdmin);
+
         barChart = view.findViewById(R.id.barChart);
         databaseHelper = new MyDatabaseHelper(requireContext());
 
@@ -46,14 +51,25 @@ public class StatisticsFragment extends Fragment {
 // Xử lý khi bấm vào `nav_tour`
         navTour.setOnClickListener(v -> navigateToFragment(new AdminTourFragment()));
 
-        // Xử lý khi bấm vào `nav_accountAdmin`
-        navAccountAdmin.setOnClickListener(v -> navigateToFragment(new AdminAccountFragment()));
 
 
         return view;
 
 
     }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        LinearLayout navAccountAdmin = view.findViewById(R.id.nav_accountAdmin);
+
+        navAccountAdmin.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ManageAccountActivity.class);
+            startActivity(intent);
+        });
+    }
+
+
 
     // 🛠️ **Hàm lấy dữ liệu & vẽ biểu đồ**
     private void loadChartData() {
@@ -103,10 +119,15 @@ public class StatisticsFragment extends Fragment {
         barChart.invalidate(); // 🔄 **Vẽ lại biểu đồ**
     }
     private void navigateToFragment(Fragment fragment) {
-        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentContainer, fragment);
-        transaction.addToBackStack(null); // Cho phép quay lại Fragment trước
-        transaction.commit();
+        if (getActivity() != null) {
+            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.cardViewStatistics, fragment);
+// Đảm bảo ID này tồn tại
+            transaction.addToBackStack(null);
+            transaction.commit();
+        }
     }
+
+
 
 }

@@ -8,22 +8,20 @@ public class UserModel {
     private String password;
     private String birthDate;
     private String image;
+    private int roleId; // 🔥 Thêm roleId
     private String roleName;
     private String status; // ✅ Thêm trạng thái tài khoản (active/banned)
 
-    // Constructor mặc định
-
-
     // Constructor đầy đủ
-    public UserModel(int id, String name, String email, String phone, String birthDate, String status) {
+    public UserModel(int id, String name, String email, String phone, String birthDate, String status, int roleId) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.birthDate = birthDate;
         this.status = status;
+        this.roleId = roleId; // ✅ Gán roleId
     }
-
 
     // Getter và Setter
     public int getId() { return id; }
@@ -46,6 +44,9 @@ public class UserModel {
 
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
+
+    public int getRoleId() { return roleId; } // ✅ Thêm phương thức getRoleId()
+    public void setRoleId(int roleId) { this.roleId = roleId; } // ✅ Thêm phương thức setRoleId()
 
     public String getRoleName() { return roleName; }
     public void setRoleName(String roleName) { this.roleName = roleName; }
