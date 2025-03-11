@@ -62,5 +62,7 @@ dependencies {
     implementation("com.sun.mail:android-mail:1.6.7")
     implementation("com.sun.mail:android-activation:1.6.7")
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.7.3")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.7.3")
 
 }

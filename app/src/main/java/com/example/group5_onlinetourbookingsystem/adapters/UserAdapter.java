@@ -1,6 +1,7 @@
 package com.example.group5_onlinetourbookingsystem.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.R;
+import com.example.group5_onlinetourbookingsystem.activities.UserDetailActivity;
 import com.example.group5_onlinetourbookingsystem.models.UserModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
@@ -24,9 +27,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     // ✅ Constructor chỉ cần một lần khai báo OnUserActionListener
     public UserAdapter(Context context, List<UserModel> userList, OnUserActionListener listener) {
         this.context = context;
-        this.userList = userList;
+        this.userList = (userList != null) ? userList : new ArrayList<>();
         this.listener = listener;
     }
+
+
 
     @NonNull
     @Override
@@ -40,6 +45,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         UserModel user = userList.get(position);
         holder.tvUserName.setText(user.getName());
 
+        // ✅ Kiểm tra trạng thái mới của user
         if (user.getStatus().equals("banned")) {
             holder.btnOptions.setImageResource(R.drawable.ic_unban); // Hiển thị icon mở khóa
         } else {
@@ -53,12 +59,25 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             popupMenu.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == R.id.action_ban) {
                     listener.onBanUser(user);
+                    user.setStatus("banned"); // ✅ Cập nhật trạng thái trong danh sách
+                    notifyDataSetChanged(); // ✅ Cập nhật UI ngay lập tức
                     return true;
                 } else if (item.getItemId() == R.id.action_unban) {
                     listener.onUnbanUser(user);
+                    user.setStatus("active"); // ✅ Cập nhật trạng thái trong danh sách
+                    notifyDataSetChanged(); // ✅ Cập nhật UI ngay lập tức
                     return true;
                 }
                 return false;
+            });holder.tvUserName.setOnClickListener(view -> {
+                Intent intent = new Intent(context, UserDetailActivity.class);
+                intent.putExtra("user_id", user.getId());
+                intent.putExtra("user_name", user.getName());
+                intent.putExtra("user_email", user.getEmail());
+                intent.putExtra("user_phone", user.getPhone());
+                intent.putExtra("user_birth_date", user.getBirthDate());
+                intent.putExtra("user_status", user.getStatus());
+                context.startActivity(intent);
             });
 
             popupMenu.show();
