@@ -1156,12 +1156,17 @@
         }
         public Cursor getAllBookingsWithTourInfo() {
             SQLiteDatabase db = this.getReadableDatabase();
-            String query = "SELECT b.id AS _id, t.name AS tour_name, b.booking_date, b.adult_count, b.child_count, b.total_price, b.status " +
+            String query = "SELECT b.id AS _id, t.name AS tour_name, b.booking_date, " +
+                    "b.adult_count, b.child_count, b.total_price, " +
+                    "b.status AS booking_status, " +
+                    "(SELECT status FROM payments WHERE booking_id = b.id) AS payment_status " +
                     "FROM bookings b " +
                     "JOIN tours t ON b.tour_id = t.id " +
                     "ORDER BY b.booking_date DESC";
             return db.rawQuery(query, null);
         }
+
+
 
 
         // 🛠 Cập nhật trạng thái booking
@@ -1221,7 +1226,37 @@
             return exists;
         }
 
+        public boolean updatePaymentStatus(int bookingId, String newStatus) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            boolean success = false;
 
+            try {
+                ContentValues values = new ContentValues();
+                values.put("status", newStatus);
+
+                int rowsAffected = db.update("payments", values, "booking_id = ?", new String[]{String.valueOf(bookingId)});
+                success = rowsAffected > 0;
+
+                Log.d("DB_UPDATE", "Updated payment status for Booking ID: " + bookingId + " to " + newStatus);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e("DB_ERROR", "Lỗi cập nhật thanh toán: " + e.getMessage());
+            } finally {
+                db.close();
+            }
+
+            return success;
+        }
+
+        public Cursor getBookingDetails(int bookingId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String query = "SELECT b.id AS _id, t.name AS tour_name, b.booking_date, " +
+                    "b.adult_count, b.child_count, b.total_price, b.status, b.note " +
+                    "FROM bookings b " +
+                    "JOIN tours t ON b.tour_id = t.id " +
+                    "WHERE b.id = ?";
+            return db.rawQuery(query, new String[]{String.valueOf(bookingId)});
+        }
 
 
     }

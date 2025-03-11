@@ -1,50 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="@drawable/bg_item_booking">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/tvTourName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:text="Tên Tour"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#000000"/>
 
-        <TextView
-            android:id="@+id/tvTourName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Name: "
-            android:textSize="16sp"
-            android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/tvBookingDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ngày đặt"
+        android:textSize="14sp"
+        android:textColor="#555555"/>
 
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Status: "
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Trạng thái"
+        android:textSize="16sp"
+        android:textStyle="italic"
+        android:textColor="#007BFF"/>
+    <ImageView
+        android:id="@+id/imgStatusIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="5dp"/>
 
-        <TextView
-            android:id="@+id/tvBookingDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Date: "
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
-
-        <!-- Thêm ImageView hiển thị trạng thái -->
-        <ImageView
-            android:id="@+id/imgStatusIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginTop="8dp"
-            android:src="@drawable/ic_status"
-            android:contentDescription="Status Icon"/>
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+</LinearLayout>

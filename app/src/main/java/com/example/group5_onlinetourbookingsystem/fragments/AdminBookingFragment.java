@@ -1,16 +1,17 @@
 package com.example.group5_onlinetourbookingsystem.fragments;
 
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,124 +23,144 @@ import com.example.group5_onlinetourbookingsystem.R;
 import java.util.HashMap;
 
 public class AdminBookingFragment extends Fragment {
-    private ListView listViewAdminBookings;
+    private TableLayout tableLayoutBookings;
     private TextView tvNoAdminBooking;
     private MyDatabaseHelper dbHelper;
-    private SimpleCursorAdapter adapter;
     private HashMap<Integer, String> bookingStatusMap = new HashMap<>();
+    private HashMap<Integer, String> paymentStatusMap = new HashMap<>();
 
-    public AdminBookingFragment() {
-        // Required empty public constructor
-    }
+    public AdminBookingFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_admin_booking, container, false);
-        listViewAdminBookings = view.findViewById(R.id.listViewAdminBookings);
+        tableLayoutBookings = view.findViewById(R.id.tableLayoutBookings);
         tvNoAdminBooking = view.findViewById(R.id.tvNoAdminBooking);
         dbHelper = new MyDatabaseHelper(requireContext());
 
         loadBookings();
-
         return view;
     }
 
     private void loadBookings() {
+        tableLayoutBookings.removeAllViews(); // Xóa dữ liệu cũ
         Cursor cursor = dbHelper.getAllBookingsWithTourInfo();
 
-        if (cursor != null && cursor.getCount() > 0) {
-            String[] from = {"tour_name", "booking_date", "adult_count", "child_count", "total_price"};
-            int[] to = {R.id.tvBookingTourName, R.id.tvBookingDate, R.id.tvBookingAdultsChildren, R.id.tvBookingTotalPrice};
+        if (cursor == null || cursor.getCount() == 0) {
+            tvNoAdminBooking.setVisibility(View.VISIBLE);
+            return;
+        }
+        tvNoAdminBooking.setVisibility(View.GONE);
 
-            adapter = new SimpleCursorAdapter(
-                    requireContext(),
-                    R.layout.list_item_admin_booking,
-                    cursor,
-                    from,
-                    to,
-                    0
-            );
+        // Thêm tiêu đề cột
+        TableRow headerRow = new TableRow(getContext());
+        headerRow.setPadding(8, 8, 8, 8);
+        addHeaderCell(headerRow, "Tour", 2);
+        addHeaderCell(headerRow, "Ngày", 2);
+        addHeaderCell(headerRow, "Tổng tiền", 2);
+        addHeaderCell(headerRow, "Trạng thái Thanh toán", 2);
+        addHeaderCell(headerRow, "Trạng thái Đặt chỗ", 2);
+        tableLayoutBookings.addView(headerRow);
 
-            adapter.setViewBinder((view, cursor1, columnIndex) -> {
-                int bookingId = cursor1.getInt(cursor1.getColumnIndexOrThrow("_id"));
+        while (cursor.moveToNext()) {
+            int bookingId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+            String tourName = cursor.getString(cursor.getColumnIndexOrThrow("tour_name"));
+            String bookingDate = cursor.getString(cursor.getColumnIndexOrThrow("booking_date"));
+            double totalPrice = cursor.getDouble(cursor.getColumnIndexOrThrow("total_price"));
+            String bookingStatus = cursor.getString(cursor.getColumnIndexOrThrow("booking_status"));
+            String paymentStatus = cursor.getString(cursor.getColumnIndexOrThrow("payment_status"));
 
-                if (view.getId() == R.id.tvBookingAdultsChildren) {
-                    int adults = cursor1.getInt(cursor1.getColumnIndexOrThrow("adult_count"));
-                    int children = cursor1.getInt(cursor1.getColumnIndexOrThrow("child_count"));
-                    ((TextView) view).setText("Người lớn: " + adults + " - Trẻ em: " + children);
-                    return true;
-                } else if (view.getId() == R.id.tvBookingTotalPrice) {
-                    double totalPrice = cursor1.getDouble(cursor1.getColumnIndexOrThrow("total_price"));
-                    ((TextView) view).setText(String.format("Tổng tiền: %,d VND", (int) totalPrice));
-                    return true;
-                } else if (view.getId() == R.id.spinnerBookingStatus) {
-                    Spinner spinner = (Spinner) view;
-                    String status = cursor1.getString(cursor1.getColumnIndexOrThrow("status"));
+            TableRow row = new TableRow(getContext());
+            row.setPadding(8, 8, 8, 8);
+            row.setBackgroundColor(Color.LTGRAY);
 
-                    // Lưu trạng thái vào HashMap
-                    bookingStatusMap.put(bookingId, status);
+            addCell(row, tourName, 2);
+            addCell(row, bookingDate, 2);
+            addCell(row, String.format("%,d VND", (int) totalPrice), 2);
 
-                    if (spinner.getAdapter() == null) {
-                        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
-                                requireContext(), R.array.booking_status_options, android.R.layout.simple_spinner_item);
-                        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        spinner.setAdapter(spinnerAdapter);
+            // Spinner trạng thái Thanh toán
+            Spinner paymentSpinner = createStatusSpinner(new String[]{"Pending", "Completed", "Failed"}, paymentStatus);
+            row.addView(paymentSpinner);
+
+            // Spinner trạng thái Đặt chỗ
+            Spinner bookingSpinner = createStatusSpinner(new String[]{"Pending", "Confirmed", "Cancelled"}, bookingStatus);
+            row.addView(bookingSpinner);
+
+            paymentStatusMap.put(bookingId, paymentStatus);
+            bookingStatusMap.put(bookingId, bookingStatus);
+
+            // Cập nhật trạng thái Thanh toán
+            paymentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String newPaymentStatus = parent.getItemAtPosition(position).toString();
+                    if (!newPaymentStatus.equals(paymentStatus)) {
+                        dbHelper.updatePaymentStatus(bookingId, newPaymentStatus);
+                        paymentStatusMap.put(bookingId, newPaymentStatus);
+                        Toast.makeText(getContext(), "Trạng thái thanh toán cập nhật!", Toast.LENGTH_SHORT).show();
+                        loadBookings();
                     }
-
-                    spinner.setSelection(getStatusPosition(status), false);
-                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                            String newStatus = parent.getItemAtPosition(position).toString();
-                            bookingStatusMap.put(bookingId, newStatus); // Cập nhật trạng thái tạm thời
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> parent) {}
-                    });
-
-                    return true;
-                } else if (view.getId() == R.id.btnSaveStatus) {
-                    Button btnSave = (Button) view;
-                    btnSave.setOnClickListener(v -> {
-                        String newStatus = bookingStatusMap.get(bookingId);
-                        dbHelper.updateBookingStatus(bookingId, newStatus);
-                        Toast.makeText(requireContext(), "Trạng thái đã được cập nhật!", Toast.LENGTH_SHORT).show();
-                        loadBookings(); // 🔄 Refresh lại danh sách sau khi cập nhật
-                    });
-
-                    return true;
                 }
-                return false;
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {}
             });
 
-            listViewAdminBookings.setAdapter(adapter);
-            tvNoAdminBooking.setVisibility(View.GONE);
-            listViewAdminBookings.setVisibility(View.VISIBLE);
-        } else {
-            tvNoAdminBooking.setVisibility(View.VISIBLE);
-            listViewAdminBookings.setVisibility(View.GONE);
-            if (cursor != null) cursor.close();
+            // Cập nhật trạng thái Đặt chỗ (Chỉ khi Thanh toán = Completed)
+            bookingSpinner.setEnabled(paymentStatus.equalsIgnoreCase("Completed"));
+            bookingSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String newBookingStatus = parent.getItemAtPosition(position).toString();
+                    if (!newBookingStatus.equals(bookingStatus) && paymentStatusMap.get(bookingId).equalsIgnoreCase("Completed")) {
+                        dbHelper.updateBookingStatus(bookingId, newBookingStatus);
+                        bookingStatusMap.put(bookingId, newBookingStatus);
+                        Toast.makeText(getContext(), "Trạng thái đặt chỗ cập nhật!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {}
+            });
+
+            tableLayoutBookings.addView(row);
         }
+        cursor.close();
     }
 
+    private Spinner createStatusSpinner(String[] statusArray, String currentStatus) {
+        Spinner spinner = new Spinner(getContext());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, statusArray);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(getStatusPosition(statusArray, currentStatus));
+        return spinner;
+    }
 
-    private int getStatusPosition(String status) {
-        String[] statusArray = getResources().getStringArray(R.array.booking_status_options);
+    private void addCell(TableRow row, String text, float weight) {
+        TextView tv = new TextView(getContext());
+        tv.setText(text);
+        tv.setGravity(Gravity.CENTER);
+        tv.setTextColor(Color.BLACK);
+        tv.setPadding(8, 8, 8, 8);
+        row.addView(tv);
+    }
+
+    private void addHeaderCell(TableRow row, String text, float weight) {
+        TextView tv = new TextView(getContext());
+        tv.setText(text);
+        tv.setGravity(Gravity.CENTER);
+        tv.setTextColor(Color.WHITE);
+        tv.setPadding(8, 8, 8, 8);
+        tv.setBackgroundColor(Color.DKGRAY);
+        row.addView(tv);
+    }
+
+    private int getStatusPosition(String[] statusArray, String status) {
         for (int i = 0; i < statusArray.length; i++) {
             if (statusArray[i].equalsIgnoreCase(status)) {
                 return i;
             }
         }
         return 0;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Close the cursor when the fragment view is destroyed
-        if (adapter != null && adapter.getCursor() != null) {
-            adapter.getCursor().close();
-        }
     }
 }
