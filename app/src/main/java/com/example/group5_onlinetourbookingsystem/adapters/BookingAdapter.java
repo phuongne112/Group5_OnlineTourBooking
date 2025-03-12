@@ -46,7 +46,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
         // Hiển thị đúng tên tour thay vì tourId
         holder.tvTourName.setText("Tour: " + booking.getName());
         holder.tvBookingDate.setText("Date: " + booking.getDate());
-        holder.tvTotalPrice.setText(String.format("%,d VND", (int) booking.getTotalPrice()));
+        holder.tvTotalPrice.setText(String.format("%,d $", (int) booking.getTotalPrice()));
 
         // Cấu hình Spinner Trạng thái Thanh toán
         String[] paymentStatuses = {"Pending", "Completed", "Failed"};

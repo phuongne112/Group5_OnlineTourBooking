@@ -43,7 +43,7 @@ public class PaymentActivity extends AppCompatActivity {
         }
 
         // Hiển thị số tiền
-        tvTotalPrice.setText("Số tiền cần thanh toán: " + String.format("%,.0f", totalPrice) + " VND");
+        tvTotalPrice.setText("Số tiền cần thanh toán: " + String.format("%,.0f", totalPrice) + " $");
 
         // Sự kiện bấm nút "Đã Thanh Toán"
         btnApprove.setOnClickListener(v -> {

@@ -44,7 +44,7 @@
                     android:textSize="18sp"
                     android:textColor="@color/red"
                     android:textStyle="bold"
-                    tools:text="5,000,000 VND"/>
+                    tools:text="250.00 $"/>
 
                 <TextView
                     android:id="@+id/booking_tour_duration"
@@ -157,7 +157,7 @@
             android:id="@+id/total_price"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tổng tiền: 0 VND"
+            android:text="Tổng tiền: 0 $"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@android:color/holo_red_dark"
