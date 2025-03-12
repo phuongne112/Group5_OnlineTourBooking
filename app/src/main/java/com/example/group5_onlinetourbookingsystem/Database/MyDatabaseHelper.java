@@ -772,13 +772,14 @@
             values.put(COLUMN_USER_NAME, name);
             values.put(COLUMN_USER_PHONE, phone);
             values.put(COLUMN_USER_BIRTH, birthDate);
-            values.put(COLUMN_USER_IMAGE, imagePath); // Lưu URI thay vì file path
+            values.put(COLUMN_USER_IMAGE, imagePath); // ✅ Lưu URI ảnh vào database
 
             int rowsAffected = db.update(TABLE_USERS, values, "id=?", new String[]{String.valueOf(userId)});
             db.close();
 
             return rowsAffected > 0;
         }
+
         public int getUserRoleIdById(int userId) {
             SQLiteDatabase db = this.getReadableDatabase();
             int roleId = -1; // Giá trị mặc định nếu không tìm thấy user

@@ -82,7 +82,7 @@ public class BookingActivity extends AppCompatActivity {
         if (name != null) {
             tvTourName.setText(name);
         }
-        tvTourPrice.setText("Giá: " + pricePerAdult + " VND/người lớn");
+        tvTourPrice.setText("Giá: " + pricePerAdult + " $/người lớn");
         tvTourDuration.setText("Thời lượng: " + duration);
         tvStartTime.setText("Start time: " + startTime);
 
@@ -103,7 +103,7 @@ public class BookingActivity extends AppCompatActivity {
         int adults = parseIntOrZero(etNumAdults.getText().toString());
         int children = parseIntOrZero(etNumChildren.getText().toString());
         totalPrice = (adults * pricePerAdult) + (children * pricePerChild);
-        tvTotalPrice.setText("Tổng tiền: " + totalPrice + " VND");
+        tvTotalPrice.setText("Tổng tiền: " + totalPrice + "$");
     }
 
     private void saveBooking() {

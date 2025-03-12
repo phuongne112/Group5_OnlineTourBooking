@@ -26,6 +26,8 @@ import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.models.UserModel;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 
+import java.io.File;
+
 public class EditProfileActivity extends AppCompatActivity {
     private EditText edtUserName, edtUserPhone, edtUserBirth;
     private ImageView imgUserProfile;
@@ -34,6 +36,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private int userId;
     private String selectedImagePath = "";
+
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int STORAGE_PERMISSION_REQUEST = 100;
 
@@ -63,34 +66,68 @@ public class EditProfileActivity extends AppCompatActivity {
         btnChangeImage = findViewById(R.id.btnChangeImage);
 
         myDB = new MyDatabaseHelper(this);
-
         loadUserProfile(userId);
 
-        btnChangeImage.setOnClickListener(v -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.READ_MEDIA_IMAGES},
-                            STORAGE_PERMISSION_REQUEST);
-                } else {
-                    openGallery();
-                }
-            } else {
-                openGallery();
-            }
+        // Xử lý sự kiện đổi ảnh đại diện
+        btnChangeImage.setOnClickListener(v -> checkAndRequestPermissions());
 
-
-    });
-
+        // Xử lý sự kiện lưu thông tin
         btnSaveProfile.setOnClickListener(v -> updateUserProfile());
     }
 
+    // Kiểm tra quyền trước khi mở thư viện ảnh
+    private void checkAndRequestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+ (API 33)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, STORAGE_PERMISSION_REQUEST);
+            } else {
+                openGallery();
+            }
+        } else { // Android 12 trở xuống
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_REQUEST);
+            } else {
+                openGallery();
+            }
+        }
+    }
+
+    // Mở thư viện ảnh
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
+    // Xử lý kết quả cấp quyền
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == STORAGE_PERMISSION_REQUEST) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openGallery();
+            } else {
+                Toast.makeText(this, "Bạn cần cấp quyền để chọn ảnh!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    // Xử lý kết quả chọn ảnh từ thư viện
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            Uri imageUri = data.getData();
+            if (imageUri != null) {
+                selectedImagePath = imageUri.toString(); // ✅ Lưu URI thay vì đường dẫn file
+                Log.d("EditProfile", "Selected Image URI: " + selectedImagePath);
+
+                // ✅ Hiển thị ảnh ngay lập tức lên ImageView
+                Glide.with(this).load(imageUri).into(imgUserProfile);
+            }
+        }
+    }
+
+    // Tải thông tin user từ database
     private void loadUserProfile(int userId) {
         UserModel user = myDB.getUserById(userId);
         if (user != null) {
@@ -100,30 +137,23 @@ public class EditProfileActivity extends AppCompatActivity {
 
             if (user.getImage() != null && !user.getImage().isEmpty()) {
                 selectedImagePath = user.getImage();
-                Glide.with(this).load(Uri.parse(selectedImagePath)).into(imgUserProfile);
+
+                if (selectedImagePath.startsWith("content://")) {
+                    Glide.with(this)
+                            .load(Uri.parse(selectedImagePath))
+                            .into(imgUserProfile);
+                } else {
+                    Glide.with(this)
+                            .load(Uri.fromFile(new File(selectedImagePath)))
+                            .into(imgUserProfile);
+                }
             } else {
                 imgUserProfile.setImageResource(R.drawable.ic_user_placeholder);
             }
         }
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
-            Uri imageUri = data.getData();
-            if (imageUri != null) {
-                selectedImagePath = imageUri.toString(); // Lưu URI thay vì đường dẫn file
-                Log.d("EditProfile", "Selected Image URI: " + selectedImagePath);
-
-                // Hiển thị ảnh ngay lập tức lên ImageView
-                Glide.with(this).load(imageUri).into(imgUserProfile);
-            }
-        }
-    }
-
-
+    // Cập nhật thông tin user
     private void updateUserProfile() {
         String newName = edtUserName.getText().toString().trim();
         String newPhone = edtUserPhone.getText().toString().trim();
@@ -134,9 +164,12 @@ public class EditProfileActivity extends AppCompatActivity {
             return;
         }
 
-        // Nếu chưa chọn ảnh mới, giữ nguyên ảnh cũ
+        // Nếu chưa chọn ảnh mới, giữ nguyên ảnh cũ từ database
         if (selectedImagePath.isEmpty()) {
-            selectedImagePath = myDB.getUserById(userId).getImage();
+            UserModel currentUser = myDB.getUserById(userId);
+            if (currentUser != null) {
+                selectedImagePath = currentUser.getImage();
+            }
         }
 
         boolean isUpdated = myDB.updateUser(userId, newName, newPhone, newBirthDate, selectedImagePath);
@@ -147,20 +180,6 @@ public class EditProfileActivity extends AppCompatActivity {
             finish();
         } else {
             Toast.makeText(this, "Lỗi khi cập nhật!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
-    // Xử lý cấp quyền truy cập bộ nhớ
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_PERMISSION_REQUEST) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openGallery();
-            } else {
-                Toast.makeText(this, "Bạn cần cấp quyền để chọn ảnh!", Toast.LENGTH_SHORT).show();
-            }
         }
     }
 }

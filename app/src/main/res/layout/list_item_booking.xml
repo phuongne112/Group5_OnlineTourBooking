@@ -5,77 +5,117 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardElevation="6dp"
-    app:cardCornerRadius="12dp"
+    app:cardElevation="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardBackgroundColor="@android:color/white"
     android:padding="16dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
+        <!-- Tour Name -->
         <TextView
             android:id="@+id/tvTourName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Tour Name"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/imgStatusIcon"
+            app:layout_constraintBottom_toTopOf="@+id/tvBookingDate"
+            android:paddingBottom="4dp"/>
 
+        <!-- Booking Date -->
         <TextView
             android:id="@+id/tvBookingDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Booking Date"
-            android:textSize="16sp"
-            android:textColor="@android:color/darker_gray"/>
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvTourName"/>
 
+        <!-- Payment Status -->
         <TextView
-            android:id="@+id/tvTotalPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total Price"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_blue_dark"/>
-
-        <!-- Trạng thái Thanh toán -->
-        <TextView
+            android:id="@+id/tvPaymentStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Payment Status"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvBookingDate"/>
 
         <Spinner
             android:id="@+id/spinnerPayment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvPaymentStatus"
+            android:background="@android:color/white"
+            android:elevation="4dp"/>
 
-        <!-- Trạng thái Đặt chỗ -->
+        <!-- Booking Status -->
         <TextView
+            android:id="@+id/tvBookingStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Booking Status"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinnerPayment"/>
 
         <Spinner
             android:id="@+id/spinnerBooking"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvBookingStatus"
+            android:background="@android:color/white"
+            android:elevation="4dp"/>
 
-        <!-- Icon trạng thái -->
+        <!-- Total Price Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="@android:color/holo_blue_light"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinnerBooking">
+
+            <TextView
+                android:id="@+id/tvTotalPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Total Price"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"/>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Status Icon -->
         <ImageView
             android:id="@+id/imgStatusIcon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="12dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/ic_status"
             android:contentDescription="Status Icon"
-            android:src="@drawable/ic_status" />
-    </LinearLayout>
+            app:tint="@android:color/holo_blue_dark" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

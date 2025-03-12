@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ứng Dụng Của Tôi</string>
+    <string name="language_label">Chọn Ngôn Ngữ:</string>
+    <string name="save_button">Lưu Cài Đặt</string>
+    <string name="settings_title">Cài Đặt</string>
+    <string name="language_changed_message">Ngôn ngữ đã được cập nhật!</string>
+    <string name="select_language">Chọn một ngôn ngữ:</string>
+</resources>
