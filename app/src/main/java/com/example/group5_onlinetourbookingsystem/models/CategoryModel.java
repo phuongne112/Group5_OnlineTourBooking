@@ -3,22 +3,25 @@ package com.example.group5_onlinetourbookingsystem.models;
 public class CategoryModel {
     private int id;
     private String name;
-    private String imagePath; // Thêm biến lưu ảnh
+    private String image;
+    private String description;
 
-    // Constructor có ảnh
-    public CategoryModel(int id, String name, String imagePath) {
+    // ✅ Constructor đầy đủ (id, name, image, description)
+    public CategoryModel(int id, String name, String image, String description) {
         this.id = id;
         this.name = name;
-        this.imagePath = imagePath;
+        this.image = image;
+        this.description = description;
     }
 
-    // Constructor không có ảnh (nếu ảnh không bắt buộc)
-    public CategoryModel(int id, String name) {
-        this.id = id;
+    // ✅ Constructor cho trường hợp không có ID (khi thêm danh mục mới)
+    public CategoryModel(String name, String image, String description) {
         this.name = name;
-        this.imagePath = ""; // Mặc định không có ảnh
+        this.image = image;
+        this.description = description;
     }
 
+    // ✅ Getter và Setter
     public int getId() {
         return id;
     }
@@ -27,11 +30,27 @@ public class CategoryModel {
         return name;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public String getImage() {
+        return image;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public String getDescription() {
+        return description;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

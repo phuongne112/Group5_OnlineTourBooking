@@ -5,7 +5,14 @@ public class TourModel {
     private String name, destination, image, cityName, categoryName, description, startTime;
     private double price;
     private int duration;
-
+    public TourModel(int id, String name, String destination, double price, String image, String description) {
+        this.id = id;
+        this.name = name;
+        this.destination = destination;
+        this.price = price;
+        this.image = image;
+        this.description = description;
+    }
     public TourModel(int id, String name, String destination, double price, int duration, String image,
                      String description, int categoryId, String categoryName, int cityId, String cityName, String startTime) {
         this.id = id;

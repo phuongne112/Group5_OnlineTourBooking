@@ -51,8 +51,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         CategoryModel category = categoryList.get(position);
         holder.categoryName.setText(category.getName());
 
-        if (category.getImagePath() != null && !category.getImagePath().isEmpty()) {
-            int imageResource = context.getResources().getIdentifier(category.getImagePath(), "drawable", context.getPackageName());
+        if (category.getImage() != null && !category.getImage().isEmpty()) {
+            int imageResource = context.getResources().getIdentifier(category.getImage(), "drawable", context.getPackageName());
 
             if (imageResource != 0) {
                 Uri imageUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + imageResource);

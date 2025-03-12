@@ -19,6 +19,8 @@ import com.example.group5_onlinetourbookingsystem.MainActivity;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.activities.ForgotPasswordActivity;
 import com.example.group5_onlinetourbookingsystem.activities.ManageAccountActivity;
+import com.example.group5_onlinetourbookingsystem.activities.ManageCategoryActivity;
+import com.example.group5_onlinetourbookingsystem.activities.ManageCityActivity;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -65,6 +67,16 @@ public class StatisticsFragment extends Fragment {
 
         navAccountAdmin.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), ManageAccountActivity.class);
+            startActivity(intent);
+        });
+        LinearLayout cityNav = view.findViewById(R.id.nav_city);
+        cityNav.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ManageCityActivity.class);
+            startActivity(intent);
+        });
+        LinearLayout categoryNav = view.findViewById(R.id.nav_category);
+        categoryNav.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ManageCategoryActivity.class);
             startActivity(intent);
         });
     }

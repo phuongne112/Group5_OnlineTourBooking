@@ -19,6 +19,24 @@
         android:theme="@style/Theme.Group5_OnlineTourBookingSystem"
         tools:targetApi="31">
         <activity
+            android:name=".activities.EditCategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AddCategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ManageCategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.EditCityActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AddCityActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ManageCityActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.UserDetailActivity"
             android:exported="false" />
         <activity
@@ -83,7 +101,6 @@
             android:name=".MainActivity"
             android:exported="false" />
         <activity android:name=".activities.TourGuideDashboardActivity" />
-
     </application>
 
 </manifest>

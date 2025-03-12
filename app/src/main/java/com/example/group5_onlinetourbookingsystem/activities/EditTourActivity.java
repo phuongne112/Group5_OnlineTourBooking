@@ -1,6 +1,7 @@
 package com.example.group5_onlinetourbookingsystem.activities;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -9,10 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.models.TourModel;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -20,7 +25,7 @@ public class EditTourActivity extends AppCompatActivity {
 
     private EditText etTourName, etDestination, etPrice, etStartTime, etDescription;
     private Spinner spinnerCity;
-    private Button btnSave;
+    private Button btnSave, btnDeleteTour;
     private MyDatabaseHelper dbHelper;
     private int tourId;
     private HashMap<String, Integer> cityMap;
@@ -39,6 +44,7 @@ public class EditTourActivity extends AppCompatActivity {
         etDescription = findViewById(R.id.etDescription);
         spinnerCity = findViewById(R.id.spinnerCity);
         btnSave = findViewById(R.id.btnSave);
+        btnDeleteTour = findViewById(R.id.btnDeleteTour); // ✅ Nút xóa tour
 
         dbHelper = new MyDatabaseHelper(this);
 
@@ -53,10 +59,33 @@ public class EditTourActivity extends AppCompatActivity {
         }
 
         btnSave.setOnClickListener(v -> updateTour());
+        btnDeleteTour.setOnClickListener(v -> confirmDeleteTour()); // ✅ Xử lý xóa tour
+    }
+
+    private void confirmDeleteTour() {
+        new AlertDialog.Builder(this)
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc muốn xóa tour này?")
+                .setPositiveButton("Xóa", (dialog, which) -> deleteTour())
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void deleteTour() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int rowsDeleted = db.delete("tours", "id=?", new String[]{String.valueOf(tourId)});
+        db.close();
+
+        if (rowsDeleted > 0) {
+            Toast.makeText(this, "Xóa tour thành công!", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            Toast.makeText(this, "Xóa thất bại!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void loadCitySpinner() {
-        cityMap = dbHelper.getAllCitiesWithIds(); // Lấy danh sách cityId -> cityName
+        cityMap = dbHelper.getAllCitiesWithIds();
         cityNames = new ArrayList<>(cityMap.keySet());
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, cityNames);
@@ -67,7 +96,7 @@ public class EditTourActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
                 String selectedCity = (String) parent.getItemAtPosition(position);
-                selectedCityId = cityMap.get(selectedCity); // Lấy cityId từ tên thành phố
+                selectedCityId = cityMap.get(selectedCity);
             }
 
             @Override
@@ -84,7 +113,6 @@ public class EditTourActivity extends AppCompatActivity {
             etStartTime.setText(tour.getStartTime());
             etDescription.setText(tour.getDescription());
 
-            // ✅ Chọn đúng thành phố trong Spinner
             if (cityMap.containsValue(tour.getCityId())) {
                 for (String cityName : cityMap.keySet()) {
                     if (cityMap.get(cityName) == tour.getCityId()) {
@@ -97,7 +125,6 @@ public class EditTourActivity extends AppCompatActivity {
             }
         }
     }
-
 
     private void updateTour() {
         String name = etTourName.getText().toString().trim();

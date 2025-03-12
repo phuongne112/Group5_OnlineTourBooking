@@ -13,6 +13,7 @@
     import java.security.NoSuchAlgorithmException;
     import com.example.group5_onlinetourbookingsystem.models.BookingModel;
     import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
+    import com.example.group5_onlinetourbookingsystem.models.CityModel;
     import com.example.group5_onlinetourbookingsystem.models.TourModel;
     import com.example.group5_onlinetourbookingsystem.models.UserModel;
 
@@ -316,25 +317,25 @@
         public ArrayList<CategoryModel> getAllCategories() {
             ArrayList<CategoryModel> categoryList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery("SELECT * FROM Categories", null);
 
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        int id = cursor.getInt(0);
-                        String name = cursor.getString(1);
+            Cursor cursor = db.rawQuery("SELECT * FROM categories", null); // Kiểm tra tên bảng có chính xác không?
 
-                        // Kiểm tra nếu bảng có hơn 2 cột
-                        String image = cursor.getColumnCount() > 2 ? cursor.getString(2) : null;
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                    String image = cursor.getString(cursor.getColumnIndexOrThrow("image"));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
 
-                        categoryList.add(new CategoryModel(id, name, image));
-                    } while (cursor.moveToNext());
-                }
-                cursor.close();
+                    categoryList.add(new CategoryModel(id, name, image, description));
+                } while (cursor.moveToNext());
             }
+
+            cursor.close();
             db.close();
             return categoryList;
         }
+
 
         public ArrayList<TourModel> getToursByPage(int offset, int limit) {
             ArrayList<TourModel> tourList = new ArrayList<>();
@@ -1326,6 +1327,61 @@
                 return null;
             }
         }
+        public ArrayList<CityModel> getAllCitiesAdmin() {
+            ArrayList<CityModel> cityList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT * FROM cities", null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                    cityList.add(new CityModel(id, name));
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+            return cityList;
+        }
+        public CityModel getCityById(int cityId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            CityModel city = null;
+
+            Cursor cursor = db.rawQuery("SELECT * FROM cities WHERE id = ?", new String[]{String.valueOf(cityId)});
+
+            if (cursor.moveToFirst()) {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                city = new CityModel(id, name);
+            }
+
+            cursor.close();
+            db.close();
+            return city;
+        }
+        public CategoryModel getCategoryById(int categoryId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            CategoryModel category = null;
+
+            Cursor cursor = db.rawQuery("SELECT * FROM categories WHERE id = ?", new String[]{String.valueOf(categoryId)});
+
+            if (cursor.moveToFirst()) {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                String image = cursor.getString(cursor.getColumnIndexOrThrow("image"));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+                category = new CategoryModel(id, name, image, description);
+            }
+
+            cursor.close();
+            db.close();
+            return category;
+        }
+        public boolean addFavorite(int userId, int tourId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("user_id", userId);
+            values.put("tour_id", tourId);
 
         private void logPasswordChange(int userId) {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -1341,7 +1397,47 @@
             return sdf.format(new Date());
         }
 
+            return result != -1; // Trả về `true` nếu thêm thành công
+        }
+
+            long result = db.insert("favorites", null, values);
+            db.close();
 
 
+
+        public void removeFavorite(int userId, int tourId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete("favorites", "user_id = ? AND tour_id = ?",
+                    new String[]{String.valueOf(userId), String.valueOf(tourId)});
+            db.close();
+        }
+
+        public List<TourModel> getFavoriteTours(int userId) {
+            List<TourModel> favoriteTours = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT t.* FROM tours t " +
+                    "JOIN favorites f ON t.id = f.tour_id " +
+                    "WHERE f.user_id = ?";
+
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                    String destination = cursor.getString(cursor.getColumnIndexOrThrow("destination"));
+                    double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
+                    String image = cursor.getString(cursor.getColumnIndexOrThrow("image"));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+
+                    favoriteTours.add(new TourModel(id, name, destination, price, image, description));
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return favoriteTours;
+        }
 
     }

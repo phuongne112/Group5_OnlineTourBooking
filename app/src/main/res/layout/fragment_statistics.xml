@@ -55,6 +55,7 @@
 
             <!-- City -->
             <LinearLayout
+                android:id="@+id/nav_city"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -80,6 +81,7 @@
 
             <!-- Category -->
             <LinearLayout
+                android:id="@+id/nav_category"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
