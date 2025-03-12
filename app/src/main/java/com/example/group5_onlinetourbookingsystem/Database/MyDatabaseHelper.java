@@ -9,12 +9,14 @@
     import android.widget.Toast;
     
     import androidx.annotation.Nullable;
-
+    import java.security.MessageDigest;
+    import java.security.NoSuchAlgorithmException;
     import com.example.group5_onlinetourbookingsystem.models.BookingModel;
     import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
     import com.example.group5_onlinetourbookingsystem.models.TourModel;
     import com.example.group5_onlinetourbookingsystem.models.UserModel;
 
+    import java.security.MessageDigest;
     import java.text.Normalizer;
     import java.text.SimpleDateFormat;
     import java.util.ArrayList;
@@ -1257,6 +1259,88 @@
                     "WHERE b.id = ?";
             return db.rawQuery(query, new String[]{String.valueOf(bookingId)});
         }
+        public boolean isUserPasswordCorrect(int userId, String oldPassword) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT password FROM users WHERE id = ?", new String[]{String.valueOf(userId)});
+
+            if (cursor.moveToFirst()) {
+                String storedHashedPassword = cursor.getString(0); // Mật khẩu đã mã hóa trong DB
+                cursor.close();
+                db.close();
+
+                Log.d("DEBUG", "Mật khẩu đã mã hóa trong DB: " + storedHashedPassword);
+                Log.d("DEBUG", "Mật khẩu nhập vào (chưa mã hóa): " + oldPassword);
+
+                // ✅ Sử dụng SHA-256 để kiểm tra mật khẩu
+                String hashedInputPassword = hashPassword(oldPassword);
+
+                Log.d("DEBUG", "Mật khẩu nhập vào (sau mã hóa): " + hashedInputPassword);
+
+                return storedHashedPassword.equals(hashedInputPassword);
+            }
+
+            cursor.close();
+            db.close();
+            return false; // Nếu không tìm thấy user
+        }
+        public boolean changeUserPassword(int userId, String oldPassword, String newPassword) {
+            if (!isUserPasswordCorrect(userId, oldPassword)) {
+                Log.e("ERROR", "Mật khẩu cũ không đúng!");
+                return false;
+            }
+
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+            // ✅ Hash the new password using SHA-256
+            String hashedNewPassword = hashPassword(newPassword);
+
+            values.put("password", hashedNewPassword);
+            int rowsUpdated = db.update("users", values, "id=?", new String[]{String.valueOf(userId)});
+
+            if (rowsUpdated > 0) {
+                logPasswordChange(userId); // 🆕 Log password change event
+                Log.d("SUCCESS", "Mật khẩu đã được cập nhật và mã hóa thành công!");
+            }
+
+            db.close();
+            return rowsUpdated > 0;
+        }
+
+
+
+        private String hashPassword(String password) {
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                byte[] hash = digest.digest(password.getBytes());
+                StringBuilder hexString = new StringBuilder();
+                for (byte b : hash) {
+                    String hex = Integer.toHexString(0xff & b);
+                    if (hex.length() == 1) hexString.append('0');
+                    hexString.append(hex);
+                }
+                return hexString.toString();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        private void logPasswordChange(int userId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("user_id", userId);
+            values.put("message", "Mật khẩu của bạn đã bị thay đổi lúc " + getCurrentDateTime());
+
+            db.insert("user_notifications", null, values);
+            db.close();
+        }
+        private String getCurrentDateTime() {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            return sdf.format(new Date());
+        }
+
+
 
 
     }

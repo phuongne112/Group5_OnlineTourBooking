@@ -59,7 +59,9 @@ public class TourGuideDashboardActivity extends AppCompatActivity {
     private void loadBookings(String filter) {
         bookingList = dbHelper.getBookings(filter);
 
-        adapter = new BookingAdapter(this, bookingList);
+        MyDatabaseHelper dbHelper = new MyDatabaseHelper(this);
+        adapter = new BookingAdapter(this, bookingList, dbHelper);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }
