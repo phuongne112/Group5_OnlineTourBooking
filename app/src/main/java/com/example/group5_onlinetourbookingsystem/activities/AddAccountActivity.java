@@ -1,10 +1,15 @@
 package com.example.group5_onlinetourbookingsystem.activities;
 
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,77 +24,88 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class SignUpActivity extends AppCompatActivity {
-    private EditText etName, etEmail, etPhone, etPassword, etBirth;
-    private Button btnSignUp;
+public class AddAccountActivity extends AppCompatActivity {
+
+    private EditText etUsername, etEmail, etPhone, etPassword, etBirthDate;
+    private RadioGroup rgRole;
+    private Button btnSave;
     private MyDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up);
+        setContentView(R.layout.activity_add_account);
 
-        dbHelper = new MyDatabaseHelper(this);
-
-        etName = findViewById(R.id.etName);
+        etUsername = findViewById(R.id.etUsername);
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
         etPassword = findViewById(R.id.etPassword);
-        etBirth = findViewById(R.id.editBirth);
-        btnSignUp = findViewById(R.id.btnSignUp);
+        etBirthDate = findViewById(R.id.etBirthDate);
+        rgRole = findViewById(R.id.rgRole);
+        btnSave = findViewById(R.id.btnSave);
+        dbHelper = new MyDatabaseHelper(this);
 
+        // Hiển thị DatePickerDialog khi nhấn vào etBirthDate
+        etBirthDate.setOnClickListener(v -> showDatePicker());
 
-
-        // 🔹 Khi nhấn vào etBirth, hiển thị DatePickerDialog
-        etBirth.setOnClickListener(v -> showDatePicker());
-
-        btnSignUp.setOnClickListener(v -> {
-            String name = etName.getText().toString().trim();
-            String email = etEmail.getText().toString().trim();
-            String phone = etPhone.getText().toString().trim();
-            String password = etPassword.getText().toString().trim();
-            String birthDate = etBirth.getText().toString().trim();
-
-            // ✅ Kiểm tra dữ liệu nhập vào
-            if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty() || birthDate.isEmpty()) {
-                Toast.makeText(SignUpActivity.this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (!isValidEmail(email)) {
-                Toast.makeText(SignUpActivity.this, "Email phải là Gmail hợp lệ", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (!isValidPhone(phone)) {
-                Toast.makeText(SignUpActivity.this, "Số điện thoại phải có 10 chữ số và bắt đầu bằng 0", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (!isValidPassword(password)) {
-                Toast.makeText(SignUpActivity.this, "Mật khẩu phải có ít nhất 6 ký tự", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (!isValidBirthDate(birthDate)) {
-                Toast.makeText(this, "Ngày sinh không hợp lệ. Người dùng phải đủ 16 tuổi.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // ✅ Mã hóa mật khẩu trước khi lưu vào database
-            String hashedPassword = hashPassword(password);
-
-            long result = dbHelper.addUser(name, email, phone, hashedPassword, birthDate, "",1);
-
-            if (result != -1) {
-                Toast.makeText(SignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                finish();
-            } else {
-                Toast.makeText(SignUpActivity.this, "Đăng ký thất bại. Email có thể đã tồn tại!", Toast.LENGTH_SHORT).show();
-            }
-        });
+        btnSave.setOnClickListener(v -> addAccount());
     }
 
-    // ✅ Hàm hiển thị DatePickerDialog khi nhấn vào etBirth
+    private void addAccount() {
+        String username = etUsername.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
+        String phone = etPhone.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+        String birthDate = etBirthDate.getText().toString().trim();
+
+        int selectedRoleId = rgRole.getCheckedRadioButtonId();
+        int roleId = (selectedRoleId == R.id.rbUser) ? 1 : 3; // 1: Customer, 3: Tour Guide
+
+        if (username.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty() || birthDate.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!isValidEmail(email)) {
+            Toast.makeText(this, "Email phải là Gmail hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!isValidPhone(phone)) {
+            Toast.makeText(this, "Số điện thoại phải có 10 chữ số và bắt đầu bằng 0", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!isValidPassword(password)) {
+            Toast.makeText(this, "Mật khẩu phải có ít nhất 6 ký tự", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!isValidBirthDate(birthDate)) {
+            Toast.makeText(this, "Ngày sinh không hợp lệ. Người dùng phải đủ 16 tuổi.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        String hashedPassword = hashPassword(password);
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("name", username);
+        values.put("email", email);
+        values.put("phone", phone);
+        values.put("password", hashedPassword);
+        values.put("birth_date", birthDate);
+        values.put("role_id", roleId);
+
+        long result = db.insert("users", null, values);
+        if (result != -1) {
+            Toast.makeText(this, "Tài khoản đã được thêm thành công", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            Toast.makeText(this, "Thêm tài khoản thất bại. Email có thể đã tồn tại!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void showDatePicker() {
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -100,7 +116,7 @@ public class SignUpActivity extends AppCompatActivity {
                 this,
                 (view, selectedYear, selectedMonth, selectedDay) -> {
                     String selectedDate = selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear;
-                    etBirth.setText(selectedDate); // 🔹 Gán ngày đã chọn vào etBirth
+                    etBirthDate.setText(selectedDate);
                 },
                 year, month, day
         );
@@ -108,22 +124,18 @@ public class SignUpActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    // ✅ Hàm kiểm tra email có đúng Gmail không
     private boolean isValidEmail(String email) {
         return email.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$");
     }
 
-    // ✅ Hàm kiểm tra số điện thoại hợp lệ (bắt đầu bằng 0, có 10 số)
     private boolean isValidPhone(String phone) {
         return phone.matches("^0[0-9]{9}$");
     }
 
-    // ✅ Hàm kiểm tra mật khẩu hợp lệ (tối thiểu 6 ký tự)
     private boolean isValidPassword(String password) {
         return password.length() >= 6;
     }
 
-    // ✅ Hàm mã hóa mật khẩu SHA-256
     private String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -161,4 +173,5 @@ public class SignUpActivity extends AppCompatActivity {
             return false;
         }
     }
+
 }
