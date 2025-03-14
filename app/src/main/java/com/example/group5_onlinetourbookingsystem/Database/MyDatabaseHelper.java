@@ -1416,7 +1416,138 @@
             db.close();
             return favoriteTours;
         }
+        public void addTour(String name, String destination, int cityId, double price, int duration,
+                            String imagePath, int categoryId, String start_time, String description, int guideId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
 
+            values.put(COLUMN_TOUR_NAME, name);
+            values.put(COLUMN_TOUR_DESTINATION, destination);
+            values.put(COLUMN_TOUR_PRICE, price);
+            values.put(COLUMN_TOUR_DURATION, duration);
+            values.put(COLUMN_TOUR_IMAGE, imagePath);
+            values.put(COLUMN_TOUR_CATEGORY_ID, categoryId);
+            values.put(COLUMN_TOUR_CITY_ID, cityId);
+            values.put(COLUMN_TOUR_START_TIME, start_time);
+            values.put(COLUMN_TOUR_DESCRIPTION, description);
+            values.put(COLUMN_TOUR_GUIDE_ID, guideId); // Assign tour guide
+
+            db.insert(TABLE_TOURS, null, values);
+            db.close();
         }
+
+        public ArrayList<TourModel> getToursByGuide(int userId, int roleId) {
+            ArrayList<TourModel> tourList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, " +
+                    "t.description, c.id AS categoryId, c.name AS categoryName, " +
+                    "t.city_id, ci.name AS cityName, t.start_time " +
+                    "FROM tours t " +
+                    "LEFT JOIN categories c ON t.category_id = c.id " +
+                    "LEFT JOIN cities ci ON t.city_id = ci.id " +
+                    "WHERE t.guide_id = ? OR t.guide_id = ?";  // ✅ Fetch tours by guide_id matching userId OR roleId
+
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), String.valueOf(roleId)});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                    String destination = cursor.getString(cursor.getColumnIndexOrThrow("destination"));
+                    double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
+                    int duration = cursor.getInt(cursor.getColumnIndexOrThrow("duration"));
+                    String image = cursor.getString(cursor.getColumnIndexOrThrow("image"));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+                    int categoryId = cursor.getInt(cursor.getColumnIndexOrThrow("categoryId"));
+                    String categoryName = cursor.getString(cursor.getColumnIndexOrThrow("categoryName"));
+                    int cityId = cursor.getInt(cursor.getColumnIndexOrThrow("city_id"));
+                    String cityName = cursor.getString(cursor.getColumnIndexOrThrow("cityName")) != null
+                            ? cursor.getString(cursor.getColumnIndexOrThrow("cityName"))
+                            : "Không xác định";
+                    String startTime = cursor.getString(cursor.getColumnIndexOrThrow("start_time"));
+
+                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityId, cityName, startTime));
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return tourList;
+        }
+        public ArrayList<TourModel> getPaidBookedToursByGuide(int userId, int roleId) {
+            ArrayList<TourModel> tourList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT DISTINCT t.id, t.name, t.destination, t.price, t.duration, t.image, " +
+                    "t.description, c.id AS categoryId, c.name AS categoryName, " +
+                    "t.city_id, ci.name AS cityName, t.start_time " +
+                    "FROM tours t " +
+                    "INNER JOIN bookings b ON t.id = b.tour_id " +
+                    "INNER JOIN payments p ON b.id = p.booking_id " +
+                    "LEFT JOIN categories c ON t.category_id = c.id " +
+                    "LEFT JOIN cities ci ON t.city_id = ci.id " +
+                    "WHERE t.guide_id = ? AND b.status = 'Confirmed' AND p.status = 'Completed'";
+
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                    String destination = cursor.getString(cursor.getColumnIndexOrThrow("destination"));
+                    double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
+                    int duration = cursor.getInt(cursor.getColumnIndexOrThrow("duration"));
+                    String image = cursor.getString(cursor.getColumnIndexOrThrow("image"));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+                    int categoryId = cursor.getInt(cursor.getColumnIndexOrThrow("categoryId"));
+                    String categoryName = cursor.getString(cursor.getColumnIndexOrThrow("categoryName"));
+                    int cityId = cursor.getInt(cursor.getColumnIndexOrThrow("city_id"));
+                    String cityName = cursor.getString(cursor.getColumnIndexOrThrow("cityName")) != null
+                            ? cursor.getString(cursor.getColumnIndexOrThrow("cityName"))
+                            : "Không xác định";
+                    String startTime = cursor.getString(cursor.getColumnIndexOrThrow("start_time"));
+
+                    tourList.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityId, cityName, startTime));
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return tourList;
+        }
+
+        public ArrayList<BookingModel> getBookingsForTour(int tourId) {
+            ArrayList<BookingModel> bookingList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            // ✅ Query only booking details without user-related info
+            String query = "SELECT b.id, b.booking_date, b.status, b.adult_count, b.child_count " +
+                    "FROM bookings b " +
+                    "WHERE b.tour_id = ? AND b.status = 'Confirmed'";
+
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(tourId)});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                    String date = cursor.getString(cursor.getColumnIndexOrThrow("booking_date"));
+                    String status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
+                    int adultCount = cursor.getInt(cursor.getColumnIndexOrThrow("adult_count"));
+                    int childCount = cursor.getInt(cursor.getColumnIndexOrThrow("child_count"));
+
+                    // ✅ Ensure BookingModel supports this constructor
+                    bookingList.add(new BookingModel(id, date, status, adultCount, childCount));
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return bookingList;
+        }
+
+
+
+    }
 
 

@@ -20,6 +20,21 @@ public class BookingModel {
         this.time = time;
         this.date = date;
     }
+    public BookingModel(int id, String date, String status, int adultCount, int childCount) {
+        this.id = id;
+        this.date = date;
+        this.status = status;
+        this.adultCount = adultCount;
+        this.childCount = childCount;
+    }
+    public BookingModel(int id, String date, String status, int childCount, int adultCount, String name) {
+        this.id = id;
+        this.date = date;
+        this.status = status;
+        this.childCount = childCount;
+        this.adultCount = adultCount;
+        this.name = name;
+    }
 
     // Constructor đầy đủ với tất cả các thông tin Booking
     public BookingModel(int id, int userId, int tourId, int adultCount, int childCount, String note, double totalPrice, String status, String paymentStatus, String time, String date) {

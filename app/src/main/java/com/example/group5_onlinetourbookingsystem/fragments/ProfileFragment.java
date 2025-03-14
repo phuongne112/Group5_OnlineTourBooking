@@ -97,20 +97,7 @@ public class ProfileFragment extends Fragment {
             startActivity(new Intent(getContext(), activityClass));
         }
     }
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
 
-        // 🔹 Kiểm tra nếu Activity không null trước khi thao tác
-        if (getActivity() != null) {
-            View topNavigation = getActivity().findViewById(R.id.topNavigation);
-            View tabContainer = getActivity().findViewById(R.id.tabContainer);
-            View recyclerViewBookings = getActivity().findViewById(R.id.recyclerViewBookings);
 
-            if (topNavigation != null) topNavigation.setVisibility(View.VISIBLE);
-            if (tabContainer != null) tabContainer.setVisibility(View.VISIBLE);
-            if (recyclerViewBookings != null) recyclerViewBookings.setVisibility(View.VISIBLE);
-        }
-    }
 
 }
