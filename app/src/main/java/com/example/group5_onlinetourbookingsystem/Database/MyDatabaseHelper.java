@@ -1327,6 +1327,19 @@
                 return null;
             }
         }
+        private void logPasswordChange(int userId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("user_id", userId);
+            values.put("message", "Mật khẩu của bạn đã bị thay đổi lúc " + getCurrentDateTime());
+
+            db.insert("user_notifications", null, values);
+            db.close();
+        }
+        private String getCurrentDateTime() {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            return sdf.format(new Date());
+        }
         public ArrayList<CityModel> getAllCitiesAdmin() {
             ArrayList<CityModel> cityList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
@@ -1377,67 +1390,7 @@
             db.close();
             return category;
         }
-        public boolean addFavorite(int userId, int tourId) {
-            SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put("user_id", userId);
-            values.put("tour_id", tourId);
 
-        private void logPasswordChange(int userId) {
-            SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put("user_id", userId);
-            values.put("message", "Mật khẩu của bạn đã bị thay đổi lúc " + getCurrentDateTime());
-
-            db.insert("user_notifications", null, values);
-            db.close();
-        }
-        private String getCurrentDateTime() {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            return sdf.format(new Date());
         }
 
-            return result != -1; // Trả về `true` nếu thêm thành công
-        }
 
-            long result = db.insert("favorites", null, values);
-            db.close();
-
-
-
-        public void removeFavorite(int userId, int tourId) {
-            SQLiteDatabase db = this.getWritableDatabase();
-            db.delete("favorites", "user_id = ? AND tour_id = ?",
-                    new String[]{String.valueOf(userId), String.valueOf(tourId)});
-            db.close();
-        }
-
-        public List<TourModel> getFavoriteTours(int userId) {
-            List<TourModel> favoriteTours = new ArrayList<>();
-            SQLiteDatabase db = this.getReadableDatabase();
-
-            String query = "SELECT t.* FROM tours t " +
-                    "JOIN favorites f ON t.id = f.tour_id " +
-                    "WHERE f.user_id = ?";
-
-            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
-
-            if (cursor.moveToFirst()) {
-                do {
-                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-                    String destination = cursor.getString(cursor.getColumnIndexOrThrow("destination"));
-                    double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
-                    String image = cursor.getString(cursor.getColumnIndexOrThrow("image"));
-                    String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
-
-                    favoriteTours.add(new TourModel(id, name, destination, price, image, description));
-                } while (cursor.moveToNext());
-            }
-
-            cursor.close();
-            db.close();
-            return favoriteTours;
-        }
-
-    }
