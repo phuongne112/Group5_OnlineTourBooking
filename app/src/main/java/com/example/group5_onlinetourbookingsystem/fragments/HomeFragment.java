@@ -192,6 +192,8 @@ public class HomeFragment extends Fragment {
             databaseHelper.addTour("Tour Đà Lạt", "Đà Lạt", 1, 150.0, 3, "dalat_tour", 1, "2025-03-10 08:00:00", "Thưởng thức khí hậu mát mẻ và cảnh đẹp thơ mộng của Đà Lạt.");
             databaseHelper.addTour("Tour Phú Quốc", "Phú Quốc", 2, 200.0, 4, "phuquoc_tour", 2, "2025-03-12 09:30:00", "Khám phá hòn đảo ngọc với bãi biển tuyệt đẹp và hải sản tươi ngon.");
             databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 3, 180.0, 3, "hanoi_tour", 3, "2025-03-15 07:45:00", "Trải nghiệm văn hóa, lịch sử thủ đô với 36 phố phường và Hồ Gươm.");
+            databaseHelper.addTour("Luxury Hanoi Tour", "Hanoi", 1, 200.0, 3, "hanoi.jpg", 3, "2025-03-15 07:00:00", "Explore the best of Hanoi!", 3);
+
         }
     }
     private void checkUserRole() {

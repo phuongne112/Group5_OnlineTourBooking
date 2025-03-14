@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_tourguide"
+        android:icon="@drawable/ic_home"
+        android:title="Statistics" />
+    <item
+        android:id="@+id/nav_accounts"
+        android:icon="@drawable/bottom_btn3"
+        android:title="Accounts" />
+</menu>
