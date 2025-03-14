@@ -1183,53 +1183,6 @@
             db.close();
             return rowsAffected > 0;
         }
-
-        // 🛠 Lưu yêu thích vào database
-        public void addToFavorites(int userId, int tourId) {
-            SQLiteDatabase db = this.getWritableDatabase();
-
-            // Kiểm tra xem đã có trong danh sách yêu thích chưa
-            Cursor cursor = db.rawQuery("SELECT * FROM favorites WHERE user_id = ? AND tour_id = ?",
-                    new String[]{String.valueOf(userId), String.valueOf(tourId)});
-
-            if (cursor.getCount() == 0) { // Chưa có, thì thêm vào
-                ContentValues values = new ContentValues();
-                values.put("user_id", userId);
-                values.put("tour_id", tourId);
-
-                long result = db.insert("favorites", null, values);
-                if (result == -1) {
-                    Log.e("DB_ERROR", "Lỗi khi thêm vào danh sách yêu thích");
-                } else {
-                    Log.d("DB_SUCCESS", "Thêm vào danh sách yêu thích thành công");
-                }
-            } else {
-                Log.d("DB_INFO", "Tour đã có trong danh sách yêu thích");
-            }
-
-            cursor.close();
-            db.close();
-        }
-
-        // 🛠 Xóa khỏi danh sách yêu thích
-        public void removeFromFavorites(int userId, int tourId) {
-            SQLiteDatabase db = this.getWritableDatabase();
-            db.delete("favorites", "user_id = ? AND tour_id = ?",
-                    new String[]{String.valueOf(userId), String.valueOf(tourId)});
-            db.close();
-        }
-
-        // 🛠 Kiểm tra xem tour có trong danh sách yêu thích hay không
-        public boolean isFavorite(int userId, int tourId) {
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery("SELECT * FROM favorites WHERE user_id = ? AND tour_id = ?",
-                    new String[]{String.valueOf(userId), String.valueOf(tourId)});
-
-            boolean exists = cursor.getCount() > 0;
-            cursor.close();
-            return exists;
-        }
-
         public boolean updatePaymentStatus(int bookingId, String newStatus) {
             SQLiteDatabase db = this.getWritableDatabase();
             boolean success = false;
@@ -1389,6 +1342,79 @@
             cursor.close();
             db.close();
             return category;
+        }
+        public void addToFavorites(int userId, int tourId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("user_id", userId);
+            values.put("tour_id", tourId);
+
+            // ✅ Prevent duplicate favorites
+            Cursor cursor = db.rawQuery("SELECT * FROM favorites WHERE user_id = ? AND tour_id = ?",
+                    new String[]{String.valueOf(userId), String.valueOf(tourId)});
+
+            if (cursor.getCount() == 0) {
+                db.insert("favorites", null, values);
+            }
+            cursor.close();
+            db.close();
+        }
+
+        public void removeFromFavorites(int userId, int tourId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete("favorites", "user_id = ? AND tour_id = ?",
+                    new String[]{String.valueOf(userId), String.valueOf(tourId)});
+            db.close();
+        }
+
+        public boolean isFavorite(int userId, int tourId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT * FROM favorites WHERE user_id = ? AND tour_id = ?",
+                    new String[]{String.valueOf(userId), String.valueOf(tourId)});
+
+            boolean exists = cursor.getCount() > 0;
+            cursor.close();
+            db.close();
+            return exists;
+        }
+        public ArrayList<TourModel> getFavoriteTours(int userId) {
+            ArrayList<TourModel> favoriteTours = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT t.id, t.name, t.destination, t.price, t.duration, t.image, t.description, " +
+                    "c.id AS categoryId, c.name AS categoryName, t.city_id, ci.name AS cityName, t.start_time " +
+                    "FROM tours t " +
+                    "JOIN favorites f ON t.id = f.tour_id " +
+                    "LEFT JOIN categories c ON t.category_id = c.id " +
+                    "LEFT JOIN cities ci ON t.city_id = ci.id " +
+                    "WHERE f.user_id = ?";
+
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                    String destination = cursor.getString(cursor.getColumnIndexOrThrow("destination"));
+                    double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
+                    int duration = cursor.getInt(cursor.getColumnIndexOrThrow("duration"));
+                    String image = cursor.getString(cursor.getColumnIndexOrThrow("image"));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+                    int categoryId = cursor.getInt(cursor.getColumnIndexOrThrow("categoryId"));
+                    String categoryName = cursor.getString(cursor.getColumnIndexOrThrow("categoryName"));
+                    int cityId = cursor.getInt(cursor.getColumnIndexOrThrow("city_id"));
+                    String cityName = cursor.getString(cursor.getColumnIndexOrThrow("cityName")) != null
+                            ? cursor.getString(cursor.getColumnIndexOrThrow("cityName"))
+                            : "Không xác định";
+                    String startTime = cursor.getString(cursor.getColumnIndexOrThrow("start_time"));
+
+                    favoriteTours.add(new TourModel(id, name, destination, price, duration, image, description, categoryId, categoryName, cityId, cityName, startTime));
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return favoriteTours;
         }
 
         }
