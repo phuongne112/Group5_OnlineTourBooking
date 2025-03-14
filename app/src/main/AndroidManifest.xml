@@ -20,6 +20,9 @@
         android:theme="@style/Theme.Group5_OnlineTourBookingSystem"
         tools:targetApi="31">
         <activity
+            android:name=".activities.AddAccountActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.GuideListActivity"
             android:exported="false" />
         <activity

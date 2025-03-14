@@ -142,9 +142,13 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 // Gửi email
                 Transport.send(message);
 
-                // Thông báo khi gửi thành công
-                runOnUiThread(() -> Toast.makeText(ForgotPasswordActivity.this,
-                        "Mật khẩu mới đã được gửi đến email!", Toast.LENGTH_SHORT).show());
+                // ✅ Chuyển về Login nếu gửi thành công
+                runOnUiThread(() -> {
+                    Toast.makeText(ForgotPasswordActivity.this, "Mật khẩu mới đã được gửi!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(ForgotPasswordActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish(); // Đóng ForgotPasswordActivity
+                });
 
             } catch (MessagingException e) {
                 e.printStackTrace();
@@ -153,6 +157,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             }
         });
     }
+
     public void gotoLogin(View view) {
         Intent intent = new Intent( this, MainActivity.class);
         startActivity(intent);
