@@ -9,9 +9,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -23,13 +25,16 @@ import androidx.core.content.ContextCompat;
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
 
+import java.util.ArrayList;
+
 public class AddTourActivity extends AppCompatActivity {
     private EditText etTourName, etDestination, etCityId, etPrice, etDuration, etCategoryId, etStartTime, etDescription;
+    private Spinner spinnerTourGuides;
     private Button btnAddTour, btnChooseImage;
     private ImageView ivSelectedImage;
-    private String selectedImageName = ""; // Chỉ lưu tên file không có đuôi .jpg, .png
+    private String selectedImageName = "";
     private MyDatabaseHelper dbHelper;
-
+    private ArrayList<Integer> guideIdList;
     private static final int REQUEST_STORAGE_PERMISSION = 101;
 
     @Override
@@ -37,7 +42,6 @@ public class AddTourActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_tour);
 
-        // Ánh xạ view từ XML
         etTourName = findViewById(R.id.etTourName);
         etDestination = findViewById(R.id.etDestination);
         etCityId = findViewById(R.id.etCityId);
@@ -46,19 +50,80 @@ public class AddTourActivity extends AppCompatActivity {
         etCategoryId = findViewById(R.id.etCategoryId);
         etStartTime = findViewById(R.id.etStartTime);
         etDescription = findViewById(R.id.etDescription);
+        spinnerTourGuides = findViewById(R.id.spinnerTourGuides);
         btnAddTour = findViewById(R.id.btnAddTour);
         btnChooseImage = findViewById(R.id.btnChooseImage);
         ivSelectedImage = findViewById(R.id.ivSelectedImage);
-
         dbHelper = new MyDatabaseHelper(this);
 
-        // Xử lý chọn ảnh
-        btnChooseImage.setOnClickListener(v -> checkPermissionAndPickImage());
+        // 🟢 Tải danh sách Tour Guide vào Spinner
+        loadTourGuides();
 
-        // Xử lý sự kiện thêm tour
+        btnChooseImage.setOnClickListener(v -> checkPermissionAndPickImage());
         btnAddTour.setOnClickListener(v -> addTourToDatabase());
     }
 
+    private void loadTourGuides() {
+        ArrayList<String> guideNames = new ArrayList<>();
+        guideIdList = new ArrayList<>();
+        Cursor cursor = dbHelper.getAllTourGuides(); // Lấy danh sách hướng dẫn viên
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                guideNames.add(name);
+                guideIdList.add(id);
+            }
+            cursor.close();
+        }
+
+        if (guideNames.isEmpty()) {
+            guideNames.add("Không có hướng dẫn viên");
+            guideIdList.add(-1);
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, guideNames);
+        spinnerTourGuides.setAdapter(adapter);
+    }
+
+    private void addTourToDatabase() {
+        String name = etTourName.getText().toString().trim();
+        String destination = etDestination.getText().toString().trim();
+        String priceStr = etPrice.getText().toString().trim();
+        String durationStr = etDuration.getText().toString().trim();
+        String categoryIdStr = etCategoryId.getText().toString().trim();
+        String cityIdStr = etCityId.getText().toString().trim();
+        String startTime = etStartTime.getText().toString().trim();
+        String description = etDescription.getText().toString().trim();
+
+        if (name.isEmpty() || destination.isEmpty() || priceStr.isEmpty() || durationStr.isEmpty()
+                || categoryIdStr.isEmpty() || cityIdStr.isEmpty() || startTime.isEmpty() || description.isEmpty()) {
+            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            double price = Double.parseDouble(priceStr);
+            int duration = Integer.parseInt(durationStr);
+            int categoryId = Integer.parseInt(categoryIdStr);
+            int cityId = Integer.parseInt(cityIdStr);
+            int selectedGuideId = guideIdList.get(spinnerTourGuides.getSelectedItemPosition());
+
+            // 🟢 Thêm tour và lấy ID tour vừa thêm
+            int tourId = dbHelper.addTour(name, destination, cityId, price, duration, selectedImageName, categoryId, startTime, description);
+
+            // 🟢 Thêm Guide vào bảng `tour_guides`
+            if (selectedGuideId != -1) {
+                dbHelper.assignUserToTourGuide(tourId, selectedGuideId);
+            }
+
+            Toast.makeText(this, "Thêm tour thành công!", Toast.LENGTH_SHORT).show();
+            finish();
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Lỗi nhập số: Vui lòng nhập giá trị hợp lệ!", Toast.LENGTH_SHORT).show();
+        }
+    }
     // Kiểm tra và yêu cầu quyền truy cập ảnh
     private void checkPermissionAndPickImage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
@@ -76,19 +141,6 @@ public class AddTourActivity extends AppCompatActivity {
         }
     }
 
-    // Kết quả xin quyền
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_STORAGE_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                pickImageFromGallery();
-            } else {
-                Toast.makeText(this, "Bạn cần cấp quyền để chọn ảnh!", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
     // Mở thư viện ảnh
     private void pickImageFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -101,7 +153,7 @@ public class AddTourActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Uri selectedImageUri = result.getData().getData();
-                    selectedImageName = getFileNameWithoutExtension(selectedImageUri); // 🟢 Chỉ lấy tên file không có đuôi .jpg, .png
+                    selectedImageName = getFileNameWithoutExtension(selectedImageUri); // 🟢 Lấy tên file không có đuôi mở rộng
                     ivSelectedImage.setImageURI(selectedImageUri); // Hiển thị ảnh đã chọn
                 }
             }
@@ -131,43 +183,6 @@ public class AddTourActivity extends AppCompatActivity {
             fileName = fileName.substring(0, fileName.lastIndexOf('.'));
         }
         return fileName;
-    }
-
-    // Thêm tour vào database
-    private void addTourToDatabase() {
-        // Lấy dữ liệu từ EditText
-        String name = etTourName.getText().toString().trim();
-        String destination = etDestination.getText().toString().trim();
-        String priceStr = etPrice.getText().toString().trim();
-        String durationStr = etDuration.getText().toString().trim();
-        String categoryIdStr = etCategoryId.getText().toString().trim();
-        String cityIdStr = etCityId.getText().toString().trim();
-        String startTime = etStartTime.getText().toString().trim();
-        String description = etDescription.getText().toString().trim();
-
-        // Kiểm tra nếu có trường nào bị bỏ trống
-        if (name.isEmpty() || destination.isEmpty() || priceStr.isEmpty() || durationStr.isEmpty()
-                || categoryIdStr.isEmpty() || cityIdStr.isEmpty() || startTime.isEmpty() || description.isEmpty()) {
-            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        try {
-            // Chuyển đổi giá trị
-            double price = Double.parseDouble(priceStr);
-            int duration = Integer.parseInt(durationStr);
-            int categoryId = Integer.parseInt(categoryIdStr);
-            int cityId = Integer.parseInt(cityIdStr);
-
-            // Thêm tour vào database
-            MyDatabaseHelper dbHelper = new MyDatabaseHelper(this);
-            dbHelper.addTour(name, destination, cityId, price, duration, "", categoryId, startTime, description);
-
-            Toast.makeText(this, "Thêm tour thành công!", Toast.LENGTH_SHORT).show();
-            finish(); // Đóng activity sau khi thêm thành công
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Lỗi nhập số: Vui lòng nhập giá trị hợp lệ!", Toast.LENGTH_SHORT).show();
-        }
     }
 
 }

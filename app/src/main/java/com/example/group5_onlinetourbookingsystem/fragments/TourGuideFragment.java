@@ -29,9 +29,7 @@ public class TourGuideFragment extends Fragment {
     private ArrayList<TourModel> tourList;
     private SessionManager sessionManager;
 
-    public TourGuideFragment() {
-        // Required empty constructor
-    }
+    public TourGuideFragment() {}
 
     @Nullable
     @Override
@@ -39,37 +37,49 @@ public class TourGuideFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_tour_guide, container, false);
 
         recyclerViewTours = view.findViewById(R.id.recyclerViewTours);
-
         dbHelper = new MyDatabaseHelper(requireContext());
         sessionManager = new SessionManager(requireContext());
 
         int userId = sessionManager.getUserId();
         int roleId = sessionManager.getUserRoleId();
 
-        Log.d("TourGuideFragment", "User ID: " + userId + " | Role ID: " + roleId);
+        if (userId == -1 || roleId == -1) { // 🚨 Kiểm tra lỗi session
+            Log.e("TourGuideFragment", "⚠ Lỗi: Không lấy được userId hoặc roleId từ SessionManager!");
+            return view;
+        }
 
-        loadTours(userId, roleId);
+        // 🚨 Kiểm tra xem userId có phải là Guide hợp lệ không
+        if (!dbHelper.isUserGuide(userId)) {
+            Log.e("TourGuideFragment", "⚠ Lỗi: User ID " + userId + " không phải là hướng dẫn viên!");
+            return view;
+        }
 
+        Log.d("TourGuideFragment", "📌 User ID: " + userId + " | Role ID: " + roleId);
+
+        loadTours(userId);
         return view;
     }
 
-    private void loadTours(int userId, int roleId) {
-        tourList = dbHelper.getToursByGuide(userId, roleId);
 
-        if (tourList == null) {
-            tourList = new ArrayList<>();
-            Log.e("TourGuideFragment", "Tour list is NULL. Creating an empty list.");
+    private void loadTours(int guideId) {
+        tourList = dbHelper.getToursByGuide(guideId);
+
+        if (tourList.isEmpty()) {
+            Log.e("TourGuideFragment", "Không có tour nào được tìm thấy cho guide ID: " + guideId);
+            return;
         }
 
-
         tourAdapter = new TourAdapter(requireContext(), tourList, tour -> {
-            // ✅ Open GuideListActivity with guide's booked tours
+            Log.d("TourGuideFragment", "📌 Tour ID: " + tour.getId() + " | Guide ID: " + guideId);
+
             Intent intent = new Intent(requireContext(), GuideListActivity.class);
             intent.putExtra("tour_id", tour.getId());
+            intent.putExtra("guide_id", guideId);
             startActivity(intent);
         });
 
         recyclerViewTours.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerViewTours.setAdapter(tourAdapter);
     }
+
 }

@@ -32,6 +32,12 @@
         <!-- Mô tả -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mô tả tour" android:textStyle="bold"/>
         <EditText android:id="@+id/etDescription" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Nhập mô tả tour"/>
+        <Spinner
+            android:id="@+id/spinnerTourGuides"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"/>
+
 
         <!-- Nút lưu -->
         <Button android:id="@+id/btnSave" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Lưu chỉnh sửa" android:layout_marginTop="16dp"/>

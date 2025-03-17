@@ -3,7 +3,8 @@ package com.example.group5_onlinetourbookingsystem.activities;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView; // ✅ Import for noBookingsText
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.R;
-import com.example.group5_onlinetourbookingsystem.adapters.BookingAdapter;
+import com.example.group5_onlinetourbookingsystem.adapters.GuideBookingAdapter;
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.models.BookingModel;
 
@@ -19,58 +20,57 @@ import java.util.ArrayList;
 
 public class GuideListActivity extends AppCompatActivity {
     private RecyclerView recyclerViewBookings;
-    private BookingAdapter bookingAdapter;
+    private GuideBookingAdapter bookingAdapter;
     private MyDatabaseHelper dbHelper;
     private ArrayList<BookingModel> bookingList;
-    private int tourId;
-    private TextView noBookingsText; // ✅ TextView for "No bookings available"
+    private int tourId, guideId;
+    private TextView noBookingsText;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide_list);
 
-        // ✅ Initialize Views Properly
         recyclerViewBookings = findViewById(R.id.recyclerViewBookings);
-        noBookingsText = findViewById(R.id.noBookingsText); // Make sure this ID exists in XML
+        noBookingsText = findViewById(R.id.noBookingsText);
 
         dbHelper = new MyDatabaseHelper(this);
 
         tourId = getIntent().getIntExtra("tour_id", -1);
+        guideId = getIntent().getIntExtra("guide_id", -1);
 
-        if (tourId == -1) {
-            Log.e("GuideListActivity", "Invalid tour_id received!");
+        Log.d("GuideListActivity", "📌 Tour ID: " + tourId + " | Guide ID: " + guideId);
+
+        if (tourId == -1 || guideId == -1) {
+            Log.e("GuideListActivity", "🚨 Invalid tour_id or guide_id received! Exiting...");
+            Toast.makeText(this, "Lỗi: Không thể tải dữ liệu, thử lại sau!", Toast.LENGTH_LONG).show();
             finish();
+            return;
         }
 
-        loadBookingsForTour(tourId);
+        loadBookingsForTour(tourId, guideId);
     }
 
-    private void loadBookingsForTour(int tourId) {
-        bookingList = dbHelper.getBookingsForTour(tourId);
+    private void loadBookingsForTour(int tourId, int guideId) {
+        bookingList = dbHelper.getBookingsForGuideTour(tourId, guideId);
 
-        if (bookingList == null || bookingList.isEmpty()) {
-            Log.e("GuideListActivity", "No bookings found for tour ID: " + tourId);
-            bookingList = new ArrayList<>();
-
-            // ✅ Prevent NullPointerException
-            if (recyclerViewBookings != null) {
-                recyclerViewBookings.setVisibility(View.GONE);
-            }
-            if (noBookingsText != null) {
-                noBookingsText.setVisibility(View.VISIBLE);
-            }
-        } else {
-            if (recyclerViewBookings != null) {
-                recyclerViewBookings.setVisibility(View.VISIBLE);
-            }
-            if (noBookingsText != null) {
-                noBookingsText.setVisibility(View.GONE);
+        // 🔥 Lọc danh sách chỉ lấy Booking có trạng thái "Confirmed"
+        ArrayList<BookingModel> confirmedBookings = new ArrayList<>();
+        for (BookingModel booking : bookingList) {
+            if ("Confirmed".equalsIgnoreCase(booking.getStatus())) {
+                confirmedBookings.add(booking);
             }
         }
 
-        // ✅ Corrected constructor call by passing `dbHelper`
-        bookingAdapter = new BookingAdapter(this, bookingList, dbHelper);
+        if (confirmedBookings.isEmpty()) {
+            recyclerViewBookings.setVisibility(View.GONE);
+            noBookingsText.setVisibility(View.VISIBLE);
+        } else {
+            recyclerViewBookings.setVisibility(View.VISIBLE);
+            noBookingsText.setVisibility(View.GONE);
+        }
+
+        bookingAdapter = new GuideBookingAdapter(this, confirmedBookings);
         recyclerViewBookings.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewBookings.setAdapter(bookingAdapter);
     }

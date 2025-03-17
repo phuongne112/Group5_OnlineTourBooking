@@ -3,6 +3,7 @@ package com.example.group5_onlinetourbookingsystem.activities;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
@@ -24,14 +25,14 @@ import java.util.HashMap;
 public class EditTourActivity extends AppCompatActivity {
 
     private EditText etTourName, etDestination, etPrice, etStartTime, etDescription;
-    private Spinner spinnerCity;
+    private Spinner spinnerCity, spinnerTourGuides;
     private Button btnSave, btnDeleteTour;
     private MyDatabaseHelper dbHelper;
     private int tourId;
     private HashMap<String, Integer> cityMap;
     private ArrayList<String> cityNames;
-    private int selectedCityId;
-
+    private int selectedCityId, selectedGuideId;
+    private ArrayList<Integer> guideIdList, cityIdList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +44,7 @@ public class EditTourActivity extends AppCompatActivity {
         etStartTime = findViewById(R.id.etStartTime);
         etDescription = findViewById(R.id.etDescription);
         spinnerCity = findViewById(R.id.spinnerCity);
+        spinnerTourGuides = findViewById(R.id.spinnerTourGuides);
         btnSave = findViewById(R.id.btnSave);
         btnDeleteTour = findViewById(R.id.btnDeleteTour); // ✅ Nút xóa tour
 
@@ -50,6 +52,7 @@ public class EditTourActivity extends AppCompatActivity {
 
         // 1️⃣ Load danh sách thành phố TRƯỚC khi load dữ liệu tour
         loadCitySpinner();
+        loadTourGuides();
 
         // 2️⃣ Nhận dữ liệu từ Intent và load tour
         Intent intent = getIntent();
@@ -103,7 +106,29 @@ public class EditTourActivity extends AppCompatActivity {
             public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
     }
+    private void loadTourGuides() {
+        ArrayList<String> guideNames = new ArrayList<>();
+        guideIdList = new ArrayList<>();
+        Cursor cursor = dbHelper.getAllTourGuides();
 
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                guideNames.add(name);
+                guideIdList.add(id);
+            }
+            cursor.close();
+        }
+
+        if (guideNames.isEmpty()) {
+            guideNames.add("Không có hướng dẫn viên");
+            guideIdList.add(-1);
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, guideNames);
+        spinnerTourGuides.setAdapter(adapter);
+    }
     private void loadTourData(int id) {
         TourModel tour = dbHelper.getTourById(id);
         if (tour != null) {
@@ -152,7 +177,8 @@ public class EditTourActivity extends AppCompatActivity {
 
             int rowsAffected = db.update("tours", values, "id=?", new String[]{String.valueOf(tourId)});
             db.close();
-
+            // 🟢 Cập nhật Tour Guide trong bảng `tour_guides`
+            dbHelper.updateTourGuide(tourId, selectedGuideId);
             if (rowsAffected > 0) {
                 Toast.makeText(this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
                 finish();

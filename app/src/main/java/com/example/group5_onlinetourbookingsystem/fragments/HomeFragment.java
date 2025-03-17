@@ -1,6 +1,9 @@
 package com.example.group5_onlinetourbookingsystem.fragments;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -12,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -193,7 +197,7 @@ public class HomeFragment extends Fragment {
             databaseHelper.addTour("Tour Phú Quốc", "Phú Quốc", 2, 200.0, 4, "phuquoc_tour", 2, "2025-03-12 09:30:00", "Khám phá hòn đảo ngọc với bãi biển tuyệt đẹp và hải sản tươi ngon.");
             databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 3, 180.0, 3, "hanoi_tour", 3, "2025-03-15 07:45:00", "Trải nghiệm văn hóa, lịch sử thủ đô với 36 phố phường và Hồ Gươm.");
             databaseHelper.addTour("Luxury Hanoi Tour", "Hanoi", 1, 200.0, 3, "hanoi.jpg", 3, "2025-03-15 07:00:00", "Explore the best of Hanoi!", 3);
-
+            databaseHelper.addTour("Luxury Hanoi Tour", "Hanoi", 1, 200.0, 3, "hanoi.jpg", 3, "2025-03-15 07:00:00", "Explore the best of Hanoi!", 4);
         }
     }
     private void checkUserRole() {
