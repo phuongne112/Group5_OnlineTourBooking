@@ -1483,6 +1483,49 @@
             db.close();
         }
 
+        public BookingModel getBookingWithDetails(int bookingId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            BookingModel booking = null;
+
+            String query = "SELECT b.id, b.user_id, b.tour_id, b.booking_date, " +
+                    "b.total_price, b.status, b.adult_count, b.child_count, b.note, " +
+                    "u.name as userName, u.email, u.phone, " +
+                    "t.name as tourName, t.description, t.image as tourImage " +  // 👈 Thêm ảnh tour
+                    "FROM bookings b " +
+                    "JOIN users u ON b.user_id = u.id " +
+                    "JOIN tours t ON b.tour_id = t.id " +
+                    "WHERE b.id = ?";
+
+
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(bookingId)});
+
+            if (cursor.moveToFirst()) {
+                booking = new BookingModel(
+                        cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                        cursor.getInt(cursor.getColumnIndexOrThrow("user_id")),
+                        cursor.getInt(cursor.getColumnIndexOrThrow("tour_id")),
+                        cursor.getInt(cursor.getColumnIndexOrThrow("adult_count")),
+                        cursor.getInt(cursor.getColumnIndexOrThrow("child_count")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("note")),
+                        cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("status")),
+                        "", // paymentStatus (không có trong DB)
+                        "", // time (không có trong DB)
+                        cursor.getString(cursor.getColumnIndexOrThrow("booking_date"))
+                );
+
+                booking.setName(cursor.getString(cursor.getColumnIndexOrThrow("userName")));
+                booking.setTourImage(cursor.getString(cursor.getColumnIndexOrThrow("tourImage")));
+                booking.setUserEmail(cursor.getString(cursor.getColumnIndexOrThrow("email")));
+                booking.setUserPhone(cursor.getString(cursor.getColumnIndexOrThrow("phone")));
+                booking.setTourName(cursor.getString(cursor.getColumnIndexOrThrow("tourName")));
+                booking.setTourDesc(cursor.getString(cursor.getColumnIndexOrThrow("description")));
+            }
+
+            cursor.close();
+            db.close();
+            return booking;
+        }
 
     }
 
