@@ -21,6 +21,7 @@ import com.example.group5_onlinetourbookingsystem.activities.ForgotPasswordActiv
 import com.example.group5_onlinetourbookingsystem.activities.ManageAccountActivity;
 import com.example.group5_onlinetourbookingsystem.activities.ManageCategoryActivity;
 import com.example.group5_onlinetourbookingsystem.activities.ManageCityActivity;
+import com.example.group5_onlinetourbookingsystem.activities.ManageTourGuideWishListActivity;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -79,6 +80,12 @@ public class StatisticsFragment extends Fragment {
             Intent intent = new Intent(getActivity(), ManageCategoryActivity.class);
             startActivity(intent);
         });
+        View layoutTourGuide = view.findViewById(R.id.layoutTourGuide);
+        layoutTourGuide.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), ManageTourGuideWishListActivity.class);
+            startActivity(intent);
+        });
+
     }
 
 

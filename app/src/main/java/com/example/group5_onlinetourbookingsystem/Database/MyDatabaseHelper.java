@@ -255,6 +255,15 @@
                     COLUMN_HELP_QUESTION + " TEXT, " +
                     COLUMN_HELP_ANSWER + " TEXT, " +
                     "FOREIGN KEY(" + COLUMN_HELP_USER_ID + ") REFERENCES users(id))");
+            String createWishlistTable = "CREATE TABLE IF NOT EXISTS wishlist (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "guide_id INTEGER, " +
+                    "tour_id INTEGER, " +
+                    "apply_status TEXT DEFAULT 'Pending'," +
+                    "FOREIGN KEY(guide_id) REFERENCES users(id), " +
+                    "FOREIGN KEY(tour_id) REFERENCES tours(id))";
+            db.execSQL(createWishlistTable);
+
 
         }
 
@@ -1537,6 +1546,83 @@
             db.close();
             return booking;
         }
+        public List<BookingModel> getCompletedBookingsForGuide(int guideId) {
+            List<BookingModel> list = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT b.*, u.name AS user_name, t.name AS tour_name, " +
+                    "p.status AS payment_status " +
+                    "FROM bookings b " +
+                    "JOIN tours t ON b.tour_id = t.id " +
+                    "JOIN users u ON b.user_id = u.id " +
+                    "JOIN tour_guides tg ON tg.tour_id = t.id " +
+                    "JOIN payments p ON p.booking_id = b.id " +
+                    "WHERE tg.guide_id = ? AND p.status = 'Completed'";
+
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(guideId)});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    BookingModel booking = new BookingModel(); // cần constructor rỗng
+                    booking.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                    booking.setTourId(cursor.getInt(cursor.getColumnIndexOrThrow("tour_id")));
+                    booking.setTourName(cursor.getString(cursor.getColumnIndexOrThrow("tour_name")));
+                    booking.setName(cursor.getString(cursor.getColumnIndexOrThrow("user_name")));
+                    booking.setAdultCount(cursor.getInt(cursor.getColumnIndexOrThrow("adult_count")));
+                    booking.setChildCount(cursor.getInt(cursor.getColumnIndexOrThrow("child_count")));
+                    booking.setPaymentStatus(cursor.getString(cursor.getColumnIndexOrThrow("payment_status")));
+                    list.add(booking);
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return list;
+        }
+        public List<BookingModel> getAllTourGuideWishlists() {
+            List<BookingModel> wishlist = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT w.tour_id, t.name AS tourName, u.name AS guideName, w.apply_status " +
+                    "FROM wishlist w " +
+                    "JOIN users u ON w.guide_id = u.id " +
+                    "JOIN tours t ON w.tour_id = t.id";
+
+            Cursor cursor = db.rawQuery(query, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    BookingModel booking = new BookingModel();
+                    booking.setTourId(cursor.getInt(cursor.getColumnIndexOrThrow("tour_id")));
+                    booking.setTourName(cursor.getString(cursor.getColumnIndexOrThrow("tourName")));
+                    booking.setName(cursor.getString(cursor.getColumnIndexOrThrow("guideName")));
+                    booking.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("apply_status"))); // reuse status field for apply status
+                    wishlist.add(booking);
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+
+            return wishlist;
+        }
+        public boolean updateApplyStatus(int tourId, int guideId, String newStatus) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("apply_status", newStatus);
+
+            int rowsAffected = db.update("wishlist", values,
+                    "tour_id = ? AND guide_id = ?",
+                    new String[]{String.valueOf(tourId), String.valueOf(guideId)});
+
+            db.close();
+            return rowsAffected > 0;
+        }
+
+
+
+
+
 
     }
 

@@ -1,7 +1,6 @@
 package com.example.group5_onlinetourbookingsystem.activities;
 
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -19,13 +18,11 @@ public class TourGuideDashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tour_guide_dashboard);
 
         BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigation);
-        View fragmentContainer = findViewById(R.id.fragmentContainer);
 
         // ✅ Load TourGuideFragment as the default fragment when activity starts
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new TourGuideFragment())
-                    .commit();
+            loadFragment(new TourGuideFragment());
+            bottomNavigation.setSelectedItemId(R.id.nav_tourguide); // optional: highlight default
         }
 
         bottomNavigation.setOnItemSelectedListener(item -> {
@@ -45,5 +42,12 @@ public class TourGuideDashboardActivity extends AppCompatActivity {
             }
             return true;
         });
+
+    }
+
+    private void loadFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, fragment)
+                .commit();
     }
 }

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Tên tour -->
+        <TextView
+            android:id="@+id/tvTourName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tên Tour"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="#000000"/>
+
+        <!-- Người đặt -->
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvTourName"
+            android:layout_marginTop="4dp"
+            android:text="Người đặt: "
+            android:textSize="14sp" />
+
+        <!-- Người lớn -->
+        <TextView
+            android:id="@+id/tvAdults"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvUserName"
+            android:layout_marginTop="4dp"
+            android:text="Người lớn: "
+            android:textSize="14sp" />
+
+        <!-- Trẻ em -->
+        <TextView
+            android:id="@+id/tvChildren"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvAdults"
+            android:layout_marginTop="4dp"
+            android:text="Trẻ em: "
+            android:textSize="14sp" />
+
+        <!-- Apply Status -->
+        <TextView
+            android:id="@+id/tvApplyStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvChildren"
+            android:layout_marginTop="8dp"
+            android:text="Apply Status"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+
+        <!-- Nút yêu thích -->
+        <ImageButton
+            android:id="@+id/btnAddToWishlist"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_favorite_border"
+            android:contentDescription="Thêm vào wishlist"
+            app:tint="#FF4081" />
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

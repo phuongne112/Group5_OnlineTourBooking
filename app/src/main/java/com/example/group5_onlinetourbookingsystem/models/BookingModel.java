@@ -23,6 +23,20 @@ public class BookingModel implements Serializable {
     private String tourName;
     private String tourDesc;
 
+    // ✅ Thêm trạng thái yêu thích
+    private boolean isFavorite;
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    // ✅ Constructor mặc định để hỗ trợ SQLite và object creation không tham số
+    public BookingModel() {}
+
     // ✅ Constructor đơn giản (ví dụ hiển thị tên, thời gian)
     public BookingModel(String name, String time, String date) {
         this.name = name;
@@ -62,6 +76,15 @@ public class BookingModel implements Serializable {
         this(0, userId, tourId, adultCount, childCount, note, totalPrice, status, paymentStatus, time, date);
     }
 
+    // ✅ Constructor đơn giản cho TourGuideBookingAdapter
+    public BookingModel(int tourId, String tourName, String name, int adultCount, int childCount) {
+        this.tourId = tourId;
+        this.tourName = tourName;
+        this.name = name;
+        this.adultCount = adultCount;
+        this.childCount = childCount;
+    }
+
     // ✅ Getter
     public int getId() { return id; }
     public int getUserId() { return userId; }
@@ -75,7 +98,6 @@ public class BookingModel implements Serializable {
     public String getTime() { return time; }
     public String getDate() { return date; }
     public String getName() { return name; }
-
     public String getUserEmail() { return userEmail; }
     public String getUserPhone() { return userPhone; }
     public String getTourName() { return tourName; }
@@ -95,10 +117,9 @@ public class BookingModel implements Serializable {
     public void setTime(String time) { this.time = time; }
     public void setDate(String date) { this.date = date; }
     public void setName(String name) { this.name = name; }
-
     public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
     public void setUserPhone(String userPhone) { this.userPhone = userPhone; }
-    public void setTourName(String tourName) { this.tourName = tourName; } // ✅ Đảm bảo setter này được dùng
+    public void setTourName(String tourName) { this.tourName = tourName; }
     public void setTourDesc(String tourDesc) { this.tourDesc = tourDesc; }
     public void setTourImage(String tourImage) { this.tourImage = tourImage; }
 }

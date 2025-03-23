@@ -20,6 +20,12 @@
         android:theme="@style/Theme.Group5_OnlineTourBookingSystem"
         tools:targetApi="31">
         <activity
+            android:name=".activities.ManageTourGuideWishListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.MyWishlistActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.BookingDetailActivity"
             android:exported="false" />
         <activity

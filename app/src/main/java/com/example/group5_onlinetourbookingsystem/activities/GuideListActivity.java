@@ -48,13 +48,16 @@ public class GuideListActivity extends AppCompatActivity {
             return;
         }
 
-        loadBookingsForTour(tourId, guideId);
+        loadConfirmedBookings(tourId, guideId);
     }
 
-    private void loadBookingsForTour(int tourId, int guideId) {
+    private void loadConfirmedBookings(int tourId, int guideId) {
         bookingList = dbHelper.getBookingsForGuideTour(tourId, guideId);
 
-        // 🔥 Lọc danh sách chỉ lấy Booking có trạng thái "Confirmed"
+        if (bookingList == null) {
+            bookingList = new ArrayList<>();
+        }
+
         ArrayList<BookingModel> confirmedBookings = new ArrayList<>();
         for (BookingModel booking : bookingList) {
             if ("Confirmed".equalsIgnoreCase(booking.getStatus())) {
@@ -68,10 +71,10 @@ public class GuideListActivity extends AppCompatActivity {
         } else {
             recyclerViewBookings.setVisibility(View.VISIBLE);
             noBookingsText.setVisibility(View.GONE);
-        }
 
-        bookingAdapter = new GuideBookingAdapter(this, confirmedBookings);
-        recyclerViewBookings.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewBookings.setAdapter(bookingAdapter);
+            bookingAdapter = new GuideBookingAdapter(this, confirmedBookings);
+            recyclerViewBookings.setLayoutManager(new LinearLayoutManager(this));
+            recyclerViewBookings.setAdapter(bookingAdapter);
+        }
     }
 }

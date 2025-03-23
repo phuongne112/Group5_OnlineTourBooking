@@ -12,5 +12,11 @@
 
     <string name="language_label" translatable="false">Chọn Ngôn Ngữ:</string>
     <string name="save_button" translatable="false">Lưu Cài Đặt</string>
+    <string-array name="apply_status_options">
+        <item>Pending</item>
+        <item>Approved</item>
+        <item>Rejected</item>
+    </string-array>
+
 
 </resources>

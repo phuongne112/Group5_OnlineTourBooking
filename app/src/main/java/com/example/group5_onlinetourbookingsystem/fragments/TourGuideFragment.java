@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,10 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.activities.GuideListActivity;
+import com.example.group5_onlinetourbookingsystem.activities.MyWishlistActivity;
 import com.example.group5_onlinetourbookingsystem.adapters.TourAdapter;
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.models.TourModel;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
+import com.example.group5_onlinetourbookingsystem.adapters.TourGuideBookingAdapter;
+import com.example.group5_onlinetourbookingsystem.models.BookingModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -28,6 +33,9 @@ public class TourGuideFragment extends Fragment {
     private MyDatabaseHelper dbHelper;
     private ArrayList<TourModel> tourList;
     private SessionManager sessionManager;
+
+    private TourGuideBookingAdapter bookingAdapter;
+    private ArrayList<BookingModel> bookingList;
 
     public TourGuideFragment() {}
 
@@ -43,20 +51,33 @@ public class TourGuideFragment extends Fragment {
         int userId = sessionManager.getUserId();
         int roleId = sessionManager.getUserRoleId();
 
-        if (userId == -1 || roleId == -1) { // 🚨 Kiểm tra lỗi session
+        if (userId == -1 || roleId == -1) {
             Log.e("TourGuideFragment", "⚠ Lỗi: Không lấy được userId hoặc roleId từ SessionManager!");
             return view;
         }
 
-        // 🚨 Kiểm tra xem userId có phải là Guide hợp lệ không
         if (!dbHelper.isUserGuide(userId)) {
-            Log.e("TourGuideFragment", "⚠ Lỗi: User ID " + userId + " không phải là hướng dẫn viên!");
-            return view;
+            Log.w("TourGuideFragment", "⚠ User ID " + userId + " chưa là hướng dẫn viên. Đang tự gán...");
+
+            ArrayList<TourModel> availableTours = dbHelper.getAllTours();
+            if (!availableTours.isEmpty()) {
+                int tourId = availableTours.get(0).getId();
+                dbHelper.assignUserToTourGuide(tourId, userId);
+            } else {
+                Log.e("TourGuideFragment", "❌ Không có tour nào để gán hướng dẫn viên!");
+                return view;
+            }
         }
 
-        Log.d("TourGuideFragment", "📌 User ID: " + userId + " | Role ID: " + roleId);
+        // 👉 Thêm xử lý sự kiện FloatingActionButton
+        FloatingActionButton fabWishlist = view.findViewById(R.id.fabWishlist);
+        fabWishlist.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), MyWishlistActivity.class);
+            intent.putExtra("guide_id", userId); // Truyền guide ID
+            startActivity(intent);
+        });
 
-        loadTours(userId);
+        loadBookingsForGuide(userId);
         return view;
     }
 
@@ -82,4 +103,35 @@ public class TourGuideFragment extends Fragment {
         recyclerViewTours.setAdapter(tourAdapter);
     }
 
+    private void loadBookingsForGuide(int guideId) {
+        bookingList = (ArrayList<BookingModel>) dbHelper.getCompletedBookingsForGuide(guideId);
+
+        Log.d("TourGuideFragment", "📌 Số lượng booking có trạng thái COMPLETED: " + bookingList.size());
+
+        if (bookingList.isEmpty()) {
+            Log.e("TourGuideFragment", "❌ Không có booking nào có trạng thái COMPLETED.");
+            return;
+        }
+
+        for (BookingModel booking : bookingList) {
+            Log.d("TourGuideFragment", "📌 Tour: " + booking.getTourName()
+                    + ", User: " + booking.getName()
+                    + ", Adults: " + booking.getAdultCount()
+                    + ", Children: " + booking.getChildCount());
+        }
+
+        bookingAdapter = new TourGuideBookingAdapter(requireContext(), bookingList, (booking, isFavorite) -> {
+            if (isFavorite) {
+                dbHelper.addToFavorites(guideId, booking.getTourId());
+                Toast.makeText(requireContext(), "✅ Đã thêm vào wishlist thành công", Toast.LENGTH_SHORT).show();
+            } else {
+                dbHelper.removeFromFavorites(guideId, booking.getTourId());
+                Toast.makeText(requireContext(), "❌ Đã xóa khỏi wishlist", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        recyclerViewTours.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerViewTours.setAdapter(bookingAdapter);
+    }
 }
