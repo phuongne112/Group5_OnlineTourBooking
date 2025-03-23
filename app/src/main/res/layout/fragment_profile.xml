@@ -33,7 +33,7 @@
                 android:src="@drawable/user_1"
                 android:scaleType="centerCrop"
                 android:background="@drawable/circle_background"
-                android:layout_marginEnd="12dp"/>
+                android:layout_marginEnd="12dp" />
 
             <!-- Tên người dùng -->
             <TextView
@@ -44,7 +44,7 @@
                 android:text="Hello Guest"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <!-- Nút Đăng nhập -->
             <Button
@@ -56,7 +56,7 @@
                 android:textColor="@color/white"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="8dp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <!-- Nút Đăng xuất -->
             <Button
@@ -68,7 +68,7 @@
                 android:textColor="@color/white"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="8dp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -82,14 +82,13 @@
         android:textStyle="bold"
         android:textColor="@android:color/holo_blue_dark"
         android:gravity="center"
-        android:padding="16dp"/>
+        android:padding="16dp" />
 
-    <!-- Đường kẻ phân cách -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp" />
 
     <!-- Danh sách các mục cài đặt -->
     <LinearLayout
@@ -112,13 +111,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="User Profile"
-                android:textSize="18sp"/>
+                android:textSize="18sp" />
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@android:color/darker_gray"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp" />
 
         <!-- Mục Contact -->
         <LinearLayout
@@ -135,13 +135,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Contact Us"
-                android:textSize="18sp"/>
+                android:textSize="18sp" />
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@android:color/darker_gray"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp" />
 
         <!-- Mục Legal -->
         <LinearLayout
@@ -158,13 +159,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Legal"
-                android:textSize="18sp"/>
+                android:textSize="18sp" />
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@android:color/darker_gray"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp" />
 
         <!-- Mục Change Password -->
         <LinearLayout
@@ -181,19 +183,18 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Change Password"
-                android:textSize="18sp"/>
-
+                android:textSize="18sp" />
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@android:color/darker_gray"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp" />
 
-
-        <!-- Mục App Settings -->
+        <!-- Mục Help Center -->
         <LinearLayout
-            android:id="@+id/appSettings"
+            android:id="@+id/helpCenter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -205,36 +206,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="App Settings"
-                android:textSize="18sp"/>
+                android:text="Help Center"
+                android:textSize="18sp" />
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@android:color/darker_gray"
-            android:layout_marginBottom="8dp"/>
-
+            android:layout_marginBottom="8dp" />
     </LinearLayout>
-    <LinearLayout
-        android:id="@+id/helpCenter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Help Center"
-            android:textSize="18sp"/>
-    </LinearLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
-        android:layout_marginBottom="8dp"/>
-
 </LinearLayout>

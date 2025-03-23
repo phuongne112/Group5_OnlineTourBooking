@@ -1,0 +1,24 @@
+			      📜 Legal Disclaimer
+Last updated: [March 23, 2025]
+
+This travel booking application (“App”) is provided by [Your Company Name] to help users search, view, and book travel tours and related services.
+
+By using this App, you agree to the following terms:
+
+1. Service Accuracy
+We strive to provide up-to-date and accurate information about available tours, prices, and schedules. However, we do not guarantee that all information is error-free, and details may be changed or updated by tour providers at any time without prior notice.
+
+2. User Responsibility
+Users are responsible for providing accurate personal information when making bookings. Any errors or issues resulting from incorrect information are the user’s responsibility.
+
+3. Booking and Payments
+All bookings are subject to availability. Payments (if processed through the app) are final unless otherwise stated in our refund policy.
+
+4. Third-party Services
+Some tours or services may be operated by third-party providers. We are not responsible for the quality or safety of those services. Any complaints or issues should be directed to the service provider.
+
+5. Privacy
+We respect your privacy and collect only necessary information to provide services. Your data will not be shared with third parties without your consent, except as required by law.
+
+6. Changes to Terms
+We may update this legal disclaimer from time to time. Continued use of the app means you accept these changes.
