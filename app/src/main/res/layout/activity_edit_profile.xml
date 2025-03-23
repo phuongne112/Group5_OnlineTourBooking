@@ -22,6 +22,7 @@
             android:gravity="center">
 
             <!-- Ảnh đại diện -->
+
             <ImageView
                 android:id="@+id/imgUserProfile"
                 android:layout_width="120dp"

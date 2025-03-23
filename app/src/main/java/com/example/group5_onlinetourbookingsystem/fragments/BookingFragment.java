@@ -6,113 +6,107 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
+import com.example.group5_onlinetourbookingsystem.adapters.UserBookingAdapter;
+import com.example.group5_onlinetourbookingsystem.models.BookingModel;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 
-public class BookingFragment extends Fragment {
-    private SessionManager sessionManager;
-    private ListView listViewBookings;
-    private MyDatabaseHelper dbHelper;
-    private TextView tvNoBooking;
+import java.util.ArrayList;
+import java.util.List;
 
-    public BookingFragment() {
-        // Required empty public constructor
-    }
+public class BookingFragment extends Fragment {
+    private RecyclerView recyclerViewUserBookings;
+    private TextView tvNoBooking;
+    private MyDatabaseHelper dbHelper;
+    private SessionManager sessionManager;
+    private List<BookingModel> bookingList;
+    private UserBookingAdapter userBookingAdapter;
+
+    public BookingFragment() {}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_booking, container, false);
 
-        listViewBookings = view.findViewById(R.id.listViewBookings);
+        recyclerViewUserBookings = view.findViewById(R.id.recyclerViewUserBookings);
         tvNoBooking = view.findViewById(R.id.tvNoBooking);
-        dbHelper = new MyDatabaseHelper(getContext());
+
+        dbHelper = new MyDatabaseHelper(requireContext());
         sessionManager = new SessionManager(requireContext());
 
-        int userId = sessionManager.getUserId();
+        bookingList = new ArrayList<>();
+        userBookingAdapter = new UserBookingAdapter(requireContext(), bookingList);
 
+        recyclerViewUserBookings.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewUserBookings.setAdapter(userBookingAdapter);
+
+        int userId = sessionManager.getUserId();
         if (userId == -1) {
             Log.e("BookingFragment", "Không tìm thấy ID người dùng!");
-            tvNoBooking.setVisibility(View.VISIBLE);
-            listViewBookings.setVisibility(View.GONE);
+            showEmptyView(true);
         } else {
             loadUserBookings(userId);
         }
-
-        listViewBookings.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                String status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
-                String tourName = cursor.getString(cursor.getColumnIndexOrThrow("tour_name"));
-                Toast.makeText(getContext(), "Tour: " + tourName + "\nTrạng thái: " + status, Toast.LENGTH_SHORT).show();
-            }
-        });
 
         return view;
     }
 
     private void loadUserBookings(int userId) {
-        Cursor cursor = dbHelper.getUserBookings(userId);
+        bookingList.clear();
+        Cursor cursor;
+
+        boolean isAdmin = sessionManager.getUserRoleId() == 2;
+
+        if (isAdmin) {
+            cursor = dbHelper.getUserBookingsWithPayment(userId);
+        } else {
+            cursor = dbHelper.getUserBookings(userId);
+        }
 
         if (cursor != null && cursor.getCount() > 0) {
-            String[] from = {"tour_name", "status", "booking_date"};
-            int[] to = {R.id.tvTourName, R.id.tvStatus, R.id.tvBookingDate};
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+                String tourName = cursor.getString(cursor.getColumnIndexOrThrow("tour_name"));
+                String bookingDate = cursor.getString(cursor.getColumnIndexOrThrow("booking_date"));
+                String bookingStatus = cursor.getString(cursor.getColumnIndexOrThrow("status"));
+                double totalPrice = cursor.getDouble(cursor.getColumnIndexOrThrow("total_price"));
 
-            SimpleCursorAdapter adapter = new SimpleCursorAdapter(
-                    getContext(),
-                    R.layout.list_item_booking,
-                    cursor,
-                    from,
-                    to,
-                    0);
-
-            // Custom ViewBinder để set màu và icon
-            adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-                @Override
-                public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                    if (view.getId() == R.id.tvStatus) {
-                        String status = cursor.getString(columnIndex);
-                        TextView tvStatus = (TextView) view;
-                        tvStatus.setText(status);
-
-                        ImageView imgStatus = ((ViewGroup) view.getParent()).findViewById(R.id.imgStatusIcon);
-
-                        if (status.equalsIgnoreCase("Pending")) {
-                            tvStatus.setTextColor(getResources().getColor(android.R.color.holo_orange_light));
-                            imgStatus.setImageResource(R.drawable.ic_pending); // icon chờ duyệt
-                        } else if (status.equalsIgnoreCase("Confirmed")) {
-                            tvStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-                            imgStatus.setImageResource(R.drawable.ic_approved); // icon đã duyệt
-                        } else if (status.equalsIgnoreCase("Cancel")) {
-                            tvStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-                            imgStatus.setImageResource(R.drawable.ic_cancel); // icon hủy
-                        } else {
-                            tvStatus.setTextColor(getResources().getColor(android.R.color.black));
-                            imgStatus.setImageResource(R.drawable.ic_default); // icon mặc định
-                        }
-                        return true;
-                    }
-                    return false;
+                if (totalPrice == 0) {
+                    continue; // Bỏ qua tour có giá 0
                 }
-            });
+                int adultCountIndex = cursor.getColumnIndex("adult_count");
+                int adultCount = adultCountIndex != -1 ? cursor.getInt(adultCountIndex) : 0;
 
-            listViewBookings.setAdapter(adapter);
-            listViewBookings.setVisibility(View.VISIBLE);
-            tvNoBooking.setVisibility(View.GONE);
+                String paymentStatus = "";
+
+                if (isAdmin) {
+                    paymentStatus = cursor.getString(cursor.getColumnIndexOrThrow("payment_status"));
+                }
+
+                BookingModel booking = new BookingModel(id, adultCount, 0, 0, 0, "", totalPrice, bookingStatus, paymentStatus, "", bookingDate);
+                booking.setTourName(tourName);
+                booking.setAdultCount(adultCount);
+
+                bookingList.add(booking);
+            }
+            cursor.close();
+            showEmptyView(false);
         } else {
-            listViewBookings.setVisibility(View.GONE);
-            tvNoBooking.setVisibility(View.VISIBLE);
+            showEmptyView(true);
         }
+
+        userBookingAdapter.notifyDataSetChanged();
+    }
+
+    private void showEmptyView(boolean isEmpty) {
+        tvNoBooking.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        recyclerViewUserBookings.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
     }
 }

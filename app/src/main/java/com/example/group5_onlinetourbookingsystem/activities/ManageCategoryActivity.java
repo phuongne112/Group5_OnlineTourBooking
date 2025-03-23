@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
@@ -35,13 +35,15 @@ public class ManageCategoryActivity extends AppCompatActivity {
         dbHelper = new MyDatabaseHelper(this);
 
         categoryList = dbHelper.getAllCategories();
+
         categoryAdapter = new CategoryAdapter(this, categoryList, category -> {
             Intent intent = new Intent(this, EditCategoryActivity.class);
             intent.putExtra("CATEGORY_ID", category.getId());
             startActivity(intent);
         });
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // ✅ Sửa ở đây: dùng GridLayoutManager với 2 cột
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerView.setAdapter(categoryAdapter);
 
         btnAddCategory.setOnClickListener(v -> {

@@ -3,6 +3,7 @@ package com.example.group5_onlinetourbookingsystem.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -61,7 +62,7 @@ public class UserProfileActivity extends AppCompatActivity {
         // Chỉnh sửa hồ sơ
         btnEditProfile.setOnClickListener(v -> {
             Intent intent = new Intent(UserProfileActivity.this, EditProfileActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, 200);
         });
 
         // Đăng xuất
@@ -80,10 +81,12 @@ public class UserProfileActivity extends AppCompatActivity {
             tvUserPhone.setText(user.getPhone());
             tvUserBirth.setText(user.getBirthDate());
 
+            Log.d("Database", "Loaded user image path: " + user.getImage());
             // Kiểm tra ảnh từ database
             if (user.getImage() != null && !user.getImage().isEmpty()) {
                 userImagePath = user.getImage();
 
+                Log.d("ImagePath", "Before Glide load: " + userImagePath);
                 if (userImagePath.startsWith("content://")) {
                     Glide.with(this)
                             .load(Uri.parse(userImagePath))
@@ -100,6 +103,14 @@ public class UserProfileActivity extends AppCompatActivity {
             } else {
                 imgUserProfile.setImageResource(R.drawable.ic_user_placeholder);
             }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 200 && resultCode == RESULT_OK) {
+            loadUserProfile(userId);
         }
     }
 

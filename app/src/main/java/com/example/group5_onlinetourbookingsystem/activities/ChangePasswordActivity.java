@@ -28,6 +28,13 @@ public class ChangePasswordActivity extends AppCompatActivity {
         dbHelper = new MyDatabaseHelper(this);
         sessionManager = new SessionManager(this);
 
+        // ✅ Kiểm tra trạng thái đăng nhập
+        if (!sessionManager.isLoggedIn()) {
+            Toast.makeText(this, "Vui lòng đăng nhập để thay đổi mật khẩu!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         edtOldPassword = findViewById(R.id.edtOldPassword);
         edtNewPassword = findViewById(R.id.edtNewPassword);
         edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
@@ -35,6 +42,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         btnChangePassword.setOnClickListener(v -> changePassword());
     }
+
 
     private void changePassword() {
         String oldPassword = edtOldPassword.getText().toString().trim();

@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="220dp"
             android:scaleType="centerCrop"
-            android:background="@drawable/image_placeholder"
+            android:background="@drawable/tour_image_placeholder"
             android:contentDescription="@string/tour_image"
             android:layout_marginBottom="12dp"
             android:clipToOutline="true"

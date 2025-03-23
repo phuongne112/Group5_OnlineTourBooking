@@ -20,7 +20,6 @@ import com.example.group5_onlinetourbookingsystem.activities.ContactUsActivity;
 import com.example.group5_onlinetourbookingsystem.activities.HelpCenterActivity;
 import com.example.group5_onlinetourbookingsystem.activities.HomePage;
 import com.example.group5_onlinetourbookingsystem.activities.LegalActivity;
-import com.example.group5_onlinetourbookingsystem.activities.SettingsActivity;
 import com.example.group5_onlinetourbookingsystem.activities.UserProfileActivity;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 
@@ -29,7 +28,7 @@ public class ProfileFragment extends Fragment {
     private TextView textViewUserName;
 
     public ProfileFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
@@ -44,11 +43,9 @@ public class ProfileFragment extends Fragment {
         Button btnLogin = view.findViewById(R.id.btnLogin);
         Button btnLogout = view.findViewById(R.id.btnLogout);
 
-        // Kiểm tra trạng thái đăng nhập
         if (sessionManager.isLoggedIn()) {
             String email = sessionManager.getUserName();
-            String displayName = email.split("@")[0]; // Lấy phần trước dấu '@'
-
+            String displayName = email.split("@")[0];
             textViewUserName.setText("Hello " + displayName);
             btnLogout.setVisibility(View.VISIBLE);
             btnLogin.setVisibility(View.GONE);
@@ -58,12 +55,10 @@ public class ProfileFragment extends Fragment {
             btnLogin.setVisibility(View.VISIBLE);
         }
 
-        // Xử lý đăng nhập
         btnLogin.setOnClickListener(v -> {
             startActivity(new Intent(requireActivity(), MainActivity.class));
         });
 
-        // Xử lý đăng xuất
         btnLogout.setOnClickListener(v -> {
             sessionManager.logoutUser();
             Intent intent = new Intent(requireActivity(), HomePage.class);
@@ -72,26 +67,30 @@ public class ProfileFragment extends Fragment {
             requireActivity().finish();
         });
 
-        // Lấy từng mục từ XML
         LinearLayout userProfile = view.findViewById(R.id.userProfile);
         LinearLayout contactUs = view.findViewById(R.id.contactUs);
         LinearLayout legal = view.findViewById(R.id.legal);
         LinearLayout changePassword = view.findViewById(R.id.changePassword);
-        LinearLayout appSettings = view.findViewById(R.id.appSettings);
-        LinearLayout helpCenter = view.findViewById(R.id.helpCenter); // Add Help Center option
 
-        // Xử lý sự kiện nhấn từng mục
+        LinearLayout helpCenter = view.findViewById(R.id.helpCenter);
+
         userProfile.setOnClickListener(v -> openActivity(UserProfileActivity.class));
         contactUs.setOnClickListener(v -> openActivity(ContactUsActivity.class));
         legal.setOnClickListener(v -> openActivity(LegalActivity.class));
-        changePassword.setOnClickListener(v -> openActivity(ChangePasswordActivity.class));
-        appSettings.setOnClickListener(v -> openActivity(SettingsActivity.class));
-        helpCenter.setOnClickListener(v -> openActivity(HelpCenterActivity.class)); // Handle Help Center click
+
+        helpCenter.setOnClickListener(v -> openActivity(HelpCenterActivity.class));
+
+
+        if (sessionManager.getUserRoleId() == 2) {
+            changePassword.setVisibility(View.GONE);
+        } else {
+            changePassword.setVisibility(View.VISIBLE);
+            changePassword.setOnClickListener(v -> openActivity(ChangePasswordActivity.class));
+        }
 
         return view;
     }
 
-    // Phương thức giúp mở Activity
     private void openActivity(Class<?> activityClass) {
         if (getContext() != null) {
             startActivity(new Intent(getContext(), activityClass));

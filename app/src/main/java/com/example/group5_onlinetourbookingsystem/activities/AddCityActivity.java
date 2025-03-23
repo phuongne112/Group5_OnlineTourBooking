@@ -1,6 +1,7 @@
 package com.example.group5_onlinetourbookingsystem.activities;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Button;
@@ -47,6 +48,7 @@ public class AddCityActivity extends AppCompatActivity {
 
         if (result > 0) {
             Toast.makeText(this, "Thêm thành phố thành công!", Toast.LENGTH_SHORT).show();
+            setResult(RESULT_OK); // Báo hiệu rằng dữ liệu đã được thêm thành công
             finish(); // Quay lại màn hình trước đó
         } else {
             Toast.makeText(this, "Thêm thất bại!", Toast.LENGTH_SHORT).show();

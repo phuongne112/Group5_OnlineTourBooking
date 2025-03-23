@@ -55,4 +55,13 @@ public class ManageCityActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Load lại danh sách thành phố
+        cityList.clear();
+        cityList.addAll(dbHelper.getAllCitiesAdmin());
+        cityAdapter.notifyDataSetChanged();
+    }
+
 }
