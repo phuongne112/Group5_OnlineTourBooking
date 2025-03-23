@@ -23,27 +23,32 @@ public class ContactUsActivity extends AppCompatActivity {
 
         sessionManager = new SessionManager(this);
 
+        // ✅ Kiểm tra nếu chưa đăng nhập
+        if (!sessionManager.isLoggedIn()) {
+            Toast.makeText(this, "Please login to contact us!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         editTextName = findViewById(R.id.editTextName);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextSubject = findViewById(R.id.editTextSubject);
         editTextMessage = findViewById(R.id.editTextMessage);
         sendButton = findViewById(R.id.buttonSendMessage);
 
-        // Get user data
-        String name = sessionManager.getUserName(); // Example function to get name
-        String email = sessionManager.getUserEmail(); // Example function to get email
+        // Lấy thông tin người dùng từ session
+        String name = sessionManager.getUserName();
+        String email = sessionManager.getUserEmail();
 
-        // Set user data to EditText fields
+        // Hiển thị vào ô input
         editTextName.setText(name);
         editTextEmail.setText(email);
-
-        // Disable editing for name and email fields
         editTextName.setEnabled(false);
         editTextEmail.setEnabled(false);
 
-        // Send message on button click
         sendButton.setOnClickListener(v -> sendMessage());
     }
+
 
     private void sendMessage() {
         String subject = editTextSubject.getText().toString().trim();

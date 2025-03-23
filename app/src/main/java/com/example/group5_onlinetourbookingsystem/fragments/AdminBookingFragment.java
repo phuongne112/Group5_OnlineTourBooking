@@ -5,11 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +17,6 @@ import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.adapters.BookingAdapter;
 import com.example.group5_onlinetourbookingsystem.models.BookingModel;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +35,13 @@ public class AdminBookingFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_admin_booking, container, false);
 
         recyclerViewBookings = view.findViewById(R.id.recyclerViewBookings);
-
         tvNoAdminBooking = view.findViewById(R.id.tvNoAdminBooking);
         dbHelper = new MyDatabaseHelper(requireContext());
 
         recyclerViewBookings.setLayoutManager(new LinearLayoutManager(getContext()));
-        bookingAdapter = new BookingAdapter(getContext(), bookingList, dbHelper);
+
+        // ✅ Truyền true để đánh dấu đây là admin
+        bookingAdapter = new BookingAdapter(getContext(), bookingList, dbHelper, true);
         recyclerViewBookings.setAdapter(bookingAdapter);
 
         loadBookings();
@@ -71,8 +67,8 @@ public class AdminBookingFragment extends Fragment {
             String paymentStatus = cursor.getString(cursor.getColumnIndexOrThrow("payment_status"));
 
             bookingList.add(new BookingModel(bookingId, 0, 0, 0, 0, tourName, totalPrice, bookingStatus, paymentStatus, "", bookingDate));
-
         }
+
         cursor.close();
         bookingAdapter.notifyDataSetChanged();
     }

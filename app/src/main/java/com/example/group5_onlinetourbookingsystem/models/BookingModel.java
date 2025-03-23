@@ -10,28 +10,27 @@ public class BookingModel implements Serializable {
     private int childCount;
     private String note;
     private double totalPrice;
-    private String status; // "Pending", "Confirmed", "Canceled", "Completed"
-    private String paymentStatus; // "Pending", "Completed", "Failed"
+    private String status;
+    private String paymentStatus;
     private String time;
     private String date;
-    private String name; // tên người đặt
+    private String name;
     private String tourImage;
 
-
-    // ✅ Thêm các thông tin mở rộng
+    // ✅ Thêm thông tin mở rộng
     private String userEmail;
     private String userPhone;
     private String tourName;
     private String tourDesc;
 
-    // ✅ Simplified Constructor with Name, Time, and Date
+    // ✅ Constructor đơn giản (ví dụ hiển thị tên, thời gian)
     public BookingModel(String name, String time, String date) {
         this.name = name;
         this.time = time;
         this.date = date;
     }
 
-    // ✅ Simplified Constructor for Summary Booking Information
+    // ✅ Constructor đơn giản để hiển thị tóm tắt booking
     public BookingModel(int id, String date, String status, int adultCount, int childCount, String name) {
         this.id = id;
         this.date = date;
@@ -41,7 +40,7 @@ public class BookingModel implements Serializable {
         this.name = name;
     }
 
-    // ✅ Full Constructor with all Booking Information
+    // ✅ Constructor đầy đủ thông tin booking
     public BookingModel(int id, int userId, int tourId, int adultCount, int childCount, String note,
                         double totalPrice, String status, String paymentStatus, String time, String date) {
         this.id = id;
@@ -57,13 +56,13 @@ public class BookingModel implements Serializable {
         this.date = date;
     }
 
-    // ✅ Constructor for Creating New Bookings (without ID)
+    // ✅ Constructor để tạo booking mới (không có id)
     public BookingModel(int userId, int tourId, int adultCount, int childCount, String note,
                         double totalPrice, String status, String paymentStatus, String time, String date) {
         this(0, userId, tourId, adultCount, childCount, note, totalPrice, status, paymentStatus, time, date);
     }
 
-    // ✅ Getters
+    // ✅ Getter
     public int getId() { return id; }
     public int getUserId() { return userId; }
     public int getTourId() { return tourId; }
@@ -81,8 +80,9 @@ public class BookingModel implements Serializable {
     public String getUserPhone() { return userPhone; }
     public String getTourName() { return tourName; }
     public String getTourDesc() { return tourDesc; }
+    public String getTourImage() { return tourImage; }
 
-    // ✅ Setters
+    // ✅ Setter
     public void setId(int id) { this.id = id; }
     public void setUserId(int userId) { this.userId = userId; }
     public void setTourId(int tourId) { this.tourId = tourId; }
@@ -98,14 +98,7 @@ public class BookingModel implements Serializable {
 
     public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
     public void setUserPhone(String userPhone) { this.userPhone = userPhone; }
-    public void setTourName(String tourName) { this.tourName = tourName; }
+    public void setTourName(String tourName) { this.tourName = tourName; } // ✅ Đảm bảo setter này được dùng
     public void setTourDesc(String tourDesc) { this.tourDesc = tourDesc; }
-    public String getTourImage() {
-        return tourImage;
-    }
-
-    public void setTourImage(String tourImage) {
-        this.tourImage = tourImage;
-    }
-
+    public void setTourImage(String tourImage) { this.tourImage = tourImage; }
 }

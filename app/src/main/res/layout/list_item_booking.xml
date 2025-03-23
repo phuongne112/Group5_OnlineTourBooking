@@ -88,7 +88,7 @@
                 android:id="@+id/tvTotalPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3,240 $"
+                android:text=""
                 android:textStyle="bold"
                 android:textColor="@android:color/holo_blue_dark"
                 android:textSize="16sp"

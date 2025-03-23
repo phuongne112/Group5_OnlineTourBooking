@@ -915,11 +915,22 @@
         }
         public Cursor getUserBookings(int userId) {
             SQLiteDatabase db = this.getReadableDatabase();
-            String query = "SELECT b.id AS _id, t.name AS tour_name, b.status, b.booking_date " +
+            String query = "SELECT b.id AS _id, t.name AS tour_name, b.status, b.booking_date, b.total_price \n" +
+                    "FROM bookings b \n" +
+                    "INNER JOIN tours t ON b.tour_id = t.id \n" +
+                    "WHERE b.user_id = ?\n";
+            return db.rawQuery(query, new String[]{String.valueOf(userId)});
+        }
+
+        public Cursor getUserBookingsWithPayment(int userId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String query = "SELECT b.id AS _id, t.name AS tour_name, b.status, b.booking_date, b.total_price, " +
+                    "(SELECT status FROM payments WHERE booking_id = b.id LIMIT 1) AS payment_status " +
                     "FROM bookings b INNER JOIN tours t ON b.tour_id = t.id " +
                     "WHERE b.user_id = ?";
             return db.rawQuery(query, new String[]{String.valueOf(userId)});
         }
+
 
         public List<TourModel> getToursByCategory(int categoryId) {
             List<TourModel> tourList = new ArrayList<>();
