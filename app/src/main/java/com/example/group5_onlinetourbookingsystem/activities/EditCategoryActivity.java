@@ -1,97 +1,144 @@
 package com.example.group5_onlinetourbookingsystem.activities;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
+import com.example.group5_onlinetourbookingsystem.adapters.DrawableImageAdapter;
+import com.example.group5_onlinetourbookingsystem.adapters.SimpleTourAdapter;
 import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
+import com.example.group5_onlinetourbookingsystem.models.TourModel;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class EditCategoryActivity extends AppCompatActivity {
 
     private EditText etCategoryName, etCategoryDescription;
     private ImageView imgCategory;
     private Button btnUpdateCategory, btnDeleteCategory, btnSelectImage;
+    private RecyclerView recyclerViewTours;
     private MyDatabaseHelper dbHelper;
     private int categoryId;
-    private String imageUri = ""; // Lưu đường dẫn ảnh
+    private String imageUri = "";
+    private SimpleTourAdapter tourAdapter;
+    private ArrayList<TourModel> tourList;
+
+    // Danh sách các ảnh trong drawable (các tên tài nguyên)
+    private final String[] drawableImages = {
+            "city", "eco", "image3", "favorites" // Thay bằng tên các ảnh trong drawable của bạn
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_category);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
-
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
         etCategoryName = findViewById(R.id.etCategoryName);
         etCategoryDescription = findViewById(R.id.etCategoryDescription);
         imgCategory = findViewById(R.id.imgCategory);
         btnSelectImage = findViewById(R.id.btnSelectImage);
         btnUpdateCategory = findViewById(R.id.btnUpdateCategory);
         btnDeleteCategory = findViewById(R.id.btnDeleteCategory);
+        recyclerViewTours = findViewById(R.id.recyclerViewTours);
 
         dbHelper = new MyDatabaseHelper(this);
+        tourList = new ArrayList<>();
+
+        // Khởi tạo tourAdapter
+        tourAdapter = new SimpleTourAdapter(this, tourList);
+        recyclerViewTours.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewTours.setAdapter(tourAdapter);
 
         // Nhận dữ liệu từ Intent
         Intent intent = getIntent();
         if (intent.hasExtra("CATEGORY_ID")) {
             categoryId = intent.getIntExtra("CATEGORY_ID", -1);
             loadCategoryData(categoryId);
+            loadToursByCategory(categoryId);
+        } else {
+            Toast.makeText(this, "Không tìm thấy ID danh mục!", Toast.LENGTH_SHORT).show();
+            finish();
         }
 
-        btnSelectImage.setOnClickListener(v -> openGallery());
+        btnSelectImage.setOnClickListener(v -> showImageSelectionDialog());
         btnUpdateCategory.setOnClickListener(v -> updateCategory());
         btnDeleteCategory.setOnClickListener(v -> confirmDeleteCategory());
     }
 
-    private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        pickImageLauncher.launch(intent);
-    }
+    private void showImageSelectionDialog() {
+        // Tạo dialog tùy chỉnh
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_select_image, null);
+        builder.setView(dialogView);
 
-    // Lắng nghe kết quả chọn ảnh
-    private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                    Uri selectedImageUri = result.getData().getData();
-                    if (selectedImageUri != null) {
-                        imageUri = selectedImageUri.toString(); // ✅ Cập nhật đường dẫn ảnh mới
-                        imgCategory.setImageURI(Uri.parse(imageUri)); // ✅ Hiển thị ảnh mới
-                    }
-                }
-            });
+        // Thiết lập RecyclerView trong dialog
+        RecyclerView recyclerViewImages = dialogView.findViewById(R.id.recyclerViewImages);
+        recyclerViewImages.setLayoutManager(new GridLayoutManager(this, 3)); // Hiển thị dạng lưới 3 cột
+
+        // Tạo adapter cho danh sách ảnh
+        DrawableImageAdapter imageAdapter = new DrawableImageAdapter(this, Arrays.asList(drawableImages), imageName -> {
+            imageUri = imageName; // Lưu tên tài nguyên ảnh
+            int resourceId = getResources().getIdentifier(imageUri, "drawable", getPackageName());
+            if (resourceId != 0) {
+                imgCategory.setImageResource(resourceId); // Hiển thị ảnh
+            } else {
+                Toast.makeText(this, "Không tìm thấy ảnh: " + imageUri, Toast.LENGTH_SHORT).show();
+            }
+            // Đóng dialog sau khi chọn
+            AlertDialog dialog = (AlertDialog) recyclerViewImages.getTag();
+            if (dialog != null) {
+                dialog.dismiss();
+            }
+        });
+
+        recyclerViewImages.setAdapter(imageAdapter);
+
+        // Tạo và hiển thị dialog
+        AlertDialog dialog = builder.create();
+        recyclerViewImages.setTag(dialog); // Lưu dialog để đóng sau khi chọn
+        dialog.show();
+    }
 
     private void loadCategoryData(int id) {
         CategoryModel category = dbHelper.getCategoryById(id);
         if (category != null) {
             etCategoryName.setText(category.getName());
             etCategoryDescription.setText(category.getDescription());
-            imageUri = category.getImage(); // Lưu đường dẫn ảnh từ database
-
-            // ✅ Hiển thị ảnh cũ nếu có
+            imageUri = category.getImage();
             if (imageUri != null && !imageUri.isEmpty()) {
-                imgCategory.setImageURI(Uri.parse(imageUri));
+                int resourceId = getResources().getIdentifier(imageUri, "drawable", getPackageName());
+                if (resourceId != 0) {
+                    imgCategory.setImageResource(resourceId);
+                } else {
+                    imgCategory.setImageResource(R.drawable.favorites);
+                }
             }
         }
+    }
+
+    private void loadToursByCategory(int categoryId) {
+        tourList = dbHelper.getToursByCategoryId(categoryId);
+        tourAdapter.updateTourList(tourList);
     }
 
     private void updateCategory() {
@@ -103,7 +150,6 @@ public class EditCategoryActivity extends AppCompatActivity {
             return;
         }
 
-        // Nếu không chọn ảnh mới, giữ nguyên ảnh cũ
         if (imageUri == null || imageUri.isEmpty()) {
             CategoryModel category = dbHelper.getCategoryById(categoryId);
             if (category != null) {
@@ -114,7 +160,7 @@ public class EditCategoryActivity extends AppCompatActivity {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("name", newName);
-        values.put("image", imageUri); // ✅ Lưu ảnh mới hoặc giữ nguyên ảnh cũ
+        values.put("image", imageUri);
         values.put("description", newDescription);
 
         int rowsAffected = db.update("categories", values, "id=?", new String[]{String.valueOf(categoryId)});
@@ -127,7 +173,13 @@ public class EditCategoryActivity extends AppCompatActivity {
             Toast.makeText(this, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void confirmDeleteCategory() {
+        if (!tourList.isEmpty()) {
+            Toast.makeText(this, "Không thể xóa danh mục vì có " + tourList.size() + " tour liên quan!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         new AlertDialog.Builder(this)
                 .setTitle("Xác nhận xóa")
                 .setMessage("Bạn có chắc muốn xóa danh mục này?")
@@ -148,10 +200,10 @@ public class EditCategoryActivity extends AppCompatActivity {
             Toast.makeText(this, "Xóa thất bại!", Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     public boolean onSupportNavigateUp() {
-        finish(); // Quay lại màn hình trước đó
+        finish();
         return true;
     }
-
 }
