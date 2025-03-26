@@ -545,6 +545,26 @@
             db.close();
             return cityId;
         }
+        public ArrayList<CityModel> getAllCities2() {
+            ArrayList<CityModel> cityList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT id, name FROM cities"; // Lấy cả ID và tên
+            Cursor cursor = db.rawQuery(query, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(0);
+                    String name = cursor.getString(1);
+                    cityList.add(new CityModel(id, name)); // Thêm vào danh sách
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return cityList;
+        }
+
         public ArrayList<String> getAllCities() {
             ArrayList<String> cityList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
@@ -563,6 +583,7 @@
             db.close();
             return cityList;
         }
+
         public String getUserPhoneByEmail(String email) {
             SQLiteDatabase db = this.getReadableDatabase();
             Cursor cursor = db.rawQuery("SELECT phone FROM users WHERE email = ?", new String[]{email});
@@ -1544,6 +1565,17 @@
             cursor.close();
             db.close();
             return booking;
+        }
+        public void deleteBooking(long bookingId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete("bookings", "id = ?", new String[]{String.valueOf(bookingId)});
+            db.close();
+        }
+
+        public void deletePayment(long bookingId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete("payments", "booking_id = ?", new String[]{String.valueOf(bookingId)});
+            db.close();
         }
 
     }

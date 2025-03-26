@@ -18,8 +18,7 @@ public class TourGuideDashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tour_guide_dashboard);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
-
+            getSupportActionBar().hide();
         }
         BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigation);
         View fragmentContainer = findViewById(R.id.fragmentContainer);

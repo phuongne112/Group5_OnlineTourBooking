@@ -7,40 +7,49 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
         <EditText
             android:id="@+id/etTourName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Tên tour" />
+            android:hint="Tên tour"
+            android:padding="8dp"
+            android:background="@android:drawable/editbox_background" />
 
         <EditText
             android:id="@+id/etDestination"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Điểm đến" />
+            android:hint="Điểm đến"
+            android:padding="8dp"
+            android:background="@android:drawable/editbox_background" />
 
-        <EditText
-            android:id="@+id/etCityId"
+        <Spinner
+            android:id="@+id/spinnerCity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:hint="ID Thành phố" />
+            android:layout_marginTop="8dp"/>
+
 
         <EditText
             android:id="@+id/etPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:hint="Giá tour" />
+            android:hint="Giá tour"
+            android:padding="8dp"
+            android:background="@android:drawable/editbox_background" />
 
         <EditText
             android:id="@+id/etDuration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
-            android:hint="Thời gian (ngày)" />
+            android:hint="Thời gian (ngày)"
+            android:padding="8dp"
+            android:background="@android:drawable/editbox_background" />
 
         <!-- 🖼 ImageView để hiển thị ảnh đã chọn -->
         <ImageView
@@ -49,34 +58,45 @@
             android:layout_height="200dp"
             android:scaleType="centerCrop"
             android:layout_gravity="center"
-            android:src="@drawable/tour" />
+            android:src="@drawable/tour"
+            android:layout_marginTop="16dp" />
 
         <!-- 📸 Button chọn ảnh -->
         <Button
             android:id="@+id/btnChooseImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Chọn ảnh từ thư viện" />
+            android:text="Chọn ảnh từ thư viện"
+            android:layout_marginTop="8dp" />
 
-        <EditText
-            android:id="@+id/etCategoryId"
+        <!-- Spinner thay thế cho EditText nhập ID danh mục -->
+        <Spinner
+            android:id="@+id/spinnerCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:hint="ID Danh mục" />
+            android:layout_marginTop="8dp" />
 
         <EditText
             android:id="@+id/etStartTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Giờ khởi hành (HH:mm)" />
+            android:hint="Giờ khởi hành (HH:mm)"
+            android:padding="8dp"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginTop="8dp" />
 
         <EditText
             android:id="@+id/etDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Mô tả tour"
-            android:inputType="textMultiLine" />
+            android:inputType="textMultiLine"
+            android:padding="8dp"
+            android:background="@android:drawable/editbox_background"
+            android:minHeight="100dp"
+            android:layout_marginTop="8dp" />
+
+        <!-- Spinner chọn hướng dẫn viên -->
         <Spinner
             android:id="@+id/spinnerTourGuides"
             android:layout_width="match_parent"
@@ -88,7 +108,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Thêm tour"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/purple_500"
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 </ScrollView>

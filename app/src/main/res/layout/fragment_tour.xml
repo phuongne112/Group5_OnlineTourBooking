@@ -2,9 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
     android:orientation="vertical">
+    <!-- RecyclerView cho danh mục -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        android:padding="8dp">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewCategories"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            android:clipChildren="false"
+            android:clipToPadding="false"/>
+    </androidx.cardview.widget.CardView>
     <!-- RecyclerView cho danh sách tour -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

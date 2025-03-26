@@ -1,6 +1,7 @@
 package com.example.group5_onlinetourbookingsystem.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -15,6 +16,8 @@ import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.models.TourModel;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 import com.squareup.picasso.Picasso;
+
+import java.io.File;
 
 public class TourDetailActivity extends AppCompatActivity {
     private TextView tourName, tourDestination, tourPrice, tourDuration, tourCategory, tourDescription;
@@ -70,13 +73,20 @@ public class TourDetailActivity extends AppCompatActivity {
                         ? tour.getDescription()
                         : "Chưa có mô tả");
 
-                // ✅ Load tour image
-                if (tour.getImage().startsWith("http")) {
-                    Picasso.get().load(tour.getImage()).into(tourImage);
+                // ✅ Load tour image từ bộ nhớ trong
+                if (tour.getImage() != null && !tour.getImage().isEmpty()) {
+                    File imageFile = new File(tour.getImage());
+                    if (imageFile.exists()) {
+                        Picasso.get().load(imageFile).into(tourImage);
+                    } else {
+                        tourImage.setImageResource(R.drawable.favorites); // Ảnh mặc định nếu file không tồn tại
+                    }
                 } else {
-                    int imageResource = getResources().getIdentifier(tour.getImage(), "drawable", getPackageName());
-                    tourImage.setImageResource(imageResource != 0 ? imageResource : R.drawable.favorites);
+                    tourImage.setImageResource(R.drawable.favorites);
                 }
+
+
+
 
                 // ✅ Check if this tour is already in favorites
                 isFavorited = dbHelper.isFavorite(userId, tourId);

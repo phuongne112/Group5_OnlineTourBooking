@@ -34,6 +34,10 @@ import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
 import com.example.group5_onlinetourbookingsystem.models.TourModel;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
@@ -193,13 +197,46 @@ public class HomeFragment extends Fragment {
 
     private void addSampleTours() {
         if (databaseHelper.getAllTours().isEmpty()) {
-            databaseHelper.addTour("Tour Đà Lạt", "Đà Lạt", 1, 150.0, 3, "dalat_tour", 1, "2025-03-10 08:00:00", "Thưởng thức khí hậu mát mẻ và cảnh đẹp thơ mộng của Đà Lạt.");
-            databaseHelper.addTour("Tour Phú Quốc", "Phú Quốc", 2, 200.0, 4, "phuquoc_tour", 2, "2025-03-12 09:30:00", "Khám phá hòn đảo ngọc với bãi biển tuyệt đẹp và hải sản tươi ngon.");
-            databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 3, 180.0, 3, "hanoi_tour", 3, "2025-03-15 07:45:00", "Trải nghiệm văn hóa, lịch sử thủ đô với 36 phố phường và Hồ Gươm.");
-            databaseHelper.addTour("Luxury Hanoi Tour", "Hanoi", 1, 200.0, 3, "hanoi.jpg", 3, "2025-03-15 07:00:00", "Explore the best of Hanoi!", 3);
-            databaseHelper.addTour("Luxury Hanoi Tour", "Hanoi", 1, 200.0, 3, "hanoi.jpg", 3, "2025-03-15 07:00:00", "Explore the best of Hanoi!", 4);
+            // ✅ Sao chép ảnh từ drawable vào bộ nhớ trong
+            String dalatImagePath = copyDrawableToInternalStorage(R.drawable.dalat_tour, "dalat_tour.jpg");
+            String phuquocImagePath = copyDrawableToInternalStorage(R.drawable.phuquoc_tour, "phuquoc_tour.jpg");
+            String hanoiImagePath = copyDrawableToInternalStorage(R.drawable.hanoi_tour, "hanoi_tour.jpg");
+
+            // ✅ Thêm tour với đường dẫn ảnh từ bộ nhớ trong
+            databaseHelper.addTour("Tour Đà Lạt", "Đà Lạt", 1, 150.0, 3, dalatImagePath, 1, "2025-03-10 08:00:00", "Thưởng thức khí hậu mát mẻ và cảnh đẹp thơ mộng của Đà Lạt.");
+            databaseHelper.addTour("Tour Phú Quốc", "Phú Quốc", 2, 200.0, 4, phuquocImagePath, 2, "2025-03-12 09:30:00", "Khám phá hòn đảo ngọc với bãi biển tuyệt đẹp và hải sản tươi ngon.");
+            databaseHelper.addTour("Tour Hà Nội", "Hà Nội", 3, 180.0, 3, hanoiImagePath, 3, "2025-03-15 07:45:00", "Trải nghiệm văn hóa, lịch sử thủ đô với 36 phố phường và Hồ Gươm.");
         }
     }
+
+
+    /**
+     * ✅ Sao chép ảnh từ drawable vào bộ nhớ trong và trả về đường dẫn file.
+     */
+    private String copyDrawableToInternalStorage(int drawableId, String fileName) {
+        File directory = new File(requireContext().getFilesDir(), "tour_images");
+
+        if (!directory.exists()) {
+            directory.mkdirs(); // Tạo thư mục nếu chưa tồn tại
+        }
+
+        File file = new File(directory, fileName);
+        if (!file.exists()) { // Chỉ sao chép nếu chưa tồn tại
+            try (InputStream inputStream = getResources().openRawResource(drawableId);
+                 FileOutputStream outputStream = new FileOutputStream(file)) {
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = inputStream.read(buffer)) > 0) {
+                    outputStream.write(buffer, 0, length);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null; // Lỗi khi sao chép ảnh
+            }
+        }
+        return file.getAbsolutePath(); // Trả về đường dẫn đầy đủ
+    }
+
     private void checkUserRole() {
         int roleId = sessionManager.getUserRoleId();
         Log.d("SESSION_DEBUG", "Role ID tại HomeFragment: " + roleId);
