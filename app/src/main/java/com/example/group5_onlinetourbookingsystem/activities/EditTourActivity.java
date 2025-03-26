@@ -37,7 +37,10 @@ public class EditTourActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_tour);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         etTourName = findViewById(R.id.etTourName);
         etDestination = findViewById(R.id.etDestination);
         etPrice = findViewById(R.id.etPrice);
@@ -188,5 +191,10 @@ public class EditTourActivity extends AppCompatActivity {
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Vui lòng nhập số hợp lệ!", Toast.LENGTH_SHORT).show();
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

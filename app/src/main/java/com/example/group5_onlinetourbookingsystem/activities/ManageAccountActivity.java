@@ -32,7 +32,10 @@ public class ManageAccountActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_account);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         tableLayout = findViewById(R.id.tableLayout);
         btnAddAccount = findViewById(R.id.btnAddAccount);
         dbHelper = new MyDatabaseHelper(this);
@@ -161,6 +164,11 @@ public class ManageAccountActivity extends AppCompatActivity {
             divider.setBackgroundColor(Color.GRAY);
             tableLayout.addView(divider);
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 
 }

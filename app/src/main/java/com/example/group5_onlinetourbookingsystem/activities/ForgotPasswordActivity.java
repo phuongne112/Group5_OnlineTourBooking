@@ -39,7 +39,10 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         etEmail = findViewById(R.id.editTextText2);
         btnGetNewPassword = findViewById(R.id.button2);
         btnBackToLogin = findViewById(R.id.buttonBackToLogin);
@@ -162,7 +165,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         Intent intent = new Intent( this, MainActivity.class);
         startActivity(intent);
     }
-
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
+    }
 
 
 

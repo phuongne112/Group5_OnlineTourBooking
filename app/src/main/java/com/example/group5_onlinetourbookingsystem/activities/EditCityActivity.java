@@ -27,7 +27,10 @@ public class EditCityActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_city);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         etCityName = findViewById(R.id.etCityName);
         btnUpdateCity = findViewById(R.id.btnUpdateCity);
         btnDeleteCity = findViewById(R.id.btnDeleteCity); // ✅ Nút xóa thành phố
@@ -95,5 +98,10 @@ public class EditCityActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show();
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

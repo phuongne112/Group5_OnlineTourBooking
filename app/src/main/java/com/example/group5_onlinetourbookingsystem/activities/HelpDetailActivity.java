@@ -16,7 +16,10 @@ public class HelpDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help_detail);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         TextView textView = findViewById(R.id.textViewHelpContent);
         String fileName = getIntent().getStringExtra("FILE_NAME");
 
@@ -42,5 +45,10 @@ public class HelpDetailActivity extends AppCompatActivity {
             return "Không thể đọc file.";
         }
         return stringBuilder.toString();
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

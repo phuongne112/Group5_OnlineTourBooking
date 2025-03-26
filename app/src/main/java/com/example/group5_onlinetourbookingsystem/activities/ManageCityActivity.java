@@ -30,7 +30,10 @@ public class ManageCityActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_city);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         recyclerView = findViewById(R.id.recyclerViewCities);
         btnAddCity = findViewById(R.id.btnAddCity);
         dbHelper = new MyDatabaseHelper(this);
@@ -54,5 +57,10 @@ public class ManageCityActivity extends AppCompatActivity {
             Intent intent = new Intent(ManageCityActivity.this, AddCityActivity.class);
             startActivity(intent);
         });
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }
