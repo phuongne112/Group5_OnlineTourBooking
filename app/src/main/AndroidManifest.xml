@@ -21,95 +21,118 @@
         tools:targetApi="31">
         <activity
             android:name=".activities.BookingDetailActivity"
+            android:label="BookingDetail"
             android:exported="false" />
         <activity
             android:name=".activities.AddAccountActivity"
+            android:label="AddAccount"
             android:exported="false" />
         <activity
             android:name=".activities.GuideListActivity"
+            android:label="GuideList"
             android:exported="false" />
         <activity
             android:name=".activities.TourGuideDashboardActivity"
+            android:label="TourGuideDashboard"
             android:exported="false" />
         <activity
             android:name=".activities.EditCategoryActivity"
+            android:label="EditCategory"
             android:exported="false" />
         <activity
             android:name=".activities.AddCategoryActivity"
+            android:label="AddCategory"
             android:exported="false" />
         <activity
             android:name=".activities.ManageCategoryActivity"
+            android:label="ManageCategory"
             android:exported="false" />
         <activity
             android:name=".activities.EditCityActivity"
+            android:label="EditCity"
             android:exported="false" />
         <activity
             android:name=".activities.AddCityActivity"
+            android:label="AddCity"
             android:exported="false" />
         <activity
             android:name=".activities.ManageCityActivity"
+            android:label="ManageCity"
             android:exported="false" />
         <activity
             android:name=".activities.UserDetailActivity"
+            android:label="UserDetail"
             android:exported="false" />
         <activity
             android:name=".activities.ManageAccountActivity"
+            android:label="ManageAccount"
             android:exported="false" />
         <activity
             android:name=".activities.PaymentActivity"
+            android:label="Payment"
             android:exported="false" />
-        <activity android:name=".activities.AdminDashboardActivity" />
+        <activity android:name=".activities.AdminDashboardActivity"
+            android:label="AdminDashboard"/>
         <activity
             android:name=".activities.EditProfileActivity"
+            android:label="EditProfile"
             android:exported="false" />
         <activity
             android:name=".activities.UserProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.SettingsActivity"
+            android:label="UserProfile"
             android:exported="false" />
         <activity
             android:name=".activities.LegalActivity"
+            android:label="Legal"
             android:exported="false" />
         <activity
             android:name=".activities.ContactUsActivity"
+            android:label="ContactUs"
             android:exported="false" />
         <activity
             android:name=".activities.HelpCenterActivity"
+            android:label="HelpCenter"
             android:exported="false" />
         <activity
             android:name=".activities.EditTourActivity"
+            android:label="EditTour"
             android:exported="false" />
         <activity
             android:name=".activities.AddTourActivity"
+            android:label="AddTour"
             android:exported="false" />
         <activity
             android:name=".activities.HelpDetailActivity"
+            android:label="HelpDetail"
             android:exported="false" />
         <activity
             android:name=".activities.ChangePasswordActivity"
+            android:label="ChangePassword"
             android:exported="false" />
         <activity
             android:name=".activities.ForgotPasswordActivity"
+            android:label="ForgotPassword"
             android:exported="false" />
         <activity
             android:name=".activities.BookingActivity"
+            android:label="Booking"
             android:exported="false" />
         <activity
             android:name=".activities.TourDetailActivity"
+            android:label="TourDetail"
             android:exported="false" />
         <activity
             android:name=".activities.SignUpActivity"
+            android:label="SignUp"
             android:exported="false" /> <!-- HomePage là màn hình khởi động -->
         <activity
             android:name=".activities.HomePage"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- MainActivity không còn là màn hình khởi động -->
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="false" />

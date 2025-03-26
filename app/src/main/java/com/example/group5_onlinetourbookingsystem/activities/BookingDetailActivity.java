@@ -16,7 +16,10 @@ public class BookingDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking_detail);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         int bookingId = ((BookingModel) getIntent().getSerializableExtra("booking")).getId();
 
         MyDatabaseHelper dbHelper = new MyDatabaseHelper(this);
@@ -50,5 +53,10 @@ public class BookingDetailActivity extends AppCompatActivity {
 
             tvBookingStatus.setText("Trạng thái đặt chỗ: " + booking.getStatus());
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

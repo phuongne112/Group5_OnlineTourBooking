@@ -20,7 +20,10 @@ public class ContactUsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_us);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         sessionManager = new SessionManager(this);
 
         // ✅ Kiểm tra nếu chưa đăng nhập
@@ -61,5 +64,10 @@ public class ContactUsActivity extends AppCompatActivity {
 
         // TODO: Handle sending the message (e.g., send email or save in the database)
         Toast.makeText(this, "Message sent successfully!", Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

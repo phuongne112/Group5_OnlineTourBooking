@@ -19,7 +19,10 @@ public class HelpCenterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help_center);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         // Ánh xạ các mục 01 và 02
         LinearLayout item01 = findViewById(R.id.item_01);
         LinearLayout item02 = findViewById(R.id.item_02);
@@ -35,5 +38,10 @@ public class HelpCenterActivity extends AppCompatActivity {
         Intent intent = new Intent(this, HelpDetailActivity.class);
         intent.putExtra("FILE_NAME", fileName);
         startActivity(intent);
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

@@ -29,7 +29,10 @@ public class ManageCategoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_category);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         recyclerView = findViewById(R.id.recyclerViewCategories);
         btnAddCategory = findViewById(R.id.btnAddCategory);
         dbHelper = new MyDatabaseHelper(this);
@@ -50,5 +53,10 @@ public class ManageCategoryActivity extends AppCompatActivity {
             Intent intent = new Intent(this, AddCategoryActivity.class);
             startActivity(intent);
         });
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

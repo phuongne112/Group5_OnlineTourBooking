@@ -24,7 +24,10 @@ public class ChangePasswordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         dbHelper = new MyDatabaseHelper(this);
         sessionManager = new SessionManager(this);
 
@@ -75,5 +78,10 @@ public class ChangePasswordActivity extends AppCompatActivity {
             Toast.makeText(this, "Mật khẩu cũ không đúng!", Toast.LENGTH_SHORT).show();
             Log.e("ERROR", "Mật khẩu cũ không hợp lệ");
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

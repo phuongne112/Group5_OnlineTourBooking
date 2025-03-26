@@ -33,7 +33,10 @@ public class TourDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tour_detail);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         // ✅ Initialize DB and session manager
         dbHelper = new MyDatabaseHelper(this);
         sessionManager = new SessionManager(this);
@@ -137,4 +140,10 @@ public class TourDetailActivity extends AppCompatActivity {
             favoriteButton.setImageResource(R.drawable.favourite); // 🔹 Default icon
         }
     }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
+    }
+
 }

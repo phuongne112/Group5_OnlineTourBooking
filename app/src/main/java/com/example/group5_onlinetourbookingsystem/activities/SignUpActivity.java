@@ -28,7 +28,10 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         dbHelper = new MyDatabaseHelper(this);
 
         etName = findViewById(R.id.etName);
@@ -160,5 +163,10 @@ public class SignUpActivity extends AppCompatActivity {
         } catch (Exception e) {
             return false;
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

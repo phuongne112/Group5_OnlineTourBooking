@@ -26,9 +26,15 @@ public class HomePage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         sessionManager = new SessionManager(this);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
 
 
         // Fragment Bottom Navigation
@@ -69,7 +75,11 @@ public class HomePage extends AppCompatActivity {
             return true;
         });
     }
-
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
+    }
 
     
 }

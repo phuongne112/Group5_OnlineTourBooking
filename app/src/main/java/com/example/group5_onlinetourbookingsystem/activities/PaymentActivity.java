@@ -21,13 +21,17 @@ public class PaymentActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
+
+        }
         setContentView(R.layout.activity_payment);
         imgQrCode = findViewById(R.id.imgQrCode);
         tvTotalPrice = findViewById(R.id.payment_total_price);
         btnApprove = findViewById(R.id.btn_approve_payment);
         btnCancel = findViewById(R.id.btn_cancel_payment);
         dbHelper = new MyDatabaseHelper(this);
-// Hiển thị ảnh QR mặc định
+        // Hiển thị ảnh QR mặc định
         imgQrCode.setImageResource(R.drawable.qr_code);
         // Nhận tổng tiền từ Intent
         final double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
@@ -67,5 +71,10 @@ public class PaymentActivity extends AppCompatActivity {
             Toast.makeText(this, "Thanh toán bị hủy!", Toast.LENGTH_SHORT).show();
             finish();
         });
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }
