@@ -50,6 +50,12 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.CityViewHolder
         return cityList.size();
     }
 
+    // Phương thức để cập nhật danh sách thành phố
+    public void updateCityList(ArrayList<CityModel> newCityList) {
+        this.cityList = newCityList;
+        notifyDataSetChanged(); // Thông báo RecyclerView làm mới toàn bộ dữ liệu
+    }
+
     static class CityViewHolder extends RecyclerView.ViewHolder {
         TextView tvCityName;
 

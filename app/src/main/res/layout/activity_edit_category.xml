@@ -1,21 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
     android:orientation="vertical">
 
-    <TextView android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Tên danh mục" android:textStyle="bold"/>
-
-    <EditText android:id="@+id/etCategoryName"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nhập tên danh mục"/>
+        android:text="Tên danh mục"
+        android:textStyle="bold" />
 
-    <TextView android:layout_width="match_parent"
+    <EditText
+        android:id="@+id/etCategoryName"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hình ảnh" android:textStyle="bold"/>
+        android:hint="Nhập tên danh mục" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hình ảnh"
+        android:textStyle="bold" />
 
     <!-- ImageView hiển thị ảnh cũ hoặc mới -->
     <ImageView
@@ -24,31 +30,56 @@
         android:layout_height="200dp"
         android:layout_gravity="center"
         android:scaleType="centerCrop"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
 
     <!-- Nút chọn ảnh -->
-    <Button android:id="@+id/btnSelectImage"
+    <Button
+        android:id="@+id/btnSelectImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chọn ảnh từ thư viện"/>
+        android:text="Chọn ảnh từ thư viện" />
 
-    <TextView android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Mô tả danh mục" android:textStyle="bold"/>
-
-    <EditText android:id="@+id/etCategoryDescription"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nhập mô tả danh mục"/>
+        android:text="Mô tả danh mục"
+        android:textStyle="bold" />
 
-    <Button android:id="@+id/btnUpdateCategory"
+    <EditText
+        android:id="@+id/etCategoryDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cập Nhật"/>
+        android:hint="Nhập mô tả danh mục" />
 
-    <Button android:id="@+id/btnDeleteCategory"
+    <!-- Tiêu đề danh sách tour -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Danh sách tour trong danh mục"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp" />
+
+    <!-- RecyclerView để hiển thị danh sách tour -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewTours"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp" />
+
+    <Button
+        android:id="@+id/btnUpdateCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cập Nhật"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnDeleteCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Xóa"
-        android:backgroundTint="@android:color/holo_red_light"/>
+        android:backgroundTint="@android:color/holo_red_light"
+        android:layout_marginTop="8dp" />
+
 </LinearLayout>

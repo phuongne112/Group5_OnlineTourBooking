@@ -1566,7 +1566,9 @@
             db.close();
             return booking;
         }
-        public void deleteBooking(long bookingId) {
+
+    
+ public void deleteBooking(long bookingId) {
             SQLiteDatabase db = this.getWritableDatabase();
             db.delete("bookings", "id = ?", new String[]{String.valueOf(bookingId)});
             db.close();
@@ -1577,7 +1579,77 @@
             db.delete("payments", "booking_id = ?", new String[]{String.valueOf(bookingId)});
             db.close();
         }
+          public ArrayList<TourModel> getToursByCityId(int cityId) {
+            ArrayList<TourModel> tourList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
 
+            String query = "SELECT t.*, c.name AS city_name, cat.name AS category_name " +
+                    "FROM " + TABLE_TOURS + " t " +
+                    "LEFT JOIN " + TABLE_CITIES + " c ON t." + COLUMN_TOUR_CITY_ID + " = c.id " +
+                    "LEFT JOIN " + TABLE_CATEGORIES + " cat ON t." + COLUMN_TOUR_CATEGORY_ID + " = cat.id " +
+                    "WHERE t." + COLUMN_TOUR_CITY_ID + " = ?";
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(cityId)});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOUR_ID));
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOUR_NAME));
+                    String destination = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOUR_DESTINATION));
+                    double price = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_TOUR_PRICE));
+                    int duration = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOUR_DURATION));
+                    String image = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOUR_IMAGE));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOUR_DESCRIPTION));
+                    int categoryId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOUR_CATEGORY_ID));
+                    String categoryName = cursor.getString(cursor.getColumnIndexOrThrow("category_name"));
+                    int tourCityId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOUR_CITY_ID));
+                    String cityName = cursor.getString(cursor.getColumnIndexOrThrow("city_name"));
+                    String startTime = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOUR_START_TIME));
+
+                    TourModel tour = new TourModel(id, name, destination, price, duration, image, description,
+                            categoryId, categoryName, tourCityId, cityName, startTime);
+                    tourList.add(tour);
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return tourList;
+        }
+        public ArrayList<TourModel> getToursByCategoryId(int categoryId) {
+            ArrayList<TourModel> tourList = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT t.*, c." + COLUMN_CITY_NAME + " AS city_name, cat." + COLUMN_CATEGORY_NAME + " AS category_name " +
+                    "FROM " + TABLE_TOURS + " t " +
+                    "LEFT JOIN " + TABLE_CITIES + " c ON t." + COLUMN_TOUR_CITY_ID + " = c.id " +
+                    "LEFT JOIN " + TABLE_CATEGORIES + " cat ON t." + COLUMN_TOUR_CATEGORY_ID + " = cat.id " +
+                    "WHERE t." + COLUMN_TOUR_CATEGORY_ID + " = ?";
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(categoryId)});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOUR_ID));
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOUR_NAME));
+                    String destination = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOUR_DESTINATION));
+                    double price = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_TOUR_PRICE));
+                    int duration = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOUR_DURATION));
+                    String image = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOUR_IMAGE));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOUR_DESCRIPTION));
+                    int tourCategoryId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOUR_CATEGORY_ID));
+                    String categoryName = cursor.getString(cursor.getColumnIndexOrThrow("category_name"));
+                    int cityId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TOUR_CITY_ID));
+                    String cityName = cursor.getString(cursor.getColumnIndexOrThrow("city_name"));
+                    String startTime = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TOUR_START_TIME));
+
+                    TourModel tour = new TourModel(id, name, destination, price, duration, image, description,
+                            tourCategoryId, categoryName, cityId, cityName, startTime);
+                    tourList.add(tour);
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return tourList;
+        }
     }
-
 
