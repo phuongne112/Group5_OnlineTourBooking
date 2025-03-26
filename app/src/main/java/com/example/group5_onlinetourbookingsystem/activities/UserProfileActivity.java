@@ -34,7 +34,10 @@ public class UserProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         sessionManager = new SessionManager(this);
         userId = sessionManager.getUserId();
         myDB = new MyDatabaseHelper(this);
@@ -104,6 +107,11 @@ public class UserProfileActivity extends AppCompatActivity {
                 imgUserProfile.setImageResource(R.drawable.ic_user_placeholder);
             }
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 
     @Override

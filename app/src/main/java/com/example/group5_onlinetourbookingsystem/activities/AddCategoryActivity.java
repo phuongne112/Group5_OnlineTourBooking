@@ -26,7 +26,10 @@ public class AddCategoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_category);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         etCategoryName = findViewById(R.id.etCategoryName);
         etCategoryImage = findViewById(R.id.etCategoryImage);
         etCategoryDescription = findViewById(R.id.etCategoryDescription);
@@ -34,6 +37,7 @@ public class AddCategoryActivity extends AppCompatActivity {
         dbHelper = new MyDatabaseHelper(this);
 
         btnSaveCategory.setOnClickListener(v -> addCategory());
+
     }
 
     private void addCategory() {
@@ -61,5 +65,10 @@ public class AddCategoryActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Thêm thất bại!", Toast.LENGTH_SHORT).show();
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

@@ -23,7 +23,10 @@ public class AddCityActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_city);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         etCityName = findViewById(R.id.etCityName);
         btnSaveCity = findViewById(R.id.btnSaveCity);
         dbHelper = new MyDatabaseHelper(this);
@@ -53,5 +56,10 @@ public class AddCityActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Thêm thất bại!", Toast.LENGTH_SHORT).show();
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

@@ -30,7 +30,10 @@ public class ManageCityActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_city);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         recyclerView = findViewById(R.id.recyclerViewCities);
         btnAddCity = findViewById(R.id.btnAddCity);
         dbHelper = new MyDatabaseHelper(this);
@@ -56,12 +59,4 @@ public class ManageCityActivity extends AppCompatActivity {
         });
     }
     @Override
-    protected void onResume() {
-        super.onResume();
-        // Load lại danh sách thành phố
-        cityList.clear();
-        cityList.addAll(dbHelper.getAllCitiesAdmin());
-        cityAdapter.notifyDataSetChanged();
-    }
 
-}

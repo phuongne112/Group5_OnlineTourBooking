@@ -25,7 +25,10 @@ public class LegalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_legal);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         tvLegalContent = findViewById(R.id.tvLegalContent);
 
         // Set padding for edge-to-edge
@@ -58,5 +61,10 @@ public class LegalActivity extends AppCompatActivity {
         }
 
         return stringBuilder.toString();
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

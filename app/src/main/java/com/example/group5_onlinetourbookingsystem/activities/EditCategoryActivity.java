@@ -37,7 +37,10 @@ public class EditCategoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_category);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         etCategoryName = findViewById(R.id.etCategoryName);
         etCategoryDescription = findViewById(R.id.etCategoryDescription);
         imgCategory = findViewById(R.id.imgCategory);
@@ -144,6 +147,11 @@ public class EditCategoryActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Xóa thất bại!", Toast.LENGTH_SHORT).show();
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 
 }

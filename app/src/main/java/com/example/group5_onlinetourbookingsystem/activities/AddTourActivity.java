@@ -41,7 +41,10 @@ public class AddTourActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_tour);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         etTourName = findViewById(R.id.etTourName);
         etDestination = findViewById(R.id.etDestination);
         etCityId = findViewById(R.id.etCityId);
@@ -184,5 +187,9 @@ public class AddTourActivity extends AppCompatActivity {
         }
         return fileName;
     }
-
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
+    }
 }

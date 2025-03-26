@@ -30,7 +30,10 @@ public class GuideListActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide_list);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         recyclerViewBookings = findViewById(R.id.recyclerViewBookings);
         noBookingsText = findViewById(R.id.noBookingsText);
 
@@ -73,5 +76,10 @@ public class GuideListActivity extends AppCompatActivity {
         bookingAdapter = new GuideBookingAdapter(this, confirmedBookings);
         recyclerViewBookings.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewBookings.setAdapter(bookingAdapter);
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

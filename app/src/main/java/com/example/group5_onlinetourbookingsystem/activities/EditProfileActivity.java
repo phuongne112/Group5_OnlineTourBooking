@@ -48,7 +48,10 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         sessionManager = new SessionManager(this);
         userId = sessionManager.getUserId();
 
@@ -194,5 +197,10 @@ public class EditProfileActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Lỗi khi cập nhật!", Toast.LENGTH_SHORT).show();
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

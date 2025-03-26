@@ -13,7 +13,10 @@ public class UserDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_detail);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         tvUserName = findViewById(R.id.tvUserName);
         tvEmail = findViewById(R.id.tvEmail);
         tvPhone = findViewById(R.id.tvPhone);
@@ -33,5 +36,10 @@ public class UserDetailActivity extends AppCompatActivity {
         tvPhone.setText(phone);
         tvBirthDate.setText(birthDate);
         tvStatus.setText(status);
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }

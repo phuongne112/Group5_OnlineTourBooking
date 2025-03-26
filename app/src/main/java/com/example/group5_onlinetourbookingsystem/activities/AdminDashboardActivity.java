@@ -18,7 +18,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_dashboard);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
+        }
         BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigation);
         View fragmentContainer = findViewById(R.id.fragmentContainer);
 
@@ -50,5 +53,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
             return true;
         });
 
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish(); // Quay lại màn hình trước đó
+        return true;
     }
 }
