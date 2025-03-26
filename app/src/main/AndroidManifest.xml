@@ -33,7 +33,6 @@
             android:exported="false" />
         <activity
             android:name=".activities.TourGuideDashboardActivity"
-            android:label="TourGuideDashboard"
             android:exported="false" />
         <activity
             android:name=".activities.EditCategoryActivity"
