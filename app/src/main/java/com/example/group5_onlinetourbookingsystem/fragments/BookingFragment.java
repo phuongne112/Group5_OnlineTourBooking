@@ -77,14 +77,23 @@ public class BookingFragment extends Fragment {
                 String bookingDate = cursor.getString(cursor.getColumnIndexOrThrow("booking_date"));
                 String bookingStatus = cursor.getString(cursor.getColumnIndexOrThrow("status"));
                 double totalPrice = cursor.getDouble(cursor.getColumnIndexOrThrow("total_price"));
+
+                if (totalPrice == 0) {
+                    continue; // Bỏ qua tour có giá 0
+                }
+                int adultCountIndex = cursor.getColumnIndex("adult_count");
+                int adultCount = adultCountIndex != -1 ? cursor.getInt(adultCountIndex) : 0;
+
                 String paymentStatus = "";
 
                 if (isAdmin) {
                     paymentStatus = cursor.getString(cursor.getColumnIndexOrThrow("payment_status"));
                 }
 
-                BookingModel booking = new BookingModel(id, 0, 0, 0, 0, "", totalPrice, bookingStatus, paymentStatus, "", bookingDate);
-                booking.setTourName(tourName); // ✅ Gán tên tour đúng cách
+                BookingModel booking = new BookingModel(id, adultCount, 0, 0, 0, "", totalPrice, bookingStatus, paymentStatus, "", bookingDate);
+                booking.setTourName(tourName);
+                booking.setAdultCount(adultCount);
+
                 bookingList.add(booking);
             }
             cursor.close();

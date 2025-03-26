@@ -1,13 +1,13 @@
 package com.example.group5_onlinetourbookingsystem.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.R;
@@ -15,10 +15,12 @@ import com.example.group5_onlinetourbookingsystem.models.BookingModel;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 
 import java.util.List;
+import java.util.Locale;
+
 public class UserBookingAdapter extends RecyclerView.Adapter<UserBookingAdapter.ViewHolder> {
-    private Context context;
-    private List<BookingModel> bookingList;
-    private int roleId;
+    private final Context context;
+    private final List<BookingModel> bookingList;
+    private final int roleId;
 
     public UserBookingAdapter(Context context, List<BookingModel> bookingList) {
         this.context = context;
@@ -39,7 +41,9 @@ public class UserBookingAdapter extends RecyclerView.Adapter<UserBookingAdapter.
         BookingModel booking = bookingList.get(position);
 
         holder.tvTourName.setText("Tour: " + booking.getTourName());
-        holder.tvTotalPrice.setText(String.format("Tổng: %,d $", (int) booking.getTotalPrice()));
+        holder.tvAdultCount.setText("Người lớn: " + booking.getAdultCount());
+        holder.tvBookingDate.setText("Ngày đặt: " + booking.getDate());
+        holder.tvTotalPrice.setText(String.format(Locale.getDefault(), "Tổng: %,.2f $", booking.getTotalPrice()));
         holder.tvBookingStatus.setText("Trạng thái: " + booking.getStatus());
 
         // ✅ Chỉ admin mới thấy payment status
@@ -50,13 +54,14 @@ public class UserBookingAdapter extends RecyclerView.Adapter<UserBookingAdapter.
             holder.tvPaymentStatus.setVisibility(View.GONE);
         }
 
-        String imageName = "placeholder_image";
+        // ✅ Load hình ảnh tour
         if (booking.getTourImage() != null && !booking.getTourImage().isEmpty()) {
-            imageName = booking.getTourImage().replace(".jpg", "").replace(".png", "").toLowerCase().trim();
+            String imageName = booking.getTourImage().replace(".jpg", "").replace(".png", "").toLowerCase().trim();
+            int imageResId = context.getResources().getIdentifier(imageName, "drawable", context.getPackageName());
+            holder.imgTourImage.setImageResource(imageResId != 0 ? imageResId : R.drawable.placeholder_image);
+        } else {
+            holder.imgTourImage.setImageResource(R.drawable.placeholder_image);
         }
-
-        int imageResId = context.getResources().getIdentifier(imageName, "drawable", context.getPackageName());
-        holder.imgTourImage.setImageResource(imageResId != 0 ? imageResId : R.drawable.placeholder_image);
     }
 
     @Override
@@ -65,7 +70,7 @@ public class UserBookingAdapter extends RecyclerView.Adapter<UserBookingAdapter.
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTourName, tvTotalPrice, tvBookingStatus, tvPaymentStatus;
+        TextView tvTourName, tvTotalPrice, tvBookingStatus, tvPaymentStatus, tvAdultCount,tvBookingDate;
         ImageView imgTourImage;
 
         public ViewHolder(@NonNull View itemView) {
@@ -74,6 +79,8 @@ public class UserBookingAdapter extends RecyclerView.Adapter<UserBookingAdapter.
             tvTotalPrice = itemView.findViewById(R.id.tvTotalPrice);
             tvBookingStatus = itemView.findViewById(R.id.tvBookingStatus);
             tvPaymentStatus = itemView.findViewById(R.id.tvPaymentStatus);
+            tvAdultCount = itemView.findViewById(R.id.tvAdultCount);
+            tvBookingDate = itemView.findViewById(R.id.tvBookingDate);// Thêm dòng này
             imgTourImage = itemView.findViewById(R.id.imgTourImage);
         }
     }

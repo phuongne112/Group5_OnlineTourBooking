@@ -20,8 +20,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.models.BookingModel;
-import com.example.group5_onlinetourbookingsystem.activities.BookingDetailActivity;
+import com.example.group5_onlinetourbookingsystem.activities.b;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingViewHolder> {
@@ -35,6 +36,14 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
         this.bookingList = bookingList;
         this.dbHelper = dbHelper;
         this.isAdmin = isAdmin;
+
+//        this.bookingList = new ArrayList<>();
+//        for (BookingModel booking : bookingList) {
+//            if (booking.getTotalPrice() > 0) {
+//                this.bookingList.add(booking);
+//            }
+//        }
+
     }
 
     @NonNull
@@ -47,7 +56,8 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
     @Override
     public void onBindViewHolder(@NonNull BookingViewHolder holder, int position) {
         BookingModel booking = bookingList.get(position);
-
+        Log.d("BookingAdapter", "Tour Namesssssss: " + booking.getTourName());
+        holder.tvTourName.setText(booking.getTourName());
         holder.tvBookingDate.setText("Date: " + booking.getDate());
         holder.tvTotalPrice.setText(String.format("%,d $", (int) booking.getTotalPrice()));
 
@@ -64,6 +74,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
         String[] paymentStatuses = {"Pending", "Completed", "Failed"};
         ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, paymentStatuses);
         holder.spinnerPayment.setAdapter(paymentAdapter);
+
 
         String bookingPaymentStatus = (booking.getPaymentStatus() == null || booking.getPaymentStatus().isEmpty())
                 ? "Pending" : booking.getPaymentStatus();

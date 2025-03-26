@@ -778,10 +778,18 @@
             values.put(COLUMN_USER_NAME, name);
             values.put(COLUMN_USER_PHONE, phone);
             values.put(COLUMN_USER_BIRTH, birthDate);
-            values.put(COLUMN_USER_IMAGE, imagePath); // ✅ Lưu URI ảnh vào database
+            values.put(COLUMN_USER_IMAGE, imagePath);
+
+            Log.d("Database", "Updating user: ID=" + userId + ", Name=" + name + ", ImagePath=" + imagePath);
 
             int rowsAffected = db.update(TABLE_USERS, values, "id=?", new String[]{String.valueOf(userId)});
             db.close();
+
+            if (rowsAffected > 0) {
+                Log.d("Database", "Update successful");
+            } else {
+                Log.d("Database", "Update failed");
+            }
 
             return rowsAffected > 0;
         }

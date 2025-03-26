@@ -22,7 +22,6 @@ import java.util.HashMap;
 public class BookingActivity extends AppCompatActivity {
     private EditText etUserName, etUserEmail, etUserPhone, etNumAdults, etNumChildren, etBookingNote;
     private TextView tvTourName, tvTourPrice, tvTotalPrice, tvTourDuration, tvStartTime;
-
     private Button btnConfirmBooking;
     private MyDatabaseHelper dbHelper;
     private SessionManager sessionManager;
@@ -74,12 +73,7 @@ public class BookingActivity extends AppCompatActivity {
         String duration = intent.getStringExtra("tour_duration");
         String startTime = intent.getStringExtra("start_time");
 
-        // 🔥 Thêm Log để kiểm tra dữ liệu
-        Log.d("BookingActivity", "Tour ID: " + tourId);
-        Log.d("BookingActivity", "Tour Name: " + name);
-        Log.d("BookingActivity", "Tour Price: " + pricePerAdult);
-        Log.d("BookingActivity", "Tour Duration: " + duration);
-        Log.d("BookingActivity", "Start Time: " + startTime);
+
 
         // Hiển thị dữ liệu lên UI
         if (name != null) {
@@ -92,8 +86,6 @@ public class BookingActivity extends AppCompatActivity {
         etNumAdults.addTextChangedListener(new PriceWatcher());
         etNumChildren.addTextChangedListener(new PriceWatcher());
     }
-
-
 
     private void loadUserData() {
         HashMap<String, String> user = sessionManager.getUserDetails();
@@ -117,8 +109,14 @@ public class BookingActivity extends AppCompatActivity {
 
         int adults = parseIntOrZero(etNumAdults.getText().toString());
         int children = parseIntOrZero(etNumChildren.getText().toString());
-        String note = etBookingNote.getText().toString();
 
+        // Kiểm tra nếu cả vé người lớn và trẻ em đều bằng 0
+        if (adults == 0 && children == 0) {
+            Toast.makeText(this, "Vui lòng nhập ít nhất một vé người lớn hoặc trẻ em", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String note = etBookingNote.getText().toString();
         calculateTotalPrice();
 
         long bookingId = dbHelper.addBooking(userId, tourId, adults, children, note, totalPrice, "Pending");
@@ -130,13 +128,11 @@ public class BookingActivity extends AppCompatActivity {
 
         Log.d("BookingDebug", "Booking ID: " + bookingId);
 
-        // Chuyển sang màn hình PaymentActivity
         Intent intent = new Intent(BookingActivity.this, PaymentActivity.class);
         intent.putExtra("bookingId", bookingId);
         intent.putExtra("totalPrice", totalPrice);
         startActivity(intent);
     }
-
 
     private int parseIntOrZero(String value) {
         return value.isEmpty() ? 0 : Integer.parseInt(value);

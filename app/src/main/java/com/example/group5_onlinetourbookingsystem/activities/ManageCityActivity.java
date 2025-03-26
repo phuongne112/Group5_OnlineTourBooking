@@ -59,8 +59,4 @@ public class ManageCityActivity extends AppCompatActivity {
         });
     }
     @Override
-    public boolean onSupportNavigateUp() {
-        finish(); // Quay lại màn hình trước đó
-        return true;
-    }
-}
+

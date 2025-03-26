@@ -68,6 +68,22 @@
                     android:textColor="@android:color/holo_blue_dark"
                     android:textSize="14sp"
                     android:layout_marginTop="4dp" />
+                <TextView
+                    android:id="@+id/tvAdultCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="14sp"
+                    android:textColor="@android:color/black"
+                    android:layout_marginTop="2dp" />
+
+                <TextView
+                    android:id="@+id/tvBookingDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" "
+                    android:textSize="14sp"
+                    android:textColor="@color/black"/>
 
                 <!-- ✅ Trạng thái thanh toán -->
                 <TextView
@@ -88,6 +104,8 @@
                     android:textSize="14sp"
                     android:textColor="@android:color/black"
                     android:layout_marginTop="2dp" />
+
+
 
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

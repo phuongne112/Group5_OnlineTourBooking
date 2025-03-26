@@ -9,7 +9,7 @@
         android:id="@+id/tvBookingTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=" Booking List"
+        android:text=" Booking List "
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"

@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
+
         <!-- 🖼 Tour Image - Chiếm full chiều cao bên trái -->
         <ImageView
             android:id="@+id/imgTourImage"
@@ -40,6 +41,15 @@
             app:layout_constraintStart_toEndOf="@id/imgTourImage"
             app:layout_constraintEnd_toStartOf="@id/imgStatusIcon">
 
+            <TextView
+                android:id="@+id/tvTourName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tour Name"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="4dp"/>
             <!-- 🗓 Ngày đặt -->
             <TextView
                 android:id="@+id/tvBookingDate"
