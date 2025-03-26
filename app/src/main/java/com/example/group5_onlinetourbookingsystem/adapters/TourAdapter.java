@@ -1,6 +1,7 @@
 package com.example.group5_onlinetourbookingsystem.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.models.TourModel;
 import com.squareup.picasso.Picasso;
+
+import java.io.File;
 import java.util.ArrayList;
 
 public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
@@ -26,9 +29,8 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
     public TourAdapter(Context context, ArrayList<TourModel> tourList, OnTourClickListener listener) {
         this.context = context;
         this.tourList = tourList;
-        this.listener = listener; // Gán giá trị listener
+        this.listener = listener;
     }
-
 
     @NonNull
     @Override
@@ -45,15 +47,18 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
         holder.price.setText(String.format("$%.2f", tour.getPrice()));
         holder.duration.setText(tour.getDuration() + " days");
         holder.destination.setText(tour.getDestination());
-        holder.categoryTextView.setText("Category: " + tour.getCategoryName());  // Hiển thị category name thay vì ID
+        holder.categoryTextView.setText("Category: " + tour.getCategoryName());
 
-        int imageResource = context.getResources().getIdentifier(tour.getImage(), "drawable", context.getPackageName());
-
-        if (imageResource != 0) {
-            Uri imageUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + imageResource);
-            Picasso.get().load(imageUri).into(holder.TourImage);
+        // ✅ Chỉ hiển thị ảnh từ bộ nhớ trong
+        if (tour.getImage() != null && !tour.getImage().isEmpty()) {
+            File imageFile = new File(tour.getImage());
+            if (imageFile.exists()) {
+                Picasso.get().load(imageFile).into(holder.tourImage);
+            } else {
+                holder.tourImage.setImageResource(R.drawable.favorites); // Ảnh mặc định nếu không tìm thấy ảnh
+            }
         } else {
-            Picasso.get().load(R.drawable.favorites).into(holder.TourImage);
+            holder.tourImage.setImageResource(R.drawable.favorites);
         }
 
         holder.itemView.setOnClickListener(v -> {
@@ -61,7 +66,6 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
                 listener.onTourClick(tour);
             }
         });
-
     }
 
     @Override
@@ -71,7 +75,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView name, destination, price, duration, categoryTextView;
-        ImageView TourImage;
+        ImageView tourImage;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -79,7 +83,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
             destination = itemView.findViewById(R.id.tour_destination);
             price = itemView.findViewById(R.id.tour_price);
             duration = itemView.findViewById(R.id.tour_duration);
-            TourImage = itemView.findViewById(R.id.tour_image);
+            tourImage = itemView.findViewById(R.id.tour_image);
             categoryTextView = itemView.findViewById(R.id.textCategory);
         }
     }
@@ -89,10 +93,10 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
         tourList.addAll(newTourList);
         notifyDataSetChanged();
     }
+
     public void addTours(ArrayList<TourModel> newTours) {
         int startPosition = tourList.size();
         tourList.addAll(newTours);
         notifyItemRangeInserted(startPosition, newTours.size());
     }
-
 }

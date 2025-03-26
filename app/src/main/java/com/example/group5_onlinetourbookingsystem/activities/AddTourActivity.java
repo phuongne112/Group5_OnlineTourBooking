@@ -24,19 +24,25 @@ import androidx.core.content.ContextCompat;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
+import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
+import com.example.group5_onlinetourbookingsystem.models.CityModel;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class AddTourActivity extends AppCompatActivity {
-    private EditText etTourName, etDestination, etCityId, etPrice, etDuration, etCategoryId, etStartTime, etDescription;
-    private Spinner spinnerTourGuides;
+    private EditText etTourName, etDestination, etCityId, etPrice, etDuration, etStartTime, etDescription;
+    private Spinner spinnerTourGuides, spinnerCategory,spinnerCity;
     private Button btnAddTour, btnChooseImage;
     private ImageView ivSelectedImage;
     private String selectedImageName = "";
     private MyDatabaseHelper dbHelper;
-    private ArrayList<Integer> guideIdList;
+    private ArrayList<Integer> guideIdList, categoryIdList;
     private static final int REQUEST_STORAGE_PERMISSION = 101;
-
+    private ArrayList<Integer> cityIdList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,22 +51,25 @@ public class AddTourActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
 
         }
+        // Ánh xạ view
         etTourName = findViewById(R.id.etTourName);
         etDestination = findViewById(R.id.etDestination);
-        etCityId = findViewById(R.id.etCityId);
+        spinnerCity = findViewById(R.id.spinnerCity);
         etPrice = findViewById(R.id.etPrice);
         etDuration = findViewById(R.id.etDuration);
-        etCategoryId = findViewById(R.id.etCategoryId);
         etStartTime = findViewById(R.id.etStartTime);
         etDescription = findViewById(R.id.etDescription);
         spinnerTourGuides = findViewById(R.id.spinnerTourGuides);
+        spinnerCategory = findViewById(R.id.spinnerCategory);
         btnAddTour = findViewById(R.id.btnAddTour);
         btnChooseImage = findViewById(R.id.btnChooseImage);
         ivSelectedImage = findViewById(R.id.ivSelectedImage);
         dbHelper = new MyDatabaseHelper(this);
 
-        // 🟢 Tải danh sách Tour Guide vào Spinner
+        // Load dữ liệu vào Spinner
         loadTourGuides();
+        loadCategories();
+        loadCities();
 
         btnChooseImage.setOnClickListener(v -> checkPermissionAndPickImage());
         btnAddTour.setOnClickListener(v -> addTourToDatabase());
@@ -69,7 +78,7 @@ public class AddTourActivity extends AppCompatActivity {
     private void loadTourGuides() {
         ArrayList<String> guideNames = new ArrayList<>();
         guideIdList = new ArrayList<>();
-        Cursor cursor = dbHelper.getAllTourGuides(); // Lấy danh sách hướng dẫn viên
+        Cursor cursor = dbHelper.getAllTourGuides();
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
@@ -90,18 +99,41 @@ public class AddTourActivity extends AppCompatActivity {
         spinnerTourGuides.setAdapter(adapter);
     }
 
+    private void loadCategories() {
+        ArrayList<String> categoryNames = new ArrayList<>();
+        categoryIdList = new ArrayList<>();
+
+        // Lấy danh sách danh mục từ cơ sở dữ liệu
+        ArrayList<CategoryModel> categoryList = dbHelper.getAllCategories();
+
+        // Duyệt qua danh sách danh mục
+        for (CategoryModel category : categoryList) {
+            categoryNames.add(category.getName());
+            categoryIdList.add(category.getId());
+        }
+
+        // Nếu không có danh mục nào, thêm mục mặc định
+        if (categoryNames.isEmpty()) {
+            categoryNames.add("Không có danh mục");
+            categoryIdList.add(-1);
+        }
+
+        // Gán danh sách vào Spinner
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, categoryNames);
+        spinnerCategory.setAdapter(adapter);
+    }
+
+
     private void addTourToDatabase() {
         String name = etTourName.getText().toString().trim();
         String destination = etDestination.getText().toString().trim();
         String priceStr = etPrice.getText().toString().trim();
         String durationStr = etDuration.getText().toString().trim();
-        String categoryIdStr = etCategoryId.getText().toString().trim();
-        String cityIdStr = etCityId.getText().toString().trim();
         String startTime = etStartTime.getText().toString().trim();
         String description = etDescription.getText().toString().trim();
 
-        if (name.isEmpty() || destination.isEmpty() || priceStr.isEmpty() || durationStr.isEmpty()
-                || categoryIdStr.isEmpty() || cityIdStr.isEmpty() || startTime.isEmpty() || description.isEmpty()) {
+        // ⚠️ XÓA `cityIdStr` khỏi điều kiện kiểm tra
+        if (name.isEmpty() || destination.isEmpty() || priceStr.isEmpty() || durationStr.isEmpty() || startTime.isEmpty() || description.isEmpty()) {
             Toast.makeText(this, "Vui lòng điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -109,14 +141,17 @@ public class AddTourActivity extends AppCompatActivity {
         try {
             double price = Double.parseDouble(priceStr);
             int duration = Integer.parseInt(durationStr);
-            int categoryId = Integer.parseInt(categoryIdStr);
-            int cityId = Integer.parseInt(cityIdStr);
-            int selectedGuideId = guideIdList.get(spinnerTourGuides.getSelectedItemPosition());
 
-            // 🟢 Thêm tour và lấy ID tour vừa thêm
-            int tourId = dbHelper.addTour(name, destination, cityId, price, duration, selectedImageName, categoryId, startTime, description);
+            // ✅ Lấy cityId từ spinnerCity thay vì EditText
+            int selectedCityId = cityIdList.get(spinnerCity.getSelectedItemPosition());
 
-            // 🟢 Thêm Guide vào bảng `tour_guides`
+            int selectedGuideId = (guideIdList.isEmpty()) ? -1 : guideIdList.get(spinnerTourGuides.getSelectedItemPosition());
+            int selectedCategoryId = (categoryIdList.isEmpty()) ? -1 : categoryIdList.get(spinnerCategory.getSelectedItemPosition());
+
+            String imageName = (selectedImageName == null) ? "" : selectedImageName;
+
+            int tourId = dbHelper.addTour(name, destination, selectedCityId, price, duration, imageName, selectedCategoryId, startTime, description);
+
             if (selectedGuideId != -1) {
                 dbHelper.assignUserToTourGuide(tourId, selectedGuideId);
             }
@@ -127,7 +162,8 @@ public class AddTourActivity extends AppCompatActivity {
             Toast.makeText(this, "Lỗi nhập số: Vui lòng nhập giá trị hợp lệ!", Toast.LENGTH_SHORT).show();
         }
     }
-    // Kiểm tra và yêu cầu quyền truy cập ảnh
+
+
     private void checkPermissionAndPickImage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
@@ -144,48 +180,68 @@ public class AddTourActivity extends AppCompatActivity {
         }
     }
 
-    // Mở thư viện ảnh
     private void pickImageFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         imagePickerLauncher.launch(intent);
     }
 
-    // Nhận kết quả từ thư viện ảnh
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Uri selectedImageUri = result.getData().getData();
-                    selectedImageName = getFileNameWithoutExtension(selectedImageUri); // 🟢 Lấy tên file không có đuôi mở rộng
-                    ivSelectedImage.setImageURI(selectedImageUri); // Hiển thị ảnh đã chọn
+                    if (selectedImageUri != null) {
+                        selectedImageName = copyImageToInternalStorage(selectedImageUri);
+                        ivSelectedImage.setImageURI(selectedImageUri);
+                    }
                 }
             }
     );
+    private void loadCities() {
+        ArrayList<String> cityNames = new ArrayList<>();
+        cityIdList = new ArrayList<>();
 
-    // Lấy tên file từ URI và bỏ phần mở rộng (.jpg, .png, ...)
-    private String getFileNameWithoutExtension(Uri uri) {
-        String fileName = null;
-        if (uri.getScheme().equals("content")) {
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-            if (cursor != null) {
-                int nameIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
-                cursor.moveToFirst();
-                fileName = cursor.getString(nameIndex);
-                cursor.close();
+        ArrayList<CityModel> cityList = dbHelper.getAllCities2(); // ✅ Sử dụng hàm mới
+
+        for (CityModel city : cityList) {
+            cityNames.add(city.getName());
+            cityIdList.add(city.getId());
+        }
+
+        if (cityNames.isEmpty()) {
+            cityNames.add("Không có thành phố");
+            cityIdList.add(-1);
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, cityNames);
+        spinnerCity.setAdapter(adapter);
+    }
+
+
+    private String copyImageToInternalStorage(Uri imageUri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+            File directory = new File(getFilesDir(), "tour_images");
+            if (!directory.exists()) {
+                directory.mkdirs();
             }
-        }
-        if (fileName == null) {
-            fileName = uri.getPath();
-            int cut = fileName.lastIndexOf('/');
-            if (cut != -1) {
-                fileName = fileName.substring(cut + 1);
+            String fileName = System.currentTimeMillis() + ".jpg";
+            File file = new File(directory, fileName);
+            FileOutputStream outputStream = new FileOutputStream(file);
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
             }
+
+            outputStream.close();
+            inputStream.close();
+            return file.getAbsolutePath();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
-        // 🟢 Loại bỏ phần mở rộng (.jpg, .png, .jpeg, ...)
-        if (fileName.contains(".")) {
-            fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-        }
-        return fileName;
     }
     @Override
     public boolean onSupportNavigateUp() {
