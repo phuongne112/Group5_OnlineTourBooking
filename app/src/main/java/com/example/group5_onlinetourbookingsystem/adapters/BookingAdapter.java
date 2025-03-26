@@ -19,8 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
+import com.example.group5_onlinetourbookingsystem.activities.BookingDetailActivity;
 import com.example.group5_onlinetourbookingsystem.models.BookingModel;
-import com.example.group5_onlinetourbookingsystem.activities.b;
 
 import java.util.ArrayList;
 import java.util.List;
