@@ -34,10 +34,11 @@ public class UserProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
-
         }
+
         sessionManager = new SessionManager(this);
         userId = sessionManager.getUserId();
         myDB = new MyDatabaseHelper(this);
@@ -84,30 +85,25 @@ public class UserProfileActivity extends AppCompatActivity {
             tvUserPhone.setText(user.getPhone());
             tvUserBirth.setText(user.getBirthDate());
 
-            Log.d("Database", "Loaded user image path: " + user.getImage());
-            // Kiểm tra ảnh từ database
-            if (user.getImage() != null && !user.getImage().isEmpty()) {
-                userImagePath = user.getImage();
+            userImagePath = user.getImage(); // Lấy đường dẫn ảnh từ CSDL
 
-                Log.d("ImagePath", "Before Glide load: " + userImagePath);
-                if (userImagePath.startsWith("content://")) {
-                    Glide.with(this)
-                            .load(Uri.parse(userImagePath))
-                            .placeholder(R.drawable.ic_user_placeholder)
-                            .error(R.drawable.ic_user_placeholder)
-                            .into(imgUserProfile);
+            if (userImagePath != null && !userImagePath.isEmpty()) {
+                // Kiểm tra nếu ảnh là trong drawable
+                int imageResId = getResources().getIdentifier(userImagePath, "drawable", getPackageName());
+                if (imageResId != 0) {
+                    imgUserProfile.setImageResource(imageResId);
+
                 } else {
-                    Glide.with(this)
-                            .load(Uri.fromFile(new File(userImagePath))) // Chuyển đổi file path thành URI
-                            .placeholder(R.drawable.ic_user_placeholder)
-                            .error(R.drawable.ic_user_placeholder)
-                            .into(imgUserProfile);
+
+                    imgUserProfile.setImageResource(R.drawable.ic_profile);
                 }
             } else {
-                imgUserProfile.setImageResource(R.drawable.ic_user_placeholder);
+                imgUserProfile.setImageResource(R.drawable.ic_profile);
+                // Log.e("ImageLoad", "Image path is null or empty");
             }
         }
     }
+
     @Override
     public boolean onSupportNavigateUp() {
         finish(); // Quay lại màn hình trước đó
@@ -121,5 +117,4 @@ public class UserProfileActivity extends AppCompatActivity {
             loadUserProfile(userId);
         }
     }
-
 }

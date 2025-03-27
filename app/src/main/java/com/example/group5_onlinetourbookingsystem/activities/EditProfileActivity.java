@@ -1,63 +1,57 @@
 package com.example.group5_onlinetourbookingsystem.activities;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import com.bumptech.glide.Glide;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
-import com.example.group5_onlinetourbookingsystem.MainActivity;
 import com.example.group5_onlinetourbookingsystem.R;
+import com.example.group5_onlinetourbookingsystem.adapters.DrawableImageAdapter;
 import com.example.group5_onlinetourbookingsystem.models.UserModel;
 import com.example.group5_onlinetourbookingsystem.utils.SessionManager;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
-
 public class EditProfileActivity extends AppCompatActivity {
+
     private EditText edtUserName, edtUserPhone, edtUserBirth;
     private ImageView imgUserProfile;
     private Button btnSaveProfile, btnChangeImage;
     private MyDatabaseHelper myDB;
     private SessionManager sessionManager;
     private int userId;
-    private String selectedImagePath = "";
+    private String selectedImageName = ""; // Lưu tên ảnh
+    private final String[] drawableImages = {
+            "avatar1", "avatar2", "avatar3", "avatar4", "avatar5" // Thay bằng tên các ảnh trong drawable của bạn
+    };
 
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private static final int STORAGE_PERMISSION_REQUEST = 100;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        }
         sessionManager = new SessionManager(this);
         userId = sessionManager.getUserId();
 
         if (userId == -1) {
             Toast.makeText(this, "Lỗi: Không lấy được userId! Vui lòng đăng nhập lại.", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(EditProfileActivity.this, MainActivity.class));
+            startActivity(new Intent(this, UserProfileActivity.class));
             finish();
             return;
         }
@@ -72,94 +66,59 @@ public class EditProfileActivity extends AppCompatActivity {
         myDB = new MyDatabaseHelper(this);
         loadUserProfile(userId);
 
-        btnChangeImage.setOnClickListener(v -> checkAndRequestPermissions());
+        btnChangeImage.setOnClickListener(v -> showImageSelectionDialog());
         btnSaveProfile.setOnClickListener(v -> updateUserProfile());
     }
 
-    private void checkAndRequestPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, STORAGE_PERMISSION_REQUEST);
+    private void showImageSelectionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_select_image, null);
+        builder.setView(dialogView);
+
+        RecyclerView recyclerViewImages = dialogView.findViewById(R.id.recyclerViewImages);
+        recyclerViewImages.setLayoutManager(new GridLayoutManager(this, 3));
+
+        DrawableImageAdapter imageAdapter = new DrawableImageAdapter(this, Arrays.asList(drawableImages), imageName -> {
+            selectedImageName = imageName; // Lưu tên tài nguyên ảnh
+            int resourceId = getResources().getIdentifier(selectedImageName, "drawable", getPackageName());
+            if (resourceId != 0) {
+                imgUserProfile.setImageResource(resourceId); // Hiển thị ảnh
             } else {
-                openGallery();
+                Toast.makeText(this, "Không tìm thấy ảnh: " + selectedImageName, Toast.LENGTH_SHORT).show();
             }
-        } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_REQUEST);
-            } else {
-                openGallery();
+            // Đóng dialog sau khi chọn
+            AlertDialog dialog = (AlertDialog) recyclerViewImages.getTag();
+            if (dialog != null) {
+                dialog.dismiss();
             }
-        }
+        });
+
+
+        recyclerViewImages.setAdapter(imageAdapter);
+
+
+        AlertDialog dialog = builder.create();
+        recyclerViewImages.setTag(dialog); // Lưu dialog để đóng sau khi chọn
+        dialog.show();
     }
 
-    private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_PERMISSION_REQUEST) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openGallery();
-            } else {
-                Toast.makeText(this, "Bạn cần cấp quyền để chọn ảnh!", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
-            Uri imageUri = data.getData();
-            if (imageUri != null) {
-                selectedImagePath = getRealPathFromURI(imageUri);
-                Glide.with(this).load(imageUri).into(imgUserProfile);
-                Log.d("ImagePath", "Selected: " + selectedImagePath);
-            }
-        }
-    }
-
-    private String getRealPathFromURI(Uri uri) {
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-        if (cursor != null) {
-            int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            String path = cursor.getString(columnIndex);
-            cursor.close();
-            return path;
-        }
-        return uri.toString();
-    }
     private void loadUserProfile(int userId) {
         UserModel user = myDB.getUserById(userId);
         if (user != null) {
             edtUserName.setText(user.getName());
             edtUserPhone.setText(user.getPhone());
             edtUserBirth.setText(user.getBirthDate());
-
-            if (user.getImage() != null && !user.getImage().isEmpty()) {
-                selectedImagePath = user.getImage();
-                Glide.with(this)
-                        .load(selectedImagePath.startsWith("content://") ? Uri.parse(selectedImagePath) : Uri.fromFile(new File(selectedImagePath)))
-                        .into(imgUserProfile);
-            } else {
-                imgUserProfile.setImageResource(R.drawable.ic_user_placeholder);
+            selectedImageName = user.getImage(); // Lưu tên ảnh từ database
+            Log.d("Database", "User image from DB: " + selectedImageName);
+            if (selectedImageName != null && !selectedImageName.isEmpty()) {
+                int resourceId = getResources().getIdentifier(selectedImageName, "drawable", getPackageName());
+                if (resourceId != 0) {
+                    imgUserProfile.setImageResource(resourceId);
+                } else {
+                    imgUserProfile.setImageResource(R.drawable.favorites);
+                }
             }
-        }
-    }
-
-    private boolean isValidBirthDate(String birthDate) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        sdf.setLenient(false);
-        try {
-            Date date = sdf.parse(birthDate);
-            return !date.after(new Date());
-        } catch (ParseException e) {
-            return false;
         }
     }
 
@@ -174,33 +133,43 @@ public class EditProfileActivity extends AppCompatActivity {
         }
 
         if (!isValidBirthDate(newBirthDate)) {
-            Toast.makeText(this, "Ngày sinh phải đúng định dạng dd/MM/yyyy và không được quá ngày hiện tại!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Ngày sinh không hợp lệ!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Log.d("ImagePath", "Before check: " + selectedImagePath);
-        if (selectedImagePath.isEmpty()) {
-            UserModel currentUser = myDB.getUserById(userId);
-            if (currentUser != null) {
-                selectedImagePath = currentUser.getImage();
+        // Nếu chưa chọn ảnh mới, lấy ảnh cũ từ database
+        if (selectedImageName.isEmpty()) {
+            UserModel user = myDB.getUserById(userId);
+            if (user != null && user.getImage() != null) {
+                selectedImageName = user.getImage();
             }
         }
-        Log.d("ImagePath", "After check: " + selectedImagePath);
 
-        boolean isUpdated = myDB.updateUser(userId, newName, newPhone, newBirthDate, selectedImagePath);
-
+        boolean isUpdated = myDB.updateUser(userId, newName, newPhone, newBirthDate, selectedImageName);
         if (isUpdated) {
             Toast.makeText(this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent();
-            setResult(RESULT_OK, intent);
+            setResult(RESULT_OK);
             finish();
         } else {
             Toast.makeText(this, "Lỗi khi cập nhật!", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    private boolean isValidBirthDate(String birthDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        sdf.setLenient(false);
+        try {
+            Date date = sdf.parse(birthDate);
+            return !date.after(new Date());
+        } catch (ParseException e) {
+            return false;
+        }
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
-        finish(); // Quay lại màn hình trước đó
+        finish();
         return true;
     }
 }

@@ -51,29 +51,51 @@ public class AdminBookingFragment extends Fragment {
 
     private void loadBookings() {
         bookingList.clear();
-        Cursor cursor = dbHelper.getAllBookingsWithTourInfo();
+//        Cursor cursor = dbHelper.getAllBookingsWithTourInfo();
+//        if (cursor == null || cursor.getCount() == 0) {
+//            Log.e("AdminBookingFragment", "Cursor is NULL");
+//            tvNoAdminBooking.setVisibility(View.VISIBLE);
+//            return;
+//        }
+//
+//        if (cursor.getCount() == 0) {
+//            Log.e("AdminBookingFragment", "No bookings found in DB");
+//            tvNoAdminBooking.setVisibility(View.VISIBLE);
+//            return;
+//        }
+//
+//        tvNoAdminBooking.setVisibility(View.GONE);
+//
+//        while (cursor.moveToNext()) {
+//            int bookingId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+//            String tourName = cursor.getString(cursor.getColumnIndexOrThrow("tour_name"));
+//            if (tourName == null) {
+//                Log.e("AdminBookingFragment", "Tour Name is NULL for booking ID: " + bookingId);
+//            } else {
+//                Log.d("AdminBookingFragment", "Tour Name from DB: " + tourName);
+//            }
+//            String bookingDate = cursor.getString(cursor.getColumnIndexOrThrow("booking_date"));
+//            double totalPrice = cursor.getDouble(cursor.getColumnIndexOrThrow("total_price"));
+//            String bookingStatus = cursor.getString(cursor.getColumnIndexOrThrow("booking_status"));
+//            String paymentStatus = cursor.getString(cursor.getColumnIndexOrThrow("payment_status"));
+//
+//            bookingList.add(new BookingModel(bookingId, 0, 0, 0, 0, tourName, totalPrice, bookingStatus, paymentStatus, "", bookingDate));
+//        }
+//
+//        cursor.close();
+//        bookingAdapter.notifyDataSetChanged();
+//    }
+        bookingList.addAll(dbHelper.getAllBookingsWithTourInfo());
+        List<BookingModel> bookings = dbHelper.getAllBookingsWithTourInfo(); // Lấy danh sách booking
 
-        if (cursor == null || cursor.getCount() == 0) {
-
+        if (bookings == null || bookings.isEmpty()) {
+            Log.e("AdminBookingFragment", "No bookings found in DB");
             tvNoAdminBooking.setVisibility(View.VISIBLE);
-            return;
+        } else {
+            tvNoAdminBooking.setVisibility(View.GONE);
+            bookingList.addAll(bookings);
         }
 
-        tvNoAdminBooking.setVisibility(View.GONE);
-
-        while (cursor.moveToNext()) {
-            int bookingId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-            String tourName = cursor.getString(cursor.getColumnIndexOrThrow("tour_name"));
-            Log.d("AdminBookingFragment", "Tour Name from DB: " + tourName);
-            String bookingDate = cursor.getString(cursor.getColumnIndexOrThrow("booking_date"));
-            double totalPrice = cursor.getDouble(cursor.getColumnIndexOrThrow("total_price"));
-            String bookingStatus = cursor.getString(cursor.getColumnIndexOrThrow("booking_status"));
-            String paymentStatus = cursor.getString(cursor.getColumnIndexOrThrow("payment_status"));
-
-            bookingList.add(new BookingModel(bookingId, 0, 0, 0, 0, tourName, totalPrice, bookingStatus, paymentStatus, "", bookingDate));
-        }
-
-        cursor.close();
-        bookingAdapter.notifyDataSetChanged();
+        bookingAdapter.notifyDataSetChanged(); // Cập nhật RecyclerView
     }
 }

@@ -98,7 +98,8 @@
         private static final String COLUMN_BOOKING_ADULT_COUNT = "adult_count";
         private static final String COLUMN_BOOKING_CHILD_COUNT = "child_count";
         private static final String COLUMN_BOOKING_NOTE = "note";
-        // Bảng Contacts
+
+         // Bảng Contacts
         private static final String TABLE_CONTACTS = "contacts";
         private static final String COLUMN_CONTACT_ID = "contact_id";
         private static final String COLUMN_FULL_NAME = "full_name";
@@ -697,7 +698,7 @@
             SQLiteDatabase db = this.getReadableDatabase();
             UserModel user = null;
 
-            String query = "SELECT id, name, email, phone, birth_date, status, role_id FROM users WHERE id = ?";
+            String query = "SELECT id, name, email, phone, birth_date, image, status, role_id FROM users WHERE id = ?";
             Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
 
             if (cursor.moveToFirst()) {
@@ -706,12 +707,13 @@
                 String email = cursor.getString(2);
                 String phone = cursor.getString(3);
                 String birthDate = cursor.getString(4);
-                String status = cursor.getString(5);
-                int roleId = cursor.getInt(6);
-                Log.d("Database", "User found: ID=" + id + ", Name=" + name + ", Email=" + email);
+                String image = cursor.getString(5); // Lấy thêm đường dẫn ảnh
+                String status = cursor.getString(6);
+                int roleId = cursor.getInt(7);
 
-                user = new UserModel(id, name, email, phone, birthDate , "active",roleId); // Mặc định trạng thái active
+                Log.d("Database", "User found: ID=" + id + ", Name=" + name + ", Email=" + email + ", Image=" + image);
 
+                user = new UserModel(id, name, email, phone, birthDate, image,"acitve",roleId);
             } else {
                 Log.e("Database", "Không tìm thấy user với ID: " + userId);
             }
@@ -739,7 +741,7 @@
                     String birthDate = cursor.getString(4);
                     String status = cursor.getString(5);
                     int roleId = cursor.getInt(6);
-                    userList.add(new UserModel(id, name, email, phone, birthDate, status,roleId));
+                    userList.add(new UserModel(id, name, email, phone, birthDate, status,"active",roleId));
                 } while (cursor.moveToNext());
 
                 cursor.close();
@@ -1095,19 +1097,65 @@
             db.close();
             return totalRevenue;
         }
-        public Cursor getAllBookingsWithTourInfo() {
+//        public Cursor getAllBookingsWithTourInfo() {
+//            SQLiteDatabase db = this.getReadableDatabase();
+//            String query = "SELECT b.id AS _id, t.name AS tour_name, b.booking_date, " +
+//                    "b.adult_count, b.child_count, b.total_price, " +
+//                    "b.status AS booking_status, " +
+//                    "(SELECT status FROM payments WHERE booking_id = b.id) AS payment_status " +
+//                    "FROM bookings b " +
+//                    "JOIN tours t ON b.tour_id = t.id " +
+//                    "ORDER BY b.booking_date DESC";
+//            return db.rawQuery(query, null);
+//        }
+
+//        public Cursor getAllBookingsWithTourInfo() {
+//            SQLiteDatabase db = this.getReadableDatabase();
+//            String query = "SELECT b.id AS _id, " +
+//                    "COALESCE(t.name, 'Unknown Tour') AS tour_name, " + // Nếu NULL, thay bằng 'Unknown Tour'
+//                    "b.booking_date, b.total_price, " +
+//                    "b.status AS booking_status, " +
+//                    "(SELECT status FROM payments WHERE booking_id = b.id) AS payment_status " +
+//                    "FROM bookings b " +
+//                    "LEFT JOIN tours t ON b.tour_id = t.id " + // Sử dụng LEFT JOIN để tránh mất dữ liệu
+//                    "ORDER BY b.booking_date DESC";
+//            return db.rawQuery(query, null);
+//        }
+
+        public List<BookingModel> getAllBookingsWithTourInfo() {
             SQLiteDatabase db = this.getReadableDatabase();
-            String query = "SELECT b.id AS _id, t.name AS tour_name, b.booking_date, " +
-                    "b.adult_count, b.child_count, b.total_price, " +
+            List<BookingModel> bookingList = new ArrayList<>();
+
+            String query = "SELECT b.id, " +
+                    "t.name AS tourName, " +
+                    "b.booking_date, " +
+                    "b.total_price, " +
                     "b.status AS booking_status, " +
                     "(SELECT status FROM payments WHERE booking_id = b.id) AS payment_status " +
                     "FROM bookings b " +
                     "JOIN tours t ON b.tour_id = t.id " +
                     "ORDER BY b.booking_date DESC";
-            return db.rawQuery(query, null);
+
+            Cursor cursor = db.rawQuery(query, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    BookingModel booking = new BookingModel();
+                    booking.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                    booking.setTourName(cursor.getString(cursor.getColumnIndexOrThrow("tourName")));
+                    booking.setDate(cursor.getString(cursor.getColumnIndexOrThrow("booking_date")));
+                    booking.setTotalPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")));
+                    booking.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("booking_status")));
+                    booking.setPaymentStatus(cursor.getString(cursor.getColumnIndexOrThrow("payment_status")));
+
+                    bookingList.add(booking);
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return bookingList;
         }
-
-
 
 
         // 🛠 Cập nhật trạng thái booking
@@ -1682,6 +1730,8 @@
             db.close();
             return tourList;
         }
+
+
         public ArrayList<TourModel> getToursByCategoryId(int categoryId) {
             ArrayList<TourModel> tourList = new ArrayList<>();
             SQLiteDatabase db = this.getReadableDatabase();
@@ -1718,5 +1768,72 @@
             db.close();
             return tourList;
         }
+
+
+        // Hàm để lấy số booking trong khoảng thời gian
+        public int getBookedToursCountInRange(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            // Câu truy vấn để đếm số lượng bookings trong khoảng thời gian
+            String query = "SELECT COUNT(*) FROM bookings WHERE booking_date BETWEEN ? AND ?";
+
+            // Chuyển đổi ngày tháng thành định dạng yyyy-MM-dd
+            String startDate = startYear + "-" + (startMonth + 1) + "-" + startDay;
+            String endDate = endYear + "-" + (endMonth + 1) + "-" + endDay;
+
+            // Truy vấn cơ sở dữ liệu với khoảng thời gian đã chọn
+            Cursor cursor = db.rawQuery(query, new String[]{startDate, endDate});
+            int count = 0;
+
+            if (cursor.moveToFirst()) {
+                count = cursor.getInt(0);  // Lấy kết quả đếm từ câu truy vấn
+            }
+
+            cursor.close();
+            return count;
+        }
+
+        public int getBookingsCountInRange(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            // Câu truy vấn để đếm số lượng bookings trong khoảng thời gian
+            String query = "SELECT COUNT(*) FROM bookings WHERE booking_date BETWEEN ? AND ?";
+
+            // Chuyển đổi ngày tháng thành định dạng yyyy-MM-dd
+            String startDate = startYear + "-" + (startMonth + 1) + "-" + startDay;
+            String endDate = endYear + "-" + (endMonth + 1) + "-" + endDay;
+
+            // Truy vấn cơ sở dữ liệu với khoảng thời gian đã chọn
+            Cursor cursor = db.rawQuery(query, new String[]{startDate, endDate});
+            int count = 0;
+
+            if (cursor.moveToFirst()) {
+                count = cursor.getInt(0);  // Lấy kết quả đếm từ câu truy vấn
+            }
+
+            cursor.close();
+            return count;
+        }
+
+        public float getTotalRevenueInRange(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            // Câu truy vấn để tính tổng doanh thu
+            String query = "SELECT SUM(total_price) FROM bookings WHERE booking_date BETWEEN ? AND ?";
+
+            // Chuyển đổi ngày tháng thành định dạng yyyy-MM-dd
+            String startDate = startYear + "-" + (startMonth + 1) + "-" + startDay;
+            String endDate = endYear + "-" + (endMonth + 1) + "-" + endDay;
+
+            // Truy vấn cơ sở dữ liệu với khoảng thời gian đã chọn
+            Cursor cursor = db.rawQuery(query, new String[]{startDate, endDate});
+            float totalRevenue = 0;
+
+            if (cursor.moveToFirst()) {
+                totalRevenue = cursor.getFloat(0);  // Lấy kết quả doanh thu từ câu truy vấn
+            }
+
+            cursor.close();
+            return totalRevenue;
+        }
+
     }
+
 

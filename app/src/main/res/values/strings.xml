@@ -12,5 +12,7 @@
 
     <string name="language_label" translatable="false">Chọn Ngôn Ngữ:</string>
     <string name="save_button" translatable="false">Lưu Cài Đặt</string>
-
+    <string name="password_requirements">
+        Password must have: \n+ at least 6 characters \n+ at least uppercase \n+ numbers \n+ at least special characters.
+    </string>
 </resources>

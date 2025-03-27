@@ -19,10 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
-import com.example.group5_onlinetourbookingsystem.activities.BookingDetailActivity;
 import com.example.group5_onlinetourbookingsystem.models.BookingModel;
+import com.example.group5_onlinetourbookingsystem.activities.BookingDetailActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingViewHolder> {
@@ -36,14 +35,6 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
         this.bookingList = bookingList;
         this.dbHelper = dbHelper;
         this.isAdmin = isAdmin;
-
-//        this.bookingList = new ArrayList<>();
-//        for (BookingModel booking : bookingList) {
-//            if (booking.getTotalPrice() > 0) {
-//                this.bookingList.add(booking);
-//            }
-//        }
-
     }
 
     @NonNull
@@ -61,20 +52,10 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
         holder.tvBookingDate.setText("Date: " + booking.getDate());
         holder.tvTotalPrice.setText(String.format("%,d $", (int) booking.getTotalPrice()));
 
-        // Load image
-        String imageNameRaw = booking.getTourImage();
-        String imageName = "placeholder_image";
-        if (imageNameRaw != null && !imageNameRaw.trim().isEmpty()) {
-            imageName = imageNameRaw.replace(".jpg", "").replace(".png", "").toLowerCase().trim();
-        }
-        int imageResId = context.getResources().getIdentifier(imageName, "drawable", context.getPackageName());
-        holder.imgTourImage.setImageResource(imageResId != 0 ? imageResId : R.drawable.placeholder_image);
-
         // Payment Spinner
         String[] paymentStatuses = {"Pending", "Completed", "Failed"};
         ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, paymentStatuses);
         holder.spinnerPayment.setAdapter(paymentAdapter);
-
 
         String bookingPaymentStatus = (booking.getPaymentStatus() == null || booking.getPaymentStatus().isEmpty())
                 ? "Pending" : booking.getPaymentStatus();
@@ -122,6 +103,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
                     if (!newPaymentStatus.equalsIgnoreCase(booking.getPaymentStatus())) {
                         dbHelper.updatePaymentStatus(booking.getId(), newPaymentStatus);
                         booking.setPaymentStatus(newPaymentStatus);
+                        notifyDataSetChanged(); // Cập nhật lại danh sách
                         Toast.makeText(context, "Trạng thái thanh toán cập nhật!", Toast.LENGTH_SHORT).show();
 
                         holder.spinnerBooking.setEnabled(newPaymentStatus.equalsIgnoreCase("Completed"));
@@ -156,6 +138,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
                     if (!newBookingStatus.equalsIgnoreCase(booking.getStatus()) && booking.getPaymentStatus().equalsIgnoreCase("Completed")) {
                         dbHelper.updateBookingStatus(booking.getId(), newBookingStatus);
                         booking.setStatus(newBookingStatus);
+                        notifyDataSetChanged(); // Cập nhật lại danh sách
                         Toast.makeText(context, "Trạng thái đặt chỗ cập nhật!", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -171,10 +154,6 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             intent.putExtra("booking", booking);
             context.startActivity(intent);
         });
-
-        Log.d("BookingAdapterDebug", "Booking ID: " + booking.getId());
-        Log.d("BookingAdapterDebug", "Payment Status: " + booking.getPaymentStatus());
-        Log.d("BookingAdapterDebug", "Booking Status: " + booking.getStatus());
     }
 
     @Override
@@ -185,7 +164,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
     public static class BookingViewHolder extends RecyclerView.ViewHolder {
         TextView tvTourName, tvBookingDate, tvTotalPrice;
         Spinner spinnerPayment, spinnerBooking;
-        ImageView imgStatusIcon, imgTourImage;
+        ImageView imgStatusIcon;
 
         public BookingViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -195,7 +174,6 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             spinnerPayment = itemView.findViewById(R.id.spinnerPayment);
             spinnerBooking = itemView.findViewById(R.id.spinnerBooking);
             imgStatusIcon = itemView.findViewById(R.id.imgStatusIcon);
-            imgTourImage = itemView.findViewById(R.id.imgTourImage);
         }
     }
 

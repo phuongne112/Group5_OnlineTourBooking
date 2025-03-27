@@ -30,6 +30,9 @@ public class BookingModel implements Serializable {
         this.date = date;
     }
 
+    public BookingModel() {
+    }
+
     // ✅ Constructor đơn giản để hiển thị tóm tắt booking
     public BookingModel(int id, String date, String status, int adultCount, int childCount, String name) {
         this.id = id;

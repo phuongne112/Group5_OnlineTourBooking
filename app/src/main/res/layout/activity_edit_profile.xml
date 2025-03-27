@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="#F5F5F5">
+    android:background="#8EBEED"> <!-- Nền xanh -->
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -13,25 +13,23 @@
         android:layout_margin="16dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="6dp"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@android:color/white"> <!-- Card trắng để nổi bật -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center">
-
-            <!-- Ảnh đại diện -->
+            android:padding="16dp">
 
             <ImageView
                 android:id="@+id/imgUserProfile"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
                 android:src="@drawable/ic_user_placeholder"
                 android:scaleType="centerCrop"
                 android:layout_marginBottom="16dp"
-                android:background="@android:color/darker_gray"
-                android:contentDescription="User Profile Image"
+                android:layout_gravity="center"
                 android:clipToOutline="true" />
 
             <Button
@@ -40,37 +38,56 @@
                 android:layout_height="wrap_content"
                 android:text="Đổi ảnh đại diện"
                 android:layout_gravity="center"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="10dp" />
 
-            <!-- Họ và tên -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Họ và tên"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp" />
+
             <EditText
                 android:id="@+id/edtUserName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Họ và tên"
+                android:hint="Nhập họ và tên"
                 android:textSize="18sp"
-                android:textStyle="bold"
                 android:padding="8dp" />
 
-            <!-- Số điện thoại -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Số điện thoại"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp" />
+
             <EditText
                 android:id="@+id/edtUserPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Số điện thoại"
+                android:hint="Nhập số điện thoại"
                 android:textSize="16sp"
                 android:padding="8dp" />
 
-            <!-- Ngày sinh -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ngày sinh"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp" />
+
             <EditText
                 android:id="@+id/edtUserBirth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ngày sinh"
+                android:hint="Nhập ngày sinh"
                 android:textSize="16sp"
                 android:padding="8dp" />
 
-            <!-- Nút lưu thông tin -->
             <Button
                 android:id="@+id/btnSaveProfile"
                 android:layout_width="wrap_content"
@@ -82,7 +99,5 @@
                 android:textColor="@android:color/white" />
 
         </LinearLayout>
-
     </androidx.cardview.widget.CardView>
-
 </LinearLayout>

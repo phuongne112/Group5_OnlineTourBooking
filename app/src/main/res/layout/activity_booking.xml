@@ -47,6 +47,15 @@
                     tools:text="250.00 $"/>
 
                 <TextView
+                    android:id="@+id/booking_tour_price2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/red"
+                    android:textStyle="bold"
+                    tools:text="250.00 $"/>
+
+                <TextView
                     android:id="@+id/booking_tour_duration"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -24,6 +24,15 @@
             android:paddingHorizontal="16dp"
             android:gravity="center_horizontal">
 
+            <!-- Full Name Label and Input -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Full Name"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
             <EditText
                 android:id="@+id/etUsername"
                 android:layout_width="match_parent"
@@ -33,6 +42,15 @@
                 android:background="@android:drawable/editbox_background"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp" />
+
+            <!-- Email Label and Input -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Email"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
 
             <EditText
                 android:id="@+id/etEmail"
@@ -44,6 +62,15 @@
                 android:padding="12dp"
                 android:layout_marginBottom="12dp" />
 
+            <!-- Phone Label and Input -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Phone"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
             <EditText
                 android:id="@+id/etPhone"
                 android:layout_width="match_parent"
@@ -53,6 +80,15 @@
                 android:background="@android:drawable/editbox_background"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp" />
+
+            <!-- Password Label and Input -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Password"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
 
             <EditText
                 android:id="@+id/etPassword"
@@ -64,6 +100,15 @@
                 android:padding="12dp"
                 android:layout_marginBottom="12dp" />
 
+            <!-- Date of Birth Label and Input -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Date of Birth (DD/MM/YYYY)"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
             <EditText
                 android:id="@+id/etBirthDate"
                 android:layout_width="match_parent"
@@ -74,6 +119,15 @@
                 android:background="@android:drawable/editbox_background"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp" />
+
+            <!-- Role Label and RadioGroup -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Role"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
 
             <RadioGroup
                 android:id="@+id/rgRole"
@@ -91,12 +145,19 @@
                     android:layout_marginEnd="16dp" />
 
                 <RadioButton
+                    android:id="@+id/rbAdmin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Admin" />
+
+                <RadioButton
                     android:id="@+id/rbTourGuide"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Tour Guide" />
             </RadioGroup>
 
+            <!-- Save Button -->
             <Button
                 android:id="@+id/btnSave"
                 android:layout_width="match_parent"
@@ -104,9 +165,8 @@
                 android:text="Add Account"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/rounded_button"
-            android:textColor="@android:color/white"
-            android:padding="12dp"/>
-
+                android:textColor="@android:color/white"
+                android:padding="12dp"/>
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
