@@ -2,8 +2,8 @@ package com.example.group5_onlinetourbookingsystem.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -56,11 +56,28 @@ public class ManageCityActivity extends AppCompatActivity {
         // Lấy danh sách thành phố từ database
         cityList = dbHelper.getAllCitiesAdmin();
         if (cityAdapter == null) {
-            cityAdapter = new CityAdapter(this, cityList, city -> {
-                // Mở màn hình chỉnh sửa thành phố khi bấm vào item
-                Intent intent = new Intent(ManageCityActivity.this, EditCityActivity.class);
-                intent.putExtra("CITY_ID", city.getId());
-                startActivityForResult(intent, REQUEST_CODE_EDIT_CITY);
+            cityAdapter = new CityAdapter(this, cityList, new CityAdapter.OnCityClickListener() {
+                @Override
+                public void onEditCityClick(CityModel city) {
+                    // Mở màn hình chỉnh sửa thành phố
+                    Intent intent = new Intent(ManageCityActivity.this, EditCityActivity.class);
+                    intent.putExtra("CITY_ID", city.getId());
+                    startActivityForResult(intent, REQUEST_CODE_EDIT_CITY);
+                }
+
+                @Override
+                public void onDeleteCityClick(CityModel city) {
+                    // Xóa thành phố trực tiếp
+                    int rowsDeleted = dbHelper.getWritableDatabase()
+                            .delete("cities", "id=?", new String[]{String.valueOf(city.getId())});
+                    if (rowsDeleted > 0) {
+                        Toast.makeText(ManageCityActivity.this, "Xóa thành phố thành công!", Toast.LENGTH_SHORT).show();
+                        loadCityList(); // Làm mới danh sách
+                        recyclerView.setAdapter(cityAdapter);
+                    } else {
+                        Toast.makeText(ManageCityActivity.this, "Xóa thất bại!", Toast.LENGTH_SHORT).show();
+                    }
+                }
             });
         } else {
             cityAdapter.updateCityList(cityList); // Cập nhật danh sách trong adapter
@@ -73,7 +90,7 @@ public class ManageCityActivity extends AppCompatActivity {
         if ((requestCode == REQUEST_CODE_EDIT_CITY || requestCode == REQUEST_CODE_ADD_CITY) && resultCode == RESULT_OK) {
             // Làm mới danh sách khi chỉnh sửa hoặc thêm thành phố thành công
             loadCityList();
-            recyclerView.setAdapter(cityAdapter); // Đảm bảo RecyclerView được cập nhật
+            recyclerView.setAdapter(cityAdapter);
         }
     }
 
