@@ -137,6 +137,7 @@
 
             <!-- Tour Guide -->
             <LinearLayout
+                android:id="@+id/nav_tourGuide1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"

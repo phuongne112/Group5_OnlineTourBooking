@@ -32,15 +32,45 @@
         <!-- Mô tả -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mô tả tour" android:textStyle="bold"/>
         <EditText android:id="@+id/etDescription" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Nhập mô tả tour"/>
+
+        <!-- Tour Guides Spinner -->
         <Spinner
             android:id="@+id/spinnerTourGuides"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:spinnerMode="dropdown"/>
 
+        <!-- Ảnh của Tour -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ảnh Tour"
+            android:textStyle="bold"/>
+
+        <ImageView
+            android:id="@+id/ivTourImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:background="@android:color/darker_gray"
+            android:src="@drawable/favourite"/>
+
+        <Button
+            android:id="@+id/btnSelectImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chọn ảnh"
+            android:layout_marginTop="8dp"/>
 
         <!-- Nút lưu -->
-        <Button android:id="@+id/btnSave" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Lưu chỉnh sửa" android:layout_marginTop="16dp"/>
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lưu chỉnh sửa"
+            android:layout_marginTop="16dp"/>
+
+        <!-- Nút xóa -->
         <Button
             android:id="@+id/btnDeleteTour"
             android:layout_width="match_parent"
