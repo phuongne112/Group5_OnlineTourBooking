@@ -4,45 +4,75 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.models.CityModel;
+import com.example.group5_onlinetourbookingsystem.models.TourModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class CityAdapter extends RecyclerView.Adapter<CityAdapter.CityViewHolder> {
-
+public class CityAdapter extends RecyclerView.Adapter<CityAdapter.ViewHolder> {
     private Context context;
-    private ArrayList<CityModel> cityList;
+    private List<CityModel> cityList;
     private OnCityClickListener listener;
+    private MyDatabaseHelper dbHelper;
 
     public interface OnCityClickListener {
-        void onCityClick(CityModel city);
+        void onEditCityClick(CityModel city);
+        void onDeleteCityClick(CityModel city);
     }
 
-    public CityAdapter(Context context, ArrayList<CityModel> cityList, OnCityClickListener listener) {
+    public CityAdapter(Context context, List<CityModel> cityList, OnCityClickListener listener) {
         this.context = context;
         this.cityList = cityList;
         this.listener = listener;
+        this.dbHelper = new MyDatabaseHelper(context);
     }
 
     @NonNull
     @Override
-    public CityViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_city, parent, false);
-        return new CityViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CityViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         CityModel city = cityList.get(position);
-        holder.tvCityName.setText(city.getName());
+        holder.cityName.setText(city.getName());
 
-        holder.itemView.setOnClickListener(v -> listener.onCityClick(city));
+        // Xử lý nút Sửa
+        holder.btnEditCity.setOnClickListener(v -> listener.onEditCityClick(city));
+
+        // Xử lý nút Xóa
+        holder.btnDeleteCity.setOnClickListener(v -> {
+            // Kiểm tra xem thành phố có tour liên quan không
+            ArrayList<TourModel> tours = dbHelper.getToursByCityId(city.getId());
+            if (!tours.isEmpty()) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Không thể xóa")
+                        .setMessage("Không thể xóa thành phố vì có " + tours.size() + " tour liên quan!")
+                        .setPositiveButton("OK", null)
+                        .show();
+                return;
+            }
+
+            // Hiển thị thông báo xác nhận xóa
+            new AlertDialog.Builder(context)
+                    .setTitle("Xác nhận xóa")
+                    .setMessage("Bạn có chắc muốn xóa thành phố " + city.getName() + "?")
+                    .setPositiveButton("Xóa", (dialog, which) -> listener.onDeleteCityClick(city))
+                    .setNegativeButton("Hủy", null)
+                    .show();
+        });
     }
 
     @Override
@@ -50,18 +80,20 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.CityViewHolder
         return cityList.size();
     }
 
-    // Phương thức để cập nhật danh sách thành phố
-    public void updateCityList(ArrayList<CityModel> newCityList) {
+    public void updateCityList(List<CityModel> newCityList) {
         this.cityList = newCityList;
-        notifyDataSetChanged(); // Thông báo RecyclerView làm mới toàn bộ dữ liệu
+        notifyDataSetChanged();
     }
 
-    static class CityViewHolder extends RecyclerView.ViewHolder {
-        TextView tvCityName;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView cityName;
+        ImageButton btnEditCity, btnDeleteCity;
 
-        public CityViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvCityName = itemView.findViewById(R.id.tvCityName);
+            cityName = itemView.findViewById(R.id.city_name);
+            btnEditCity = itemView.findViewById(R.id.btnEditCity);
+            btnDeleteCity = itemView.findViewById(R.id.btnDeleteCity);
         }
     }
 }

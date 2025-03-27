@@ -5,15 +5,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
@@ -34,7 +32,6 @@ public class ManageAccountActivity extends AppCompatActivity {
         setContentView(R.layout.activity_manage_account);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
-
         }
         tableLayout = findViewById(R.id.tableLayout);
         btnAddAccount = findViewById(R.id.btnAddAccount);
@@ -76,6 +73,7 @@ public class ManageAccountActivity extends AppCompatActivity {
         tvHeaderName.setGravity(Gravity.CENTER);
         tvHeaderName.setTextSize(16);
         tvHeaderName.setTextColor(Color.BLACK);
+        tvHeaderName.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
         headerRow.addView(tvHeaderName);
 
         TextView tvHeaderRole = new TextView(this);
@@ -83,6 +81,7 @@ public class ManageAccountActivity extends AppCompatActivity {
         tvHeaderRole.setGravity(Gravity.CENTER);
         tvHeaderRole.setTextSize(16);
         tvHeaderRole.setTextColor(Color.BLACK);
+        tvHeaderRole.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
         headerRow.addView(tvHeaderRole);
 
         TextView tvHeaderStatus = new TextView(this);
@@ -90,6 +89,7 @@ public class ManageAccountActivity extends AppCompatActivity {
         tvHeaderStatus.setGravity(Gravity.CENTER);
         tvHeaderStatus.setTextSize(16);
         tvHeaderStatus.setTextColor(Color.BLACK);
+        tvHeaderStatus.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
         headerRow.addView(tvHeaderStatus);
 
         tableLayout.addView(headerRow);
@@ -104,53 +104,32 @@ public class ManageAccountActivity extends AppCompatActivity {
             tvName.setText(user.getName());
             tvName.setGravity(Gravity.CENTER);
             tvName.setTextColor(Color.BLACK);
+            tvName.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
             row.addView(tvName);
 
-            // 👉 **Cột Role (Spinner)**
-            Spinner roleSpinner = new Spinner(this);
-            String[] roles = {"Customer", "Tour Guide"};
-            ArrayAdapter<String> roleAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, roles);
-            roleSpinner.setAdapter(roleAdapter);
-            roleSpinner.setSelection(user.getRoleId() == 1 ? 0 : 1);
-            row.addView(roleSpinner);
-
-            roleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    int newRoleId = (position == 0) ? 1 : 3;
-                    if (newRoleId != user.getRoleId()) {
-                        dbHelper.updateUserRole(user.getId(), newRoleId);
-                        user.setRoleId(newRoleId);
-                        Toast.makeText(ManageAccountActivity.this, "Role updated!", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
+            // 👉 **Cột Role (TextView thay vì Spinner)**
+            TextView tvRole = new TextView(this);
+            tvRole.setText(user.getRoleId() == 1 ? "Customer" : "Tour Guide");
+            tvRole.setGravity(Gravity.CENTER);
+            tvRole.setTextColor(Color.BLACK);
+            tvRole.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+            tvRole.setOnClickListener(v -> {
+                // Hiển thị dialog chọn vai trò
+                showRoleSelectionDialog(user, tvRole);
             });
+            row.addView(tvRole);
 
-            // 👉 **Cột Status (Spinner)**
-            Spinner statusSpinner = new Spinner(this);
-            String[] statuses = {"Active", "Banned"};
-            ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, statuses);
-            statusSpinner.setAdapter(statusAdapter);
-            statusSpinner.setSelection(user.getStatus().equals("active") ? 0 : 1);
-            row.addView(statusSpinner);
-
-            statusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String newStatus = (position == 0) ? "active" : "banned";
-                    if (!newStatus.equals(user.getStatus())) {
-                        dbHelper.updateUserStatus(user.getId(), newStatus);
-                        user.setStatus(newStatus);
-                        Toast.makeText(ManageAccountActivity.this, "Status updated!", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
+            // 👉 **Cột Status (TextView thay vì Spinner)**
+            TextView tvStatus = new TextView(this);
+            tvStatus.setText(user.getStatus().equals("active") ? "Active" : "Banned");
+            tvStatus.setGravity(Gravity.CENTER);
+            tvStatus.setTextColor(Color.BLACK);
+            tvStatus.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+            tvStatus.setOnClickListener(v -> {
+                // Hiển thị dialog chọn trạng thái
+                showStatusSelectionDialog(user, tvStatus);
             });
+            row.addView(tvStatus);
 
             // 👉 **Thêm dòng vào bảng**
             tableLayout.addView(row);
@@ -165,10 +144,48 @@ public class ManageAccountActivity extends AppCompatActivity {
             tableLayout.addView(divider);
         }
     }
+
+    // Hàm hiển thị dialog chọn vai trò
+    private void showRoleSelectionDialog(UserModel user, TextView tvRole) {
+        String[] roles = {"Customer", "Tour Guide"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Role");
+        builder.setItems(roles, (dialog, which) -> {
+            // Cập nhật vai trò
+            int newRoleId = (which == 0) ? 1 : 3; // Customer: 1, Tour Guide: 3
+            if (newRoleId != user.getRoleId()) {
+                dbHelper.updateUserRole(user.getId(), newRoleId);
+                user.setRoleId(newRoleId);
+                tvRole.setText(roles[which]); // Cập nhật giao diện
+                Toast.makeText(ManageAccountActivity.this, "Role updated!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    // Hàm hiển thị dialog chọn trạng thái
+    private void showStatusSelectionDialog(UserModel user, TextView tvStatus) {
+        String[] statuses = {"Active", "Banned"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Status");
+        builder.setItems(statuses, (dialog, which) -> {
+            // Cập nhật trạng thái
+            String newStatus = (which == 0) ? "active" : "banned";
+            if (!newStatus.equals(user.getStatus())) {
+                dbHelper.updateUserStatus(user.getId(), newStatus);
+                user.setStatus(newStatus);
+                tvStatus.setText(statuses[which]); // Cập nhật giao diện
+                Toast.makeText(ManageAccountActivity.this, "Status updated!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         finish(); // Quay lại màn hình trước đó
         return true;
     }
-
 }

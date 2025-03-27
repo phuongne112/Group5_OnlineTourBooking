@@ -41,7 +41,7 @@ public class EditCategoryActivity extends AppCompatActivity {
 
     // Danh sách các ảnh trong drawable (các tên tài nguyên)
     private final String[] drawableImages = {
-            "city", "eco", "image3", "favorites" // Thay bằng tên các ảnh trong drawable của bạn
+            "city", "mountain", "sea", "eco", "cultural"
     };
 
     @Override
