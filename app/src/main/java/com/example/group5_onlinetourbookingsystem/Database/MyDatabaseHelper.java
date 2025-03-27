@@ -2,6 +2,7 @@
     
     import android.content.ContentValues;
     import android.content.Context;
+    import android.content.Intent;
     import android.database.Cursor;
     import android.database.sqlite.SQLiteDatabase;
     import android.database.sqlite.SQLiteOpenHelper;
@@ -14,6 +15,7 @@
     import com.example.group5_onlinetourbookingsystem.models.BookingModel;
     import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
     import com.example.group5_onlinetourbookingsystem.models.CityModel;
+    import com.example.group5_onlinetourbookingsystem.models.Message;
     import com.example.group5_onlinetourbookingsystem.models.TourModel;
     import com.example.group5_onlinetourbookingsystem.models.UserModel;
 
@@ -254,7 +256,9 @@
                     COLUMN_HELP_USER_ID + " INTEGER, " +
                     COLUMN_HELP_QUESTION + " TEXT, " +
                     COLUMN_HELP_ANSWER + " TEXT, " +
+                    "answered INTEGER DEFAULT 0, " +  // ✅ thêm cột này
                     "FOREIGN KEY(" + COLUMN_HELP_USER_ID + ") REFERENCES users(id))");
+
 
         }
 
@@ -1566,6 +1570,69 @@
             db.close();
             return booking;
         }
+        public long addHelpQuestion(int userId, String question) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("user_id", userId);
+            values.put("question", question);
+            long result = db.insert("help_center", null, values);
+            db.close();
+            return result;
+        }
+        public ArrayList<Message> getAllHelpCenterMessages() {
+            ArrayList<Message> messages = new ArrayList<>();
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            String query = "SELECT h.id, h.question, u.name, u.role_id, u.email FROM help_center h " +
+                    "JOIN users u ON h.user_id = u.id " +
+                    "ORDER BY h.id DESC";
+
+            Cursor cursor = db.rawQuery(query, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int helpId = cursor.getInt(0);
+                    String question = cursor.getString(1);
+                    String senderName = cursor.getString(2);
+                    int roleId = cursor.getInt(3);
+                    String email = cursor.getString(4);
+
+                    String subject = roleId == 3 ? "TourGuide Question" : "User Question";
+                    messages.add(new Message(helpId, senderName, subject, question, email)); // Bạn cần sửa model Message cho đủ field
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            db.close();
+            return messages;
+        }
+
+        public void deleteHelpMessageById(int id) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete("help_center", "id=?", new String[]{String.valueOf(id)});
+            db.close();
+        }
+        private void sendEmail(String email, String subject, String message) {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("message/rfc822");
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
+            intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+            intent.putExtra(Intent.EXTRA_TEXT, message);
+
+            try {
+                context.startActivity(Intent.createChooser(intent, "Send email..."));
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(context, "No email clients installed.", Toast.LENGTH_SHORT).show();
+            }
+        }
+        public void markHelpMessageAsAnswered(int messageId) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("answered", 1);
+            db.update("help_center", values, "id = ?", new String[]{String.valueOf(messageId)});
+            db.close();
+        }
+
 
     
  public void deleteBooking(long bookingId) {
