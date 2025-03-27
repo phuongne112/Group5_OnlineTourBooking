@@ -19,12 +19,13 @@ import java.util.Locale;
 
 public class PaymentActivity extends AppCompatActivity {
     private TextView tvTotalPrice;
-    private Button btnVNPay, btnCancel;
+    private Button btnVNPay, btnApprove, btnCancel;
     private MyDatabaseHelper dbHelper;
     private long bookingId;
     private ImageView imgQrCode;
     private double totalPrice;
     private boolean isPaymentSuccessful = false;
+    private boolean isApproved = false; // Biến cờ kiểm soát việc hủy booking
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +36,11 @@ public class PaymentActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-
         tvTotalPrice = findViewById(R.id.payment_total_price);
         btnVNPay = findViewById(R.id.btn_vnpay_payment);
         btnCancel = findViewById(R.id.btn_cancel_payment);
         dbHelper = new MyDatabaseHelper(this);
-
+        btnApprove = findViewById(R.id.btn_payment_success);
         totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
         bookingId = getIntent().getLongExtra("bookingId", -1);
 
@@ -56,6 +56,23 @@ public class PaymentActivity extends AppCompatActivity {
         btnCancel.setOnClickListener(v -> {
             cancelBooking();
         });
+
+        // Sự kiện bấm nút "Đã Thanh Toán"
+        btnApprove.setOnClickListener(v -> {
+            String currentDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+
+            long paymentId = dbHelper.addPayment(bookingId, totalPrice, currentDate, "Pending");
+
+            if (paymentId != -1) {
+                dbHelper.updateBookingStatus(bookingId, "Pending");
+                isApproved = true; // Đánh dấu đã thanh toán
+                Toast.makeText(this, "Thanh toán thành công! Chờ xác nhận.", Toast.LENGTH_SHORT).show();
+                Log.d("PaymentDebug", "Payment ID: " + paymentId);
+                finish();
+            } else {
+                Toast.makeText(this, "Lỗi khi lưu thanh toán!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -65,8 +82,8 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void requestPaymentWithVNPay(int amount) {
-        String vnp_TmnCode = "YOUR_TMN_CODE";
-        String vnp_HashSecret = "YOUR_HASH_SECRET";
+        String vnp_TmnCode = "I0L3OI7O";
+        String vnp_HashSecret = "BAJHMRNAYV2YIRBGC1PD8XHJ011CWOP7";
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_OrderInfo = "Thanh toán đơn hàng " + bookingId;
@@ -108,6 +125,7 @@ public class PaymentActivity extends AppCompatActivity {
             String status = data.getStringExtra("vnp_ResponseCode");
             if ("00".equals(status)) {
                 isPaymentSuccessful = true;
+                isApproved = true; // Đánh dấu đã thanh toán
                 Toast.makeText(this, "Thanh toán VNPay thành công!", Toast.LENGTH_SHORT).show();
                 dbHelper.updateBookingStatus(bookingId, "Completed");
                 finish();
@@ -123,13 +141,13 @@ public class PaymentActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!isPaymentSuccessful) {
+        if (!isPaymentSuccessful && !isApproved) {
             cancelBooking();
         }
     }
 
     private void cancelBooking() {
-        if (bookingId != -1) {
+        if (!isApproved && bookingId != -1) {
             dbHelper.deleteBooking(bookingId);
             dbHelper.deletePayment(bookingId);
             Toast.makeText(this, "Đã hủy thanh toán, xóa booking và payment!", Toast.LENGTH_SHORT).show();

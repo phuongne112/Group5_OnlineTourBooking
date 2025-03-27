@@ -16,6 +16,7 @@ import com.example.group5_onlinetourbookingsystem.activities.TourDetailActivity;
 import com.example.group5_onlinetourbookingsystem.models.TourModel;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.ViewHolder> {
@@ -43,21 +44,28 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
         holder.tourPrice.setText(String.format("$%.2f", tour.getPrice()));
         holder.tourDuration.setText(tour.getDuration() + " days");
 
-        // Load tour image
-        if (tour.getImage().startsWith("http")) {
-            Picasso.get().load(tour.getImage()).into(holder.tourImage);
+        // ✅ Chỉ hiển thị ảnh từ bộ nhớ trong
+        if (tour.getImage() != null && !tour.getImage().isEmpty()) {
+            File imageFile = new File(tour.getImage());
+            if (imageFile.exists()) {
+                Picasso.get().load(imageFile).into(holder.tourImage);
+            } else {
+                holder.tourImage.setImageResource(R.drawable.favorites); // Ảnh mặc định nếu không tìm thấy ảnh
+            }
         } else {
-            int imageResource = context.getResources().getIdentifier(tour.getImage(), "drawable", context.getPackageName());
-            holder.tourImage.setImageResource(imageResource != 0 ? imageResource : R.drawable.favourite);
+            holder.tourImage.setImageResource(R.drawable.favorites);
         }
+
 
         // Handle click event to open TourDetailActivity
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, TourDetailActivity.class);
             intent.putExtra("tour_id", tour.getId());
             context.startActivity(intent);
+            notifyDataSetChanged();
         });
     }
+
 
     @Override
     public int getItemCount() {

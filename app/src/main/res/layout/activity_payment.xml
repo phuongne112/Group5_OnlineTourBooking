@@ -24,6 +24,14 @@
         android:backgroundTint="@color/teal_700"
         android:textColor="@android:color/white"
         android:layout_marginTop="16dp"/>
+    <Button
+        android:id="@+id/btn_payment_success"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thanh toán thành công"
+        android:backgroundTint="@color/green"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="16dp"/>
 
     <Button
         android:id="@+id/btn_cancel_payment"

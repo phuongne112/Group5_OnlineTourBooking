@@ -99,4 +99,9 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.ViewHolder> {
         tourList.addAll(newTours);
         notifyItemRangeInserted(startPosition, newTours.size());
     }
+    public void updateTours(ArrayList<TourModel> newTourList) {
+        this.tourList.clear();
+        this.tourList.addAll(newTourList);
+        notifyDataSetChanged();
+    }
 }
