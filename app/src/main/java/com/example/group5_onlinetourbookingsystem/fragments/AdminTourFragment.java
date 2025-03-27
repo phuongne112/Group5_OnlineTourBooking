@@ -36,7 +36,6 @@ public class AdminTourFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout
         return inflater.inflate(R.layout.fragment_admin_tour, container, false);
     }
 
@@ -48,26 +47,40 @@ public class AdminTourFragment extends Fragment {
         btnAddTour = view.findViewById(R.id.btnAddTour);
         dbHelper = new MyDatabaseHelper(getContext());
 
-        // Lấy danh sách tour từ database
-        tourList = dbHelper.getAllTours();
-
-        // Setup RecyclerView
-        tourAdapter = new TourAdapter(getContext(), tourList, tour -> {
-            // Mở màn hình chỉnh sửa tour khi bấm vào tour
-            Intent intent = new Intent(getActivity(), EditTourActivity.class);
-            intent.putExtra("TOUR_ID", tour.getId());
-            startActivity(intent);
-        });
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(tourAdapter);
 
-        // Xử lý nút thêm tour
+        // ✅ 초기 데이터 로드
+        loadTours();
+
+        // ✅ "추가" 버튼 클릭 시 AddTourActivity 실행
         btnAddTour.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AddTourActivity.class);
             startActivity(intent);
-
         });
+    }
 
+    // ✅ DB에서 투어 리스트를 다시 로드하는 함수
+    private void loadTours() {
+        tourList = dbHelper.getAllTours();
+
+        if (tourAdapter == null) {
+            tourAdapter = new TourAdapter(getContext(), tourList, tour -> {
+                // ✅ "수정" 화면으로 이동
+                Intent intent = new Intent(getActivity(), EditTourActivity.class);
+                intent.putExtra("TOUR_ID", tour.getId());
+                startActivity(intent);
+            });
+            recyclerView.setAdapter(tourAdapter);
+        } else {
+            // ✅ 기존 Adapter가 있으면 데이터만 갱신
+            tourAdapter.updateTours(tourList);
+        }
+    }
+
+    // ✅ 자동 새로고침: 사용자가 화면으로 돌아올 때마다 리스트 갱신
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadTours();
     }
 }

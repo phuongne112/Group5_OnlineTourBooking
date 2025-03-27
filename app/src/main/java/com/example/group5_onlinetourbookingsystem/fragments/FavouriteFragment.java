@@ -63,5 +63,16 @@ public class FavouriteFragment extends Fragment {
             favouriteAdapter = new FavouriteAdapter(getContext(), favouriteList);
             recyclerView.setAdapter(favouriteAdapter);
         }
+        if (favouriteAdapter == null) {
+            favouriteAdapter = new FavouriteAdapter(getContext(), favouriteList);
+            recyclerView.setAdapter(favouriteAdapter);
+        } else {
+            favouriteAdapter.notifyDataSetChanged();
+        }
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadFavourites();
     }
 }
