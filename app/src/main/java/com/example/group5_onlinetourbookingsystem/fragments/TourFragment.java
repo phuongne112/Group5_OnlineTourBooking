@@ -1,5 +1,6 @@
 package com.example.group5_onlinetourbookingsystem.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +17,10 @@ import android.widget.Toast;
 
 import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.R;
+import com.example.group5_onlinetourbookingsystem.activities.TourDetailActivity;
+import com.example.group5_onlinetourbookingsystem.adapters.CategoryAdapter;
 import com.example.group5_onlinetourbookingsystem.adapters.TourAdapter;
+import com.example.group5_onlinetourbookingsystem.models.CategoryModel;
 import com.example.group5_onlinetourbookingsystem.models.TourModel;
 
 import java.util.ArrayList;
@@ -25,6 +30,8 @@ public class TourFragment extends Fragment {
 
     private RecyclerView recyclerViewTours, recyclerViewCategories;
     private TourAdapter tourAdapter;
+    private ArrayList<CategoryModel> categoryList;
+    private CategoryAdapter categoryAdapter;
     private ArrayList<TourModel> tourList;
     private MyDatabaseHelper databaseHelper;
 
@@ -40,7 +47,15 @@ public class TourFragment extends Fragment {
         if (getContext() == null) return view;
 
         databaseHelper = new MyDatabaseHelper(getContext());
-
+        recyclerViewCategories = view.findViewById(R.id.recyclerViewCategories);
+        // Cấu hình RecyclerView danh mục
+        recyclerViewCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        categoryList = databaseHelper.getAllCategories();
+        categoryAdapter = new CategoryAdapter(getContext(), categoryList, category -> {
+            Log.d("HomeFragment", "Clicked category: " + category.getName());
+            filterToursByCategory(category.getId());
+        });
+        recyclerViewCategories.setAdapter(categoryAdapter);
         // 👉 Cấu hình RecyclerView tour
         recyclerViewTours = view.findViewById(R.id.recycler_view);
         recyclerViewTours.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -52,8 +67,9 @@ public class TourFragment extends Fragment {
         }
 
         tourAdapter = new TourAdapter(getContext(), tourList, tour -> {
-            // Xử lý khi click vào tour, ví dụ mở chi tiết tour
-            Toast.makeText(getContext(), "Clicked: " + tour.getName(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getContext(), TourDetailActivity.class);
+            intent.putExtra("tour_id", tour.getId());
+            startActivity(intent);
         });
 
         recyclerViewTours.setAdapter(tourAdapter);
@@ -75,6 +91,14 @@ public class TourFragment extends Fragment {
         databaseHelper.addTour("Tour Sapa", "Sapa", 6, 170.0, 3, "sapa_tour", 6, "2025-03-25 06:00:00",
                 "Chinh phục đỉnh Fansipan và khám phá văn hóa dân tộc thiểu số.");
     }
-
+    private void filterToursByCategory(int categoryId) {
+        tourList.clear();
+        if (categoryId == -1) { // Nếu chọn "Tất cả danh mục"
+            tourList.addAll(databaseHelper.getAllTours());
+        } else {
+            tourList.addAll(databaseHelper.getToursByCategory(categoryId));
+        }
+        tourAdapter.notifyDataSetChanged();
+    }
 
 }

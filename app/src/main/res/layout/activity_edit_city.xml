@@ -17,6 +17,20 @@
         android:layout_height="wrap_content"
         android:hint="Nhập tên thành phố" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Danh sách tour trong thành phố"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewTours"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"/>
+
     <Button
         android:id="@+id/btnUpdateCity"
         android:layout_width="match_parent"
@@ -31,4 +45,5 @@
         android:text="Xóa Thành Phố"
         android:layout_marginTop="8dp"
         android:backgroundTint="@android:color/holo_red_light"/>
+
 </LinearLayout>

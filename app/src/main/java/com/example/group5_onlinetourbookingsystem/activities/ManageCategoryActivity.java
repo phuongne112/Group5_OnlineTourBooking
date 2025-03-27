@@ -31,29 +31,46 @@ public class ManageCategoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_manage_category);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Kích hoạt nút Back
-
         }
+
         recyclerView = findViewById(R.id.recyclerViewCategories);
         btnAddCategory = findViewById(R.id.btnAddCategory);
         dbHelper = new MyDatabaseHelper(this);
 
-        categoryList = dbHelper.getAllCategories();
-
+        // Khởi tạo danh sách và adapter
+        categoryList = new ArrayList<>();
         categoryAdapter = new CategoryAdapter(this, categoryList, category -> {
             Intent intent = new Intent(this, EditCategoryActivity.class);
             intent.putExtra("CATEGORY_ID", category.getId());
             startActivity(intent);
         });
 
-        // ✅ Sửa ở đây: dùng GridLayoutManager với 2 cột
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerView.setAdapter(categoryAdapter);
+
+        // Tải dữ liệu lần đầu
+        loadCategories();
 
         btnAddCategory.setOnClickListener(v -> {
             Intent intent = new Intent(this, AddCategoryActivity.class);
             startActivity(intent);
         });
     }
+
+    // Phương thức tải danh sách category từ database
+    private void loadCategories() {
+        categoryList.clear(); // Xóa dữ liệu cũ
+        categoryList.addAll(dbHelper.getAllCategories()); // Thêm dữ liệu mới
+        categoryAdapter.notifyDataSetChanged(); // Thông báo adapter cập nhật giao diện
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Tải lại danh sách category mỗi khi màn hình được hiển thị lại
+        loadCategories();
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         finish(); // Quay lại màn hình trước đó

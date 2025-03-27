@@ -19,9 +19,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Group5_OnlineTourBookingSystem"
         tools:targetApi="31">
-        <activity
-            android:name=".activities.AdminViewMessagesActivity"
-            android:exported="false" />
+              <activity
+            android:name=".activities.TourGuideDashboardActivity"
+            android:exported="false"
+            android:exported="false"/>
+
         <activity
             android:name=".activities.BookingDetailActivity"
             android:exported="false"
@@ -34,10 +36,6 @@
             android:name=".activities.GuideListActivity"
             android:exported="false"
             android:label="GuideList" />
-        <activity
-            android:name=".activities.TourGuideDashboardActivity"
-            android:exported="false"
-            android:label="TourGuideDashboard" />
         <activity
             android:name=".activities.EditCategoryActivity"
             android:exported="false"
@@ -71,12 +69,15 @@
             android:exported="false"
             android:label="ManageAccount" />
         <activity
+            android:name=".activities.AdminViewMessagesActivity"
+
+            android:name=".activities.WebViewActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.PaymentActivity"
             android:exported="false"
             android:label="Payment" />
-        <activity
-            android:name=".activities.AdminDashboardActivity"
-            android:label="AdminDashboard" />
+
         <activity
             android:name=".activities.EditProfileActivity"
             android:exported="false"
@@ -125,6 +126,13 @@
             android:name=".activities.TourDetailActivity"
             android:exported="false"
             android:label="TourDetail" />
+              <activity
+
+            android:name=".activities.AdminDashboardActivity"
+         
+
+            android:name=".activities.AdminDashboardActivity"/>
+
         <activity
             android:name=".activities.SignUpActivity"
             android:exported="false"
