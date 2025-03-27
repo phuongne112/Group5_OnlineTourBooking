@@ -13,14 +13,15 @@ public class UserModel {
     private String status; // ✅ Thêm trạng thái tài khoản (active/banned)
 
     // Constructor đầy đủ
-    public UserModel(int id, String name, String email, String phone, String birthDate, String status, int roleId) {
+    public UserModel(int id, String name, String email, String phone, String birthDate, String image, String status, int roleId) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.birthDate = birthDate;
+        this.image = image; // ✅ Đảm bảo ảnh được gán
         this.status = status;
-        this.roleId = roleId; // ✅ Gán roleId
+        this.roleId = roleId;
     }
 
     // Getter và Setter

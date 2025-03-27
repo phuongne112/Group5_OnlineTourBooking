@@ -4,18 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="16dp"
-    android:background="#F5F5F5">
+    android:background="#F6EAEA">
+
+    <!-- Ảnh bìa -->
+    <ImageView
+        android:id="@+id/imgUserCover"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="0dp"
+        android:contentDescription="User Cover Image"
+        android:fitsSystemWindows="true"
+        android:padding="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/coverprofile1" />
 
     <!-- Thẻ chứa toàn bộ thông tin user -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_margin="2dp"
         app:cardCornerRadius="16dp"
-        app:cardElevation="6dp"
-        android:padding="16dp">
+        app:cardElevation="6dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,54 +35,123 @@
             <!-- Ảnh đại diện người dùng -->
             <ImageView
                 android:id="@+id/imgUserProfile"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
                 android:scaleType="centerCrop"
                 android:layout_marginBottom="16dp"
+                android:layout_marginTop="10dp"
                 android:background="@android:color/darker_gray"
                 android:contentDescription="User Profile Image"
                 android:clipToOutline="true" />
 
-            <!-- Họ và tên -->
-            <TextView
-                android:id="@+id/tvUserName"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Họ và tên"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:orientation="horizontal"
                 android:gravity="center"
-                android:padding="8dp" />
+                android:padding="4dp">
+
+                <!-- Name căn giữa -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Name :"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+                <!-- Giá trị căn trái -->
+                <TextView
+                    android:id="@+id/tvUserName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Duc"
+                    android:textSize="18sp"
+                    android:gravity="start"/>
+            </LinearLayout>
 
             <!-- Email -->
-            <TextView
-                android:id="@+id/tvUserEmail"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Email"
-                android:textSize="16sp"
+                android:orientation="horizontal"
                 android:gravity="center"
-                android:padding="8dp" />
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Email  :"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+                <TextView
+                    android:id="@+id/tvUserEmail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="duc@gmail.com"
+                    android:textSize="18sp"
+                    android:gravity="start"/>
+            </LinearLayout>
 
             <!-- Số điện thoại -->
-            <TextView
-                android:id="@+id/tvUserPhone"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Số điện thoại"
-                android:textSize="16sp"
+                android:orientation="horizontal"
                 android:gravity="center"
-                android:padding="8dp" />
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Phone:"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+                <TextView
+                    android:id="@+id/tvUserPhone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0987654321"
+                    android:textSize="18sp"
+                    android:gravity="start"/>
+            </LinearLayout>
 
             <!-- Ngày sinh -->
-            <TextView
-                android:id="@+id/tvUserBirth"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ngày sinh"
-                android:textSize="16sp"
+                android:orientation="horizontal"
                 android:gravity="center"
-                android:padding="8dp" />
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="DOB    :"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+                <TextView
+                    android:id="@+id/tvUserBirth"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="22/2/2003"
+                    android:textSize="18sp"
+                    android:gravity="start"/>
+            </LinearLayout>
 
             <!-- Nút chỉnh sửa hồ sơ -->
             <Button
@@ -83,17 +161,21 @@
                 android:text="Chỉnh sửa hồ sơ"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="18sp"
                 android:backgroundTint="@color/teal_700"
                 android:textColor="@android:color/white"/>
 
             <!-- Nút đăng xuất -->
             <Button
                 android:id="@+id/btnLogout"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Đăng xuất"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="@color/black"
+                android:text="    Đăng xuất      "
+                android:textSize="18sp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="@color/red"
                 android:textColor="@android:color/white"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

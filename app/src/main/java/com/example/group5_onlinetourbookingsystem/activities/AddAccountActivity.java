@@ -62,7 +62,15 @@ public class AddAccountActivity extends AppCompatActivity {
         String birthDate = etBirthDate.getText().toString().trim();
 
         int selectedRoleId = rgRole.getCheckedRadioButtonId();
-        int roleId = (selectedRoleId == R.id.rbUser) ? 1 : 3; // 1: Customer, 3: Tour Guide
+        int roleId;
+
+        if (selectedRoleId == R.id.rbUser) {
+            roleId = 1;
+        } else if (selectedRoleId == R.id.rbTourGuide) {
+            roleId = 2;
+        } else {
+            roleId = 3;
+        }
 
         if (username.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty() || birthDate.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();

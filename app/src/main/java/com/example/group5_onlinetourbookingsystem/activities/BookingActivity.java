@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 public class BookingActivity extends AppCompatActivity {
     private EditText etUserName, etUserEmail, etUserPhone, etNumAdults, etNumChildren, etBookingNote;
-    private TextView tvTourName, tvTourPrice, tvTotalPrice, tvTourDuration, tvStartTime;
+    private TextView tvTourName, tvTourPrice, tvTotalPrice, tvTourDuration, tvStartTime,tvTourPrice2;
     private Button btnConfirmBooking;
     private MyDatabaseHelper dbHelper;
     private SessionManager sessionManager;
@@ -54,6 +54,7 @@ public class BookingActivity extends AppCompatActivity {
         tvStartTime = findViewById(R.id.booking_start_time);
         tvTourName = findViewById(R.id.booking_tour_name);
         tvTourPrice = findViewById(R.id.booking_tour_price);
+        tvTourPrice2 = findViewById(R.id.booking_tour_price2);
         tvTotalPrice = findViewById(R.id.total_price);
         etUserName = findViewById(R.id.booking_user_name);
         etUserEmail = findViewById(R.id.booking_user_email);
@@ -80,6 +81,7 @@ public class BookingActivity extends AppCompatActivity {
             tvTourName.setText(name);
         }
         tvTourPrice.setText("Giá: " + pricePerAdult + " $/người lớn");
+        tvTourPrice2.setText("Giá: " + pricePerChild + " $/trẻ em");
         tvTourDuration.setText("Thời lượng: " + duration);
         tvStartTime.setText("Start time: " + startTime);
 
