@@ -65,13 +65,12 @@ public class StatisticsFragment extends Fragment {
         categoryNav.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), ManageCategoryActivity.class);
             startActivity(intent);
-
         });
+
         LinearLayout guideNav = view.findViewById(R.id.nav_tourGuide1);
-        categoryNav.setOnClickListener(v -> {
+        guideNav.setOnClickListener(v -> {  // Sửa từ categoryNav thành guideNav
             Intent intent = new Intent(getActivity(), GuideListActivity.class);
             startActivity(intent);
-
         });
         // Khởi tạo các view cần thiết
         barChart = view.findViewById(R.id.barChart);
