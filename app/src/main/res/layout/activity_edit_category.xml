@@ -37,25 +37,25 @@
         android:id="@+id/btnSelectImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chọn ảnh từ thư viện" />
+        android:text="Chọn ảnh" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Mô tả danh mục"
+        android:text="Mô tả "
         android:textStyle="bold" />
 
     <EditText
         android:id="@+id/etCategoryDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nhập mô tả danh mục" />
+        android:hint="Mô tả" />
 
     <!-- Tiêu đề danh sách tour -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Danh sách tour trong danh mục"
+        android:text="Danh sách tour: "
         android:textStyle="bold"
         android:layout_marginTop="16dp" />
 
@@ -71,6 +71,7 @@
         android:id="@+id/btnUpdateCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/green"
         android:text="Cập Nhật"
         android:layout_marginTop="16dp" />
 

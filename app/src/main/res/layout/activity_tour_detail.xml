@@ -109,16 +109,6 @@
                     android:paddingBottom="12dp"
                     android:lineSpacingExtra="4dp"/>
 
-                <TextView
-                    android:id="@+id/detail_tour_booking_time"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/darker_gray"
-                    android:paddingTop="8dp"
-                    android:text="Booking Time: --/--/---- --:--"
-                    android:lineSpacingExtra="4dp"/>
-
                 <!-- Nút đặt tour -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/book_button"

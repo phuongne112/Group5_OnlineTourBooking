@@ -20,6 +20,7 @@ import com.example.group5_onlinetourbookingsystem.Database.MyDatabaseHelper;
 import com.example.group5_onlinetourbookingsystem.MainActivity;
 import com.example.group5_onlinetourbookingsystem.R;
 import com.example.group5_onlinetourbookingsystem.activities.ForgotPasswordActivity;
+import com.example.group5_onlinetourbookingsystem.activities.GuideListActivity;
 import com.example.group5_onlinetourbookingsystem.activities.ManageAccountActivity;
 import com.example.group5_onlinetourbookingsystem.activities.ManageCategoryActivity;
 import com.example.group5_onlinetourbookingsystem.activities.ManageCityActivity;
@@ -49,12 +50,33 @@ public class StatisticsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_statistics, container, false);
 
-
         LinearLayout navCity = view.findViewById(R.id.nav_city);
         LinearLayout navCategory = view.findViewById(R.id.nav_category);
         LinearLayout navAccount = view.findViewById(R.id.nav_accountAdmin);
         LinearLayout navTour = view.findViewById(R.id.nav_tour);
 
+        LinearLayout navAccountAdmin = view.findViewById(R.id.nav_accountAdmin);
+
+        navAccountAdmin.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ManageAccountActivity.class);
+            startActivity(intent);
+        });
+        LinearLayout cityNav = view.findViewById(R.id.nav_city);
+        cityNav.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ManageCityActivity.class);
+            startActivity(intent);
+        });
+        LinearLayout categoryNav = view.findViewById(R.id.nav_category);
+        categoryNav.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ManageCategoryActivity.class);
+            startActivity(intent);
+        });
+
+        LinearLayout guideNav = view.findViewById(R.id.nav_tourGuide1);
+        guideNav.setOnClickListener(v -> {  // Sửa từ categoryNav thành guideNav
+            Intent intent = new Intent(getActivity(), GuideListActivity.class);
+            startActivity(intent);
+        });
         // Khởi tạo các view cần thiết
         barChart = view.findViewById(R.id.barChart);
         etDay = view.findViewById(R.id.etDay);

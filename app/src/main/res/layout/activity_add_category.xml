@@ -1,11 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
     android:orientation="vertical">
 
-    <EditText android:id="@+id/etCategoryName" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Tên danh mục"/>
-    <EditText android:id="@+id/etCategoryImage" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="URL hình ảnh"/>
-    <EditText android:id="@+id/etCategoryDescription" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Mô tả danh mục"/>
-    <Button android:id="@+id/btnSaveCategory" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Thêm Danh Mục"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tên danh mục"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etCategoryName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhập tên danh mục" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hình ảnh"
+        android:textStyle="bold" />
+
+    <!-- ImageView để hiển thị ảnh được chọn -->
+    <ImageView
+        android:id="@+id/imgCategory"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:background="@android:color/darker_gray" />
+
+    <!-- Nút để chọn ảnh -->
+    <Button
+        android:id="@+id/btnSelectImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chọn ảnh"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mô tả danh mục"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etCategoryDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhập mô tả danh mục" />
+
+    <Button
+        android:id="@+id/btnSaveCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thêm Danh Mục"
+        android:layout_marginTop="16dp" />
+
 </LinearLayout>
