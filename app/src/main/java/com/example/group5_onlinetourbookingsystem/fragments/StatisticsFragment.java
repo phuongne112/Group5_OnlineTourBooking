@@ -49,18 +49,50 @@ public class StatisticsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_statistics, container, false);
 
+
+        LinearLayout navCity = view.findViewById(R.id.nav_city);
+        LinearLayout navCategory = view.findViewById(R.id.nav_category);
+        LinearLayout navAccount = view.findViewById(R.id.nav_accountAdmin);
+        LinearLayout navTour = view.findViewById(R.id.nav_tour);
+
         // Khởi tạo các view cần thiết
         barChart = view.findViewById(R.id.barChart);
         etDay = view.findViewById(R.id.etDay);
         etMonthYear = view.findViewById(R.id.etMonthYear);
         databaseHelper = new MyDatabaseHelper(requireContext());
 
+
+        navCity.setOnClickListener(v -> {
+            // Chuyển tới trang quản lý thành phố
+            Intent intent = new Intent(getActivity(), ManageCityActivity.class);
+            startActivity(intent);
+        });
+
+        navCategory.setOnClickListener(v -> {
+            // Chuyển tới trang quản lý danh mục
+            Intent intent = new Intent(getActivity(), ManageCategoryActivity.class);
+            startActivity(intent);
+        });
+
+        navAccount.setOnClickListener(v -> {
+            // Chuyển tới trang quản lý danh mục
+            Intent intent = new Intent(getActivity(), ManageAccountActivity.class);
+            startActivity(intent);
+        });
+
+        navTour.setOnClickListener(v -> {
+            // Chuyển tới trang quản lý danh mục
+            Intent intent = new Intent(getActivity(), TourFragment.class);
+            startActivity(intent);
+        });
+
+
         // Thêm sự kiện click để mở DatePicker
         etDay.setOnClickListener(v -> showDatePickerDialog(true)); // Chọn ngày
         etMonthYear.setOnClickListener(v -> showDatePickerDialog(true)); // Chọn tháng/năm
 
         // Cập nhật dữ liệu khi bấm nút thống kê
-        LinearLayout navTour = view.findViewById(R.id.nav_tour);
+
         navTour.setOnClickListener(v -> loadChartData());
 
         // Vẽ biểu đồ mặc định khi vào trang
