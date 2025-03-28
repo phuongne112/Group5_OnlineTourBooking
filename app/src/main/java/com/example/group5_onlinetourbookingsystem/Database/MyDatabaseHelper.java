@@ -1097,30 +1097,6 @@
             db.close();
             return totalRevenue;
         }
-//        public Cursor getAllBookingsWithTourInfo() {
-//            SQLiteDatabase db = this.getReadableDatabase();
-//            String query = "SELECT b.id AS _id, t.name AS tour_name, b.booking_date, " +
-//                    "b.adult_count, b.child_count, b.total_price, " +
-//                    "b.status AS booking_status, " +
-//                    "(SELECT status FROM payments WHERE booking_id = b.id) AS payment_status " +
-//                    "FROM bookings b " +
-//                    "JOIN tours t ON b.tour_id = t.id " +
-//                    "ORDER BY b.booking_date DESC";
-//            return db.rawQuery(query, null);
-//        }
-
-//        public Cursor getAllBookingsWithTourInfo() {
-//            SQLiteDatabase db = this.getReadableDatabase();
-//            String query = "SELECT b.id AS _id, " +
-//                    "COALESCE(t.name, 'Unknown Tour') AS tour_name, " + // Nếu NULL, thay bằng 'Unknown Tour'
-//                    "b.booking_date, b.total_price, " +
-//                    "b.status AS booking_status, " +
-//                    "(SELECT status FROM payments WHERE booking_id = b.id) AS payment_status " +
-//                    "FROM bookings b " +
-//                    "LEFT JOIN tours t ON b.tour_id = t.id " + // Sử dụng LEFT JOIN để tránh mất dữ liệu
-//                    "ORDER BY b.booking_date DESC";
-//            return db.rawQuery(query, null);
-//        }
 
         public List<BookingModel> getAllBookingsWithTourInfo() {
             SQLiteDatabase db = this.getReadableDatabase();
@@ -1815,14 +1791,15 @@
 
         public float getTotalRevenueInRange(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay) {
             SQLiteDatabase db = this.getReadableDatabase();
-            // Câu truy vấn để tính tổng doanh thu
-            String query = "SELECT SUM(total_price) FROM bookings WHERE booking_date BETWEEN ? AND ?";
+
+            // Câu truy vấn để tính tổng doanh thu chỉ khi paymentStatus = 'complied'
+            String query = "SELECT SUM(total_price) FROM bookings WHERE booking_date BETWEEN ? AND ? AND status = 'Confirmed'";
 
             // Chuyển đổi ngày tháng thành định dạng yyyy-MM-dd
             String startDate = startYear + "-" + (startMonth + 1) + "-" + startDay;
             String endDate = endYear + "-" + (endMonth + 1) + "-" + endDay;
 
-            // Truy vấn cơ sở dữ liệu với khoảng thời gian đã chọn
+            // Truy vấn cơ sở dữ liệu với khoảng thời gian đã chọn và chỉ bao gồm những booking có paymentStatus = 'complied'
             Cursor cursor = db.rawQuery(query, new String[]{startDate, endDate});
             float totalRevenue = 0;
 
@@ -1833,7 +1810,6 @@
             cursor.close();
             return totalRevenue;
         }
-
     }
 
 

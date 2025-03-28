@@ -3,116 +3,133 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+
+    android:background="@drawable/booking_detail"
     android:padding="16dp">
-
-
-<LinearLayout
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:orientation="vertical"
-android:gravity="center_horizontal">
-
-<!-- Tiêu đề -->
-<TextView
-    android:id="@+id/tvTitle"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Booking Detail"
-    android:textSize="22sp"
-    android:textStyle="bold"
-    android:textColor="@android:color/black"
-    android:layout_marginBottom="16dp" />
-
-<!-- Nội dung chi tiết trong CardView để tránh ảnh hưởng bởi background -->
-<androidx.cardview.widget.CardView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:padding="16dp"
-    app:cardElevation="6dp"
-    app:cardCornerRadius="12dp"
-    app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginStart="10dp">
 
-        <!-- 🧭 Thông tin Tour -->
+        <!-- Tiêu đề -->
         <TextView
-            android:id="@+id/tvTourName"
-            android:layout_width="match_parent"
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tên tour"
+            android:text="Booking Detail"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:textSize="18sp"
-            android:paddingBottom="4dp" />
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="24dp" />
 
-        <TextView
-            android:id="@+id/tvTourDesc"
+        <!-- Nội dung chi tiết trong CardView để tránh ảnh hưởng bởi background -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Mô tả tour"
-            android:paddingBottom="12dp" />
+            android:layout_margin="8dp"
+            android:padding="16dp"
+            app:cardElevation="6dp"
+            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="@android:color/white">
 
-        <!-- 👤 Thông tin người đặt -->
-        <TextView
-            android:id="@+id/tvUserName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Người đặt"
-            android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:spacing="16dp">
 
-        <TextView
-            android:id="@+id/tvUserEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Email" />
+                <!-- 🧭 Thông tin Tour -->
+                <TextView
+                    android:id="@+id/tvTourName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tour"
+                    android:textStyle="bold"
+                    android:textSize="25sp"
+                    android:padding="8dp" /> <!-- Thêm padding cho các cạnh của TextView -->
 
-        <TextView
-            android:id="@+id/tvUserPhone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="SĐT"
-            android:paddingBottom="12dp" />
+                <TextView
+                    android:id="@+id/tvTourDesc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Mô tả tour"
+                    android:textSize="20sp"
+                    android:padding="8dp" /> <!-- Thêm padding cho các cạnh của TextView -->
 
-        <!-- 📅 Thông tin đặt chỗ -->
-        <TextView
-            android:id="@+id/tvDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ngày đặt" />
+                <!-- 👤 Thông tin người đặt -->
+                <TextView
+                    android:id="@+id/tvUserName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Người đặt"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:padding="8dp" /> <!-- Thêm padding cho các cạnh của TextView -->
 
-        <TextView
-            android:id="@+id/tvAdultChild"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Người lớn / Trẻ em" />
+                <TextView
+                    android:id="@+id/tvUserEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Email"
+                    android:textSize="20sp"
+                    android:padding="8dp" /> <!-- Thêm padding cho các cạnh của TextView -->
 
-        <TextView
-            android:id="@+id/tvNote"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ghi chú" />
+                <TextView
+                    android:id="@+id/tvUserPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SĐT"
+                    android:textSize="20sp"
+                    android:padding="8dp" /> <!-- Thêm padding cho các cạnh của TextView -->
 
-        <TextView
-            android:id="@+id/tvTotalPrice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Tổng giá"
-            android:textColor="@android:color/holo_blue_dark"
-            android:textStyle="bold"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp" />
+                <!-- 📅 Thông tin đặt chỗ -->
+                <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ngày đặt"
+                    android:textSize="20sp"
+                    android:padding="8dp" /> <!-- Thêm padding cho các cạnh của TextView -->
 
-        <TextView
-            android:id="@+id/tvBookingStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Trạng thái đặt chỗ"
-            android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tvAdultChild"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Người lớn / Trẻ em"
+                    android:textSize="20sp"
+                    android:padding="8dp" /> <!-- Thêm padding cho các cạnh của TextView -->
+
+                <TextView
+                    android:id="@+id/tvNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ghi chú"
+                    android:textSize="20sp"
+                    android:padding="8dp" /> <!-- Thêm padding cho các cạnh của TextView -->
+
+                <TextView
+                    android:id="@+id/tvTotalPrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tổng giá"
+                    android:textSize="20sp"
+                    android:textColor="@color/red"
+                    android:textStyle="bold"
+                    android:padding="8dp" /> <!-- Thêm padding cho các cạnh của TextView -->
+
+                <TextView
+                    android:id="@+id/tvBookingStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Trạng thái đặt chỗ"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="8dp" /> <!-- Thêm padding cho các cạnh của TextView -->
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
-</LinearLayout>
-    </ScrollView>
+</ScrollView>
